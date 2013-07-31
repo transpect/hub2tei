@@ -101,8 +101,8 @@
 
   <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei" />
 
-  <xsl:template match="dbk:section" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
-    <div>
+  <xsl:template match="dbk:part | dbk:chapter | dbk:section" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+    <div type="{name()}">
       <xsl:apply-templates select="dbk:title/@role, @*, node()" mode="#current" />
     </div>
   </xsl:template>
