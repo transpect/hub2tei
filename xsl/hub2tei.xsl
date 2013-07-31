@@ -92,6 +92,8 @@
     <xsl:if test="$debug = 'yes'">
       <xsl:call-template name="debug-hub2tei" />
     </xsl:if>
+    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"</xsl:processing-instruction>
+    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"</xsl:processing-instruction>
     <xsl:sequence select="$tidy" />
   </xsl:template>
 
@@ -479,6 +481,8 @@
     </TEI>
   </xsl:template>
 
+  <xsl:template match="processing-instruction('xml-model')" mode="dbk2tei" />
+
   <xsl:template match="dbk:section" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <div>
       <xsl:apply-templates select="dbk:title/@role, @*, node()" mode="#current" />
@@ -528,6 +532,12 @@
 
   <xsl:template match="dbk:br" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <seg type="br" />
+  </xsl:template>
+
+  <xsl:template match="dbk:tab" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+    <seg type="{if(@role) then @role else 'tab'}">
+      <xsl:apply-templates mode="#current"/>
+    </seg>
   </xsl:template>
 
   <xsl:template match="dbk:phrase" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
