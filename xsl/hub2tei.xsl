@@ -36,8 +36,6 @@
           inline-lists-slice
           inline-lists-dissolve-empty-phrases
           group-other-sections
-          hub:hierarchize-according-to-role-regexes
-          hub:title
           edu
           tidy" priority="-1">
     <xsl:copy copy-namespaces="no">
@@ -48,51 +46,47 @@
 
   <!-- Processing pipeline: -->
 
-  <xsl:variable name="preprocess-hub">
-    <xsl:apply-templates select="/" mode="preprocess-hub" />
+  <xsl:variable name="hub2tei:preprocess-hub">
+    <xsl:apply-templates select="/" mode="hub2tei:preprocess-hub" />
   </xsl:variable>
 
-  <xsl:variable name="insert-sep">
-    <xsl:apply-templates select="$preprocess-hub" mode="insert-sep" />
+  <xsl:variable name="hub2tei:insert-sep">
+    <xsl:apply-templates select="$hub2tei:preprocess-hub" mode="hub2tei:insert-sep" />
   </xsl:variable>
 
-  <xsl:variable name="inline-lists">
-    <xsl:apply-templates select="$insert-sep" mode="inline-lists" />
+  <xsl:variable name="hub2tei:inline-lists">
+    <xsl:apply-templates select="$hub2tei:insert-sep" mode="hub2tei:inline-lists" />
   </xsl:variable>
 
-  <xsl:variable name="hub:hierarchize-according-to-role-regexes">
-    <xsl:apply-templates select="$inline-lists" mode="hub:hierarchize-according-to-role-regexes" />
+  <xsl:variable name="hub2tei:group-other-sections">
+    <xsl:apply-templates select="$hub2tei:inline-lists" mode="hub2tei:group-other-sections" />
   </xsl:variable>
 
-  <xsl:variable name="group-other-sections">
-    <xsl:apply-templates select="$hub:hierarchize-according-to-role-regexes" mode="group-other-sections" />
+  <xsl:variable name="hub2tei:dbk2tei">
+    <xsl:apply-templates select="$hub2tei:group-other-sections" mode="hub2tei:dbk2tei" />
   </xsl:variable>
 
-  <xsl:variable name="dbk2tei">
-    <xsl:apply-templates select="$group-other-sections" mode="dbk2tei" />
+  <xsl:variable name="hub2tei:join-emph">
+    <xsl:apply-templates select="$hub2tei:dbk2tei" mode="hub2tei:join-emph" />
   </xsl:variable>
 
-  <xsl:variable name="join-emph">
-    <xsl:apply-templates select="$dbk2tei" mode="join-emph" />
+  <xsl:variable name="hub2tei:tabbed-lists">
+    <xsl:apply-templates select="$hub2tei:join-emph" mode="hub2tei:tabbed-lists" />
   </xsl:variable>
 
-  <xsl:variable name="tabbed-lists">
-    <xsl:apply-templates select="$join-emph" mode="tabbed-lists" />
+  <xsl:variable name="hub2tei:edu">
+    <xsl:apply-templates select="$hub2tei:tabbed-lists" mode="hub2tei:edu" />
   </xsl:variable>
 
-  <xsl:variable name="edu">
-    <xsl:apply-templates select="$tabbed-lists" mode="edu" />
-  </xsl:variable>
-
-  <xsl:variable name="tidy">
-    <xsl:apply-templates select="$edu" mode="tidy" />
+  <xsl:variable name="hub2tei:tidy">
+    <xsl:apply-templates select="$hub2tei:edu" mode="hub2tei:tidy" />
   </xsl:variable>
 
   <xsl:template name="main">
     <xsl:if test="$debug = 'yes'">
       <xsl:call-template name="debug-hub2tei" />
     </xsl:if>
-    <xsl:sequence select="$tidy" />
+    <xsl:sequence select="$hub2tei:tidy" />
   </xsl:template>
 
   <xsl:template name="debug-hub2tei">
@@ -100,52 +94,49 @@
       <xsl:sequence select="/" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/02.preprocess-hub.xml'))}" format="debug">
-      <xsl:sequence select="$preprocess-hub" />
+      <xsl:sequence select="$hub2tei:preprocess-hub" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/07.inline-lists.xml'))}" format="debug">
-      <xsl:sequence select="$inline-lists" />
-    </xsl:result-document>
-    <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/20.hierarchize.xml'))}" format="debug">
-      <xsl:sequence select="$hub:hierarchize-according-to-role-regexes" />
+      <xsl:sequence select="$hub2tei:inline-lists" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/22.group-other-sections.xml'))}" format="debug">
-      <xsl:sequence select="$group-other-sections" />
+      <xsl:sequence select="$hub2tei:group-other-sections" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/40.dbk2tei.xml'))}" format="debug">
-      <xsl:sequence select="$dbk2tei" />
+      <xsl:sequence select="$hub2tei:dbk2tei" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/46.join-emph.xml'))}" format="debug">
-      <xsl:sequence select="$join-emph" />
+      <xsl:sequence select="$hub2tei:join-emph" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/48.tabbed-lists.xml'))}" format="debug">
-      <xsl:sequence select="$tabbed-lists" />
+      <xsl:sequence select="$hub2tei:tabbed-lists" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/50.edu.xml'))}" format="debug">
-      <xsl:sequence select="$edu" />
+      <xsl:sequence select="$hub2tei:edu" />
     </xsl:result-document>
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/99.tidy.xml'))}" format="debug">
-      <xsl:sequence select="$tidy" />
+      <xsl:sequence select="$hub2tei:tidy" />
     </xsl:result-document>
   </xsl:template>
 
 
   <!-- mode: preprocess-hub -->
 
-  <xsl:template match="@css:font-family" mode="preprocess-hub" />
+  <xsl:template match="@css:font-family" mode="hub2tei:preprocess-hub" />
 
-  <xsl:template match="@xpath | @srcpath | dbk:annotation" mode="preprocess-hub" />
+  <xsl:template match="@xpath | @srcpath | dbk:annotation" mode="hub2tei:preprocess-hub" />
 
-  <xsl:template match="@xml:lang" mode="preprocess-hub">
+  <xsl:template match="@xml:lang" mode="hub2tei:preprocess-hub">
     <xsl:attribute name="xml:lang" select="replace(., '-\p{Lu}+$', '')" />
   </xsl:template>
 
   <!-- collateral -->
-  <xsl:template match="dbk:para/dbk:phrase[every $att in @* satisfies $att/self::attribute(xml:lang)]" mode="preprocess-hub">
+  <xsl:template match="dbk:para/dbk:phrase[every $att in @* satisfies $att/self::attribute(xml:lang)]" mode="hub2tei:preprocess-hub">
     <xsl:apply-templates mode="#current" />
   </xsl:template>
 
   <!-- collateral -->
-  <xsl:template match="dbk:para/dbk:phrase[@role eq 'hub:identifier'][. eq '&#xF031;']" mode="preprocess-hub"  />
+  <xsl:template match="dbk:para/dbk:phrase[@role eq 'hub:identifier'][. eq '&#xF031;']" mode="hub2tei:preprocess-hub"  />
 
 
   <!-- mode: insert-sep -->
@@ -179,7 +170,7 @@
                          contains(., ':')
                        ][
                          . is (ancestor::dbk:para[1]//text()[contains(., ':')])[1]
-                       ]" mode="insert-sep">
+                       ]" mode="hub2tei:insert-sep">
     <xsl:analyze-string select="." regex=":">
       <xsl:matching-substring>
         <sep xmlns="http://docbook.org/ns/docbook" type="colon"/>
@@ -204,7 +195,7 @@
                          contains(., '.')
                        ][
                          . is (ancestor::dbk:para[1]//text()[contains(., '.')])[1]
-                       ]" mode="insert-sep">
+                       ]" mode="hub2tei:insert-sep">
     <xsl:analyze-string select="." regex="\.">
       <xsl:matching-substring>
         <sep xmlns="http://docbook.org/ns/docbook" type="full-stop"/>
@@ -215,14 +206,13 @@
     </xsl:analyze-string>
   </xsl:template>
 
-
   <!-- mode: inline-lists -->
 
-  <xsl:template mode="inline-lists"
+  <xsl:template mode="hub2tei:inline-lists"
     match="dbk:para[not(@role)][contains(., '•')]" 
     xmlns="http://docbook.org/ns/docbook">
     <xsl:variable name="inline-lists-insert-sep" as="element(dbk:para)">
-      <xsl:apply-templates select="." mode="inline-lists-insert-sep" />
+      <xsl:apply-templates select="." mode="hub2tei:inline-lists-insert-sep" />
     </xsl:variable>
     <xsl:variable name="leaves" as="node()+" select="$inline-lists-insert-sep//node()[not(node())]" />
     <itemizedlist rend="inline bullet">
@@ -230,37 +220,37 @@
         <xsl:variable name="restricted-to" select="current-group()/ancestor-or-self::node()" as="node()+"/>
 	<xsl:variable name="item" as="element(dbk:item)">
           <item>
-            <xsl:apply-templates select="$inline-lists-insert-sep/node()" mode="inline-lists-slice">
+            <xsl:apply-templates select="$inline-lists-insert-sep/node()" mode="hub2tei:inline-lists-slice">
               <xsl:with-param name="restricted-to" select="$restricted-to" tunnel="yes"/>
             </xsl:apply-templates>
           </item>
 	</xsl:variable>
-        <xsl:apply-templates select="$item" mode="inline-lists-dissolve-empty-phrases" />
+        <xsl:apply-templates select="$item" mode="hub2tei:inline-lists-dissolve-empty-phrases" />
     </xsl:for-each-group>
     </itemizedlist>
   </xsl:template>
 
-  <xsl:template match="dbk:item//text()[. is (ancestor::dbk:item[1]//text())[1]]" mode="inline-lists-dissolve-empty-phrases">
+  <xsl:template match="dbk:item//text()[. is (ancestor::dbk:item[1]//text())[1]]" mode="hub2tei:inline-lists-dissolve-empty-phrases">
     <xsl:value-of select="replace(., '^\s+', '')" />
   </xsl:template>
 
   <!-- collateral: after split at seg, the paras after seg may start with unwanted WS  -->
   <xsl:template match="dbk:para[ancestor::*[1]/self::tei:div[@type eq 'pg']]//text()[
                          . is (ancestor::dbk:para[ancestor::*[1]/self::tei:div[@type eq 'pg']]//text())[1]
-                       ]" mode="inline-lists">
+                       ]" mode="hub2tei:inline-lists">
     <xsl:value-of select="replace(., '^\s+', '')" />
   </xsl:template>
 
-  <xsl:template match="dbk:item//text()[. is (ancestor::dbk:item[1]//text())[last()]]" mode="inline-lists-dissolve-empty-phrases">
+  <xsl:template match="dbk:item//text()[. is (ancestor::dbk:item[1]//text())[last()]]" mode="hub2tei:inline-lists-dissolve-empty-phrases">
     <xsl:value-of select="replace(., '\s+$', '')" />
   </xsl:template>
 
   <xsl:template match="dbk:item//text()[. is (ancestor::dbk:item[1]//text())[last()]][. is (ancestor::dbk:item[1]//text())[1]]" 
-		mode="inline-lists-dissolve-empty-phrases" priority="2">
+		mode="hub2tei:inline-lists-dissolve-empty-phrases" priority="2">
     <xsl:value-of select="replace(., '^\s+(.*?)\s*$', '$1')" />
   </xsl:template>
 
-  <xsl:template match="text()" mode="inline-lists-insert-sep" xmlns="http://docbook.org/ns/docbook">
+  <xsl:template match="text()" mode="hub2tei:inline-lists-insert-sep" xmlns="http://docbook.org/ns/docbook">
     <xsl:analyze-string select="." regex="•">
       <xsl:matching-substring>
         <sep/>
@@ -271,7 +261,7 @@
     </xsl:analyze-string>
   </xsl:template>
 
-  <xsl:template match="node()" mode="inline-lists-slice" xmlns="http://docbook.org/ns/docbook">
+  <xsl:template match="node()" mode="hub2tei:inline-lists-slice" xmlns="http://docbook.org/ns/docbook">
     <xsl:param name="restricted-to" as="node()+" tunnel="yes"/>
     <xsl:if test="exists(. intersect $restricted-to)">
       <xsl:copy copy-namespaces="no">
@@ -283,16 +273,15 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="dbk:sep" mode="inline-lists-slice" />
-
+  <xsl:template match="dbk:sep" mode="hub2tei:inline-lists-slice" />
 
   <!-- collateral -->
   <!-- Swallows significant WS, disabled: -->
-  <xsl:template match="dbk:phrase[every $n in node() satisfies $n/self::text()[matches(., '^\s*$')]]" mode="group-other-sections_DISABLED" />
-  <xsl:template match="dbk:phrase[empty(node())]" mode="group-other-sections" />
+  <xsl:template match="dbk:phrase[every $n in node() satisfies $n/self::text()[matches(., '^\s*$')]]" mode="hub2tei:group-other-sections_DISABLED" />
+  <xsl:template match="dbk:phrase[empty(node())]" mode="hub2tei:group-other-sections" />
 
   <!-- collateral -->
-  <xsl:template match="dbk:anchor[@role = ('start', 'end')]" mode="group-other-sections" />
+  <xsl:template match="dbk:anchor[@role = ('start', 'end')]" mode="hub2tei:group-other-sections" />
 
   <xsl:variable name="hub2tei:box-section-start-role-regex" as="xs:string"
     select="'^(Box)$'"/>
@@ -302,42 +291,6 @@
 
   <xsl:variable name="hub2tei:box-section-attr-values" as="xs:string"
     select="'hru-infobox'"/>
-
-  <xsl:template match="*[dbk:para[matches(@role, $hub2tei:box-section-start-role-regex)]]" 
-    mode="group-other-sections" xmlns="http://docbook.org/ns/docbook">
-    <xsl:copy copy-namespaces="no">
-      <xsl:copy-of select="@*" />
-      <xsl:for-each-group select="*" group-starting-with="dbk:para[matches(@role, $hub2tei:box-section-start-role-regex)]">
-        <xsl:choose>
-          <xsl:when test="self::dbk:para[matches(@role, $hub2tei:box-section-start-role-regex)]">
-            <xsl:for-each-group select="current-group()" group-ending-with="dbk:para[matches(@role, $hub2tei:box-section-end-role-regex)]">
-              <xsl:choose>
-                <!-- a single paragraph -->
-                <xsl:when test="current-group()[last() and position() = 2]/self::dbk:para[matches(@role, $hub2tei:box-section-end-role-regex)]">
-                  <p rend="{$hub2tei:box-section-attr-values}" xmlns="http://www.tei-c.org/ns/1.0">
-                    <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
-                  </p>
-                </xsl:when>
-                <xsl:when test="current-group()[last()]/self::dbk:para[matches(@role, 'Box_?end')]">
-                  <section role="{$hub2tei:box-section-attr-values}">
-                    <xsl:apply-templates select="." mode="hub:title"/>
-                    <xsl:apply-templates select="current-group()[position() = (2 to last() - 1)]" mode="#current"/>
-                  </section>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:apply-templates select="current-group()" mode="#current"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each-group>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="current-group()" mode="#current"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each-group>
-    </xsl:copy>
-  </xsl:template>
-
 
   <xsl:variable name="margin-para-styles" as="xs:string*"
     select="('seealso', 'see_also', 'see_also_(optional)', 'Phase_DiffAlt', 'Standard2', 'KV')"/>
@@ -349,68 +302,6 @@
                           $elt/self::dbk:informaltable[ends-with(@role, 'in_margin')]
                           " />
   </xsl:function>
-
-
-  <xsl:template match="*[dbk:para]" mode="hub:hierarchize-according-to-role-regexes" xmlns="http://www.tei-c.org/ns/1.0">
-    <xsl:copy copy-namespaces="no">
-      <xsl:copy-of select="@*" />
-      <xsl:sequence select="hub:hierarchize-according-to-role-regexes(
-                              *,
-                              $role-regexes-x,
-                              *[
-                                some $r in $role-regexes-x satisfies
-                                (matches(@role, $r, 'x'))
-                              ]
-                            )" />
-    </xsl:copy>
-  </xsl:template>
-  
-  <xsl:function name="hub:hierarchize-according-to-role-regexes" as="element(*)*" xmlns="http://docbook.org/ns/docbook">
-    <xsl:param name="elts" as="element(*)*"/>
-    <xsl:param name="role-regexes" as="xs:string*" />
-    <xsl:param name="all-headings" as="element(*)*" />
-    <xsl:choose>
-      <xsl:when test="count($role-regexes) ge 1">
-        <xsl:choose>
-          <xsl:when test="exists($elts intersect $all-headings)">
-            <xsl:for-each-group select="$elts" group-starting-with="*[matches(@role, $role-regexes[1], 'x')]">
-              <xsl:choose>
-                <xsl:when test="matches(@role, $role-regexes[1], 'x')">
-                  <section>
-                    <xsl:apply-templates select="." mode="hub:title" />
-                    <xsl:sequence select="hub:hierarchize-according-to-role-regexes(
-                                            current-group()[position() gt 1], 
-                                            $role-regexes[position() gt 1], 
-                                            $all-headings
-                                          )" />
-                  </section>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:sequence select="hub:hierarchize-according-to-role-regexes(
-                                          current-group(), 
-                                          $role-regexes[position() gt 1], 
-                                          $all-headings
-                                        )" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each-group>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="$elts" mode="hub:hierarchize-according-to-role-regexes" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select="$elts" mode="hub:hierarchize-according-to-role-regexes" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:function>
-
-  <xsl:template match="dbk:para" mode="hub:title" xmlns="http://docbook.org/ns/docbook">
-    <title>
-      <xsl:apply-templates select="@*, node()" mode="#current" />
-    </title>
-  </xsl:template>
 
   <xsl:variable name="hub2tei:unit-role-regex-x" as="xs:string"
     select="'^(Unit_?Number)$'" />
@@ -437,11 +328,11 @@
 
 
 
-  <xsl:template match="/*/@xml:base" mode="dbk2tei">
+  <xsl:template match="/*/@xml:base" mode="hub2tei:dbk2tei">
     <xsl:attribute name="xml:base" select="replace(., '\.hub\.xml$', '.tei.xml')" />
   </xsl:template>
 
-  <xsl:template match="/dbk:*" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <TEI xml:lang="de">
       <xsl:apply-templates select="@xml:base" mode="#current" />
       <teiHeader>
@@ -479,9 +370,9 @@
     </TEI>
   </xsl:template>
 
-  <xsl:template match="processing-instruction('xml-model')" mode="dbk2tei" />
+  <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei" />
 
-  <xsl:template match="dbk:section" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:section" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <div>
       <xsl:apply-templates select="dbk:title/@role, @*, node()" mode="#current" />
     </div>
@@ -494,83 +385,83 @@
                        | dbk:title
                        | dbk:para[@head-sep]
                        " 
-    mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+    mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <head>
       <xsl:apply-templates select="@* except @role, node()" mode="#current" />
     </head>
   </xsl:template>
 
-  <xsl:template match="dbk:para/@head-sep" mode="dbk2tei">
+  <xsl:template match="dbk:para/@head-sep" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rend" select="'run-in colon'" />
   </xsl:template>
 
-  <xsl:template match="dbk:para[@head-sep]/dbk:phrase/@css:font-weight" mode="dbk2tei" />
+  <xsl:template match="dbk:para[@head-sep]/dbk:phrase/@css:font-weight" mode="hub2tei:dbk2tei" />
 
-  <xsl:template match="dbk:para" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:para" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <p>
       <xsl:apply-templates select="@*, node()" mode="#current" />
     </p>
   </xsl:template>
 
-  <xsl:template match="dbk:link" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:link" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <link>
       <xsl:apply-templates select="@*, node()" mode="#current" />
     </link>
   </xsl:template>
 
-  <xsl:template match="@xlink:href" mode="dbk2tei">
+  <xsl:template match="@xlink:href" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="." />
   </xsl:template>
 
-  <xsl:template match="dbk:footnote" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:footnote" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <note type="footnote">
       <xsl:apply-templates select="@*, node()" mode="#current" />
     </note>
   </xsl:template>
 
-  <xsl:template match="dbk:br" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:br" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <seg type="br" />
   </xsl:template>
 
-  <xsl:template match="dbk:tab" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:tab" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <seg type="{if(@role) then @role else 'tab'}">
       <xsl:apply-templates mode="#current"/>
     </seg>
   </xsl:template>
 
-  <xsl:template match="dbk:phrase" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:phrase" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <seg>
       <xsl:apply-templates select="@*, node()" mode="#current" />
     </seg>
   </xsl:template>
 
-  <xsl:template match="dbk:phrase[@css:font-style eq 'italic']" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:phrase[@css:font-style eq 'italic']" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <foreign xml:lang="en">
       <xsl:apply-templates select="@* except @css:font-style, node()" mode="#current" />
     </foreign>
   </xsl:template>
 
-  <xsl:template match="@role" mode="dbk2tei">
+  <xsl:template match="@role" mode="hub2tei:dbk2tei">
     <xsl:attribute name="type" select="." />
   </xsl:template>
 
-  <xsl:template match="dbk:phrase[@role eq 'footnote_reference'][dbk:footnote][count(node()) eq 1]" mode="dbk2tei">
+  <xsl:template match="dbk:phrase[@role eq 'footnote_reference'][dbk:footnote][count(node()) eq 1]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current" />
   </xsl:template>
 
-  <xsl:template match="dbk:itemizedlist" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:itemizedlist" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <list>
       <xsl:apply-templates select="@*, node()" mode="#current" />
     </list>
   </xsl:template>
 
-  <xsl:template match="dbk:item" mode="dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
+  <xsl:template match="dbk:item" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <xsl:element name="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current" />
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="mediaobject[imageobject/imagedata/@fileref]" mode="dbk2tei" 
+  <xsl:template match="mediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook" xmlns="http://www.tei-c.org/ns/1.0">
     <graphic url="{imageobject/imagedata/@fileref}">
       <xsl:if test="imageobject/imagedata/@width">
@@ -582,7 +473,7 @@
     </graphic>
   </xsl:template>
 
-  <xsl:template match="informaltable | table" mode="dbk2tei"
+  <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei"
     xpath-default-namespace="http://docbook.org/ns/docbook"
     xmlns="http://www.tei-c.org/ns/1.0">
     <table>
@@ -617,7 +508,7 @@
     </table>
   </xsl:template>
 
-  <xsl:template match="*[tei:seg]" mode="join-emph">
+  <xsl:template match="*[tei:seg]" mode="hub2tei:join-emph">
     <xsl:copy copy-namespaces="no">
       <xsl:copy-of select="@*" />
       <xsl:for-each-group select="node()" group-adjacent="hub2tei:seg-signature(.)">
@@ -625,7 +516,7 @@
           <xsl:when test="self::tei:seg">
             <xsl:copy copy-namespaces="no">
               <xsl:copy-of select="@*" />
-              <xsl:apply-templates select="current-group()" mode="join-emph-unwrap" />
+              <xsl:apply-templates select="current-group()" mode="hub2tei:join-emph-unwrap" />
             </xsl:copy>
           </xsl:when>
           <xsl:otherwise>
@@ -697,13 +588,13 @@
                           " />
   </xsl:function>
 
-  <xsl:template match="tei:seg" mode="join-emph-unwrap">
-    <xsl:apply-templates mode="join-emph" />
+  <xsl:template match="tei:seg" mode="hub2tei:join-emph-unwrap">
+    <xsl:apply-templates mode="hub2tei:join-emph" />
   </xsl:template>
 
 
   <!-- As primitive as it may be. Doesn't work for nested lists. -->
-  <xsl:template match="*[p[seg[@type eq 'hub:identifier']][dbk:tab]]" mode="tabbed-lists"
+  <xsl:template match="*[p[seg[@type eq 'hub:identifier']][dbk:tab]]" mode="hub2tei:tabbed-lists"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0">
     <xsl:copy copy-namespaces="no">
@@ -725,7 +616,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="p[seg[@type eq 'hub:identifier']][dbk:tab]" mode="tabbed-lists"
+  <xsl:template match="p[seg[@type eq 'hub:identifier']][dbk:tab]" mode="hub2tei:tabbed-lists"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0">
     <item n="{seg[@type eq 'hub:identifier']}">
@@ -733,10 +624,10 @@
     </item>
   </xsl:template>
 
-  <xsl:template match="p/seg[@type eq 'hub:identifier'][following-sibling::*[1]/self::dbk:tab]" mode="tabbed-lists"
+  <xsl:template match="p/seg[@type eq 'hub:identifier'][following-sibling::*[1]/self::dbk:tab]" mode="hub2tei:tabbed-lists"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0" />
 
-  <xsl:template match="tei:p[tei:seg[@type eq 'hub:identifier']]/dbk:tab" mode="tabbed-lists" />
+  <xsl:template match="tei:p[tei:seg[@type eq 'hub:identifier']]/dbk:tab" mode="hub2tei:tabbed-lists" />
 
   <xsl:function name="hub2tei:list-type" as="xs:string?">
     <xsl:param name="para" as="node()" />
@@ -753,24 +644,24 @@
     </xsl:choose>
   </xsl:function>
 
-  <xsl:template match="head//text()[. is (ancestor::head//text())[1]][matches(., '^\d+[\p{Zs}&#x2003;]')]" mode="tabbed-lists" 
+  <xsl:template match="head//text()[. is (ancestor::head//text())[1]][matches(., '^\d+[\p{Zs}&#x2003;]')]" mode="hub2tei:tabbed-lists" 
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0">
     <xsl:value-of select="replace(., '^\d+[\p{Zs}&#x2003;]+', '')" />
   </xsl:template>
 
-  <xsl:template match="div[head//text()[. is (ancestor::head//text())[1]][matches(., '^\d+[\p{Zs}&#x2003;]')]]/@type" mode="tabbed-lists"
+  <xsl:template match="div[head//text()[. is (ancestor::head//text())[1]][matches(., '^\d+[\p{Zs}&#x2003;]')]]/@type" mode="hub2tei:tabbed-lists"
     xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     xmlns="http://www.tei-c.org/ns/1.0">
     <xsl:copy/>
     <xsl:attribute name="n" select="replace(../head//text()[. is (ancestor::head//text())[1]], '^(\d+)[\p{Zs}&#x2003;]+.*$', '$1')" />
   </xsl:template>
 
-  <xsl:template match="tei:seg[not(@*)]" mode="tidy">
+  <xsl:template match="tei:seg[not(@*)]" mode="hub2tei:tidy">
     <xsl:apply-templates mode="#current" />
   </xsl:template>
 
-  <xsl:template match="tei:table[not(@type)]" mode="tidy">
+  <xsl:template match="tei:table[not(@type)]" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current" />
       <xsl:attribute name="type" select="'other'" />
@@ -778,7 +669,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="/*" mode="tidy">
+  <xsl:template match="/*" mode="hub2tei:tidy">
     <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"</xsl:processing-instruction>
     <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"</xsl:processing-instruction>
     <xsl:copy>
