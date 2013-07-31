@@ -24,20 +24,7 @@
   <xsl:output name="debug" method="xml" indent="yes"/>
 
 
-  <xsl:template match="* | @* | processing-instruction()" 
-    mode="insert-sep
-          dbk2tei
-          preprocess-hub
-          join-emph
-          join-emph-unwrap
-          tabbed-lists
-          inline-lists
-          inline-lists-insert-sep
-          inline-lists-slice
-          inline-lists-dissolve-empty-phrases
-          group-other-sections
-          edu
-          tidy" priority="-1">
+  <xsl:template match="* | @* | processing-instruction()" mode="hub2tei:dbk2tei hub2tei:tidy" priority="-1">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, node()" mode="#current" />
     </xsl:copy>
