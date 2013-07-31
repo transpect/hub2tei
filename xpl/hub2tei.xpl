@@ -10,7 +10,9 @@
   
   <p:input port="source"/>
   <p:output port="result"/>
-  
+
+  <p:serialization port="result" omit-xml-declaration="false" method="xml" encoding="utf8"/>
+
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" required="false" select="resolve-uri('debug')"/>
   
