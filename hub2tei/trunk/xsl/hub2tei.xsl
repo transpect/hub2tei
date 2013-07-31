@@ -92,8 +92,6 @@
     <xsl:if test="$debug = 'yes'">
       <xsl:call-template name="debug-hub2tei" />
     </xsl:if>
-    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"</xsl:processing-instruction>
-    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"</xsl:processing-instruction>
     <xsl:sequence select="$tidy" />
   </xsl:template>
 
@@ -781,6 +779,8 @@
   </xsl:template>
 
   <xsl:template match="/*" mode="tidy">
+    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"</xsl:processing-instruction>
+    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"</xsl:processing-instruction>
     <xsl:copy>
       <xsl:namespace name="edu" select="'http://www.le-tex.de/namespace/edu'" />
       <xsl:namespace name="css" select="'http://www.w3.org/1996/css'" />
