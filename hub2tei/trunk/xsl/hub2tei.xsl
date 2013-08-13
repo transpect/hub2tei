@@ -103,7 +103,7 @@
 
   <xsl:template match="dbk:part | dbk:chapter | dbk:section" mode="hub2tei:dbk2tei" xmlns="http://www.tei-c.org/ns/1.0">
     <div type="{name()}">
-      <xsl:apply-templates select="dbk:title/@role, @*, node()" mode="#current" />
+      <xsl:apply-templates select="@*, node()" mode="#current" />
     </div>
   </xsl:template>
 
@@ -157,9 +157,10 @@
       <xsl:apply-templates select="@* except @css:font-style, node()" mode="#current" />
     </foreign>
   </xsl:template>
-
+  
+  <!-- @type is no longer supported for each element in TEI P5  -->
   <xsl:template match="@role" mode="hub2tei:dbk2tei">
-    <xsl:attribute name="type" select="." />
+    <xsl:attribute name="rend" select="." />
   </xsl:template>
 
   <xsl:template match="dbk:phrase[@role eq 'footnote_reference'][dbk:footnote][count(node()) eq 1]" mode="hub2tei:dbk2tei">
