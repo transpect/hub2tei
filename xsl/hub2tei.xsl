@@ -118,12 +118,18 @@
   </xsl:template>
 
   <xsl:template match="dbk:link" mode="hub2tei:dbk2tei">
-    <link>
+    <xsl:element name="{if(
+                         matches(
+                           (@linkend, @xlink:href)[1], 
+                           '^(file|http|ftp)[:]//.+'
+                         )
+                        ) 
+                        then 'ref' else 'link'}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </link>
+    </xsl:element>
   </xsl:template>
 
-  <xsl:template match="@xlink:href" mode="hub2tei:dbk2tei">
+  <xsl:template match="@xlink:href | dbk:link/@linkend" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="."/>
   </xsl:template>
 
