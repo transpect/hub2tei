@@ -160,6 +160,12 @@
       <xsl:apply-templates select="@* except @css:font-style, node()" mode="#current"/>
     </foreign>
   </xsl:template>
+
+  <xsl:template match="dbk:superscript | dbk:subscript" mode="hub2tei:dbk2tei">
+    <hi rend="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </hi>
+  </xsl:template>
   
   <!-- @type is no longer supported for each element in TEI P5  -->
   <xsl:template match="@role" mode="hub2tei:dbk2tei">
