@@ -155,12 +155,6 @@
     </seg>
   </xsl:template>
 
-  <xsl:template match="dbk:phrase[@css:font-style eq 'italic']" mode="hub2tei:dbk2tei">
-    <foreign xml:lang="en">
-      <xsl:apply-templates select="@* except @css:font-style, node()" mode="#current"/>
-    </foreign>
-  </xsl:template>
-
   <xsl:template match="dbk:superscript | dbk:subscript" mode="hub2tei:dbk2tei">
     <hi rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
