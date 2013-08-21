@@ -203,18 +203,34 @@
     </quote>
   </xsl:template>
 
-  <xsl:template match="dbk:itemizedlist" mode="hub2tei:dbk2tei">
-    <list>
+  <xsl:template match="dbk:itemizedlist|dbk:orderedlist|dbk:variablelist" mode="hub2tei:dbk2tei">
+    <list rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </list>
   </xsl:template>
 
-  <xsl:template match="dbk:item" mode="hub2tei:dbk2tei">
-    <xsl:element name="{local-name()}">
+  <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)]|dbk:varlistentry" mode="hub2tei:dbk2tei">
+    <item rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </xsl:element>
+    </item>
   </xsl:template>
-
+  
+  <xsl:template match="dbk:listitem[parent::dbk:varlistentry]" mode="hub2tei:dbk2tei">
+    <gloss rend="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </gloss>
+  </xsl:template>
+  
+  <xsl:template match="dbk:term" mode="hub2tei:dbk2tei">
+    <term rend="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </term>
+  </xsl:template>
+  
+  <xsl:template match="dbk:tabs|dbk:seg" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="mediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook">
     <graphic url="{imageobject/imagedata/@fileref}">
@@ -280,7 +296,7 @@
       <xsl:apply-templates mode="#current"/>
     </xsl:copy>
   </xsl:template>
-
+  
   <xsl:template match="/*" mode="hub2tei:tidy">
     <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"</xsl:processing-instruction>
     <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"</xsl:processing-instruction>
