@@ -215,6 +215,23 @@
     </item>
   </xsl:template>
   
+  <xsl:template match="@override" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="n" select="."/>
+  </xsl:template>
+  
+  <xsl:template match="@numeration" mode="hub2tei:dbk2tei">
+    <xsl:variable name="numeration-style" select="
+      if(. eq 'arabic') then 'decimal' 
+      else if(. eq 'loweralpha') then 'lower-latin'
+      else if(. eq 'upperalpha') then 'upper-latin'
+      else if(. eq 'lowerroman') then 'lower-roman'
+      else if(. eq 'upperroman') then 'upper-roman'
+      else ''"/>
+    <xsl:if test="$numeration-style ne ''">
+      <xsl:attribute name="style" select="concat('list-style-type:', $numeration-style ,';')"/>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template match="dbk:listitem[parent::dbk:varlistentry]" mode="hub2tei:dbk2tei">
     <gloss rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
