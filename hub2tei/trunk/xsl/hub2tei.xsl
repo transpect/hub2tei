@@ -7,10 +7,10 @@
   xmlns:hub="http://www.le-tex.de/namespace/hub"
   xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei"
   xmlns:tei="http://www.tei-c.org/ns/1.0"
-  xmlns:edu="http://www.le-tex.de/namespace/edu"
   xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:cx="http://xmlcalabash.com/ns/extensions" 
   xmlns="http://www.tei-c.org/ns/1.0"
-  exclude-result-prefixes="dbk xs"
+  exclude-result-prefixes="dbk hub2tei hub xlink css xs cx"
   version="2.0">
 
   <!-- see also docbook to tei:
@@ -60,8 +60,8 @@
   </xsl:template>
 
   <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei">
-    <TEI xml:lang="de">
-      <xsl:apply-templates select="@xml:base" mode="#current"/>
+    <TEI>
+      <xsl:apply-templates select="@*" mode="#current"/>
       <teiHeader>
         <fileDesc>
           <titleStmt>
@@ -87,6 +87,7 @@
           <sourceDesc>
             <p/>
           </sourceDesc>
+          <xsl:apply-templates select="/*/dbk:info/css:rules" mode="#current"></xsl:apply-templates>
         </fileDesc>
       </teiHeader>
       <text>
@@ -98,6 +99,10 @@
   </xsl:template>
 
   <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei"/>
+
+  <xsl:template match="@css:rule-selection-attribute" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="{name()}" select="'rend'"/>
+  </xsl:template>
 
   <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix" mode="hub2tei:dbk2tei">
     <div type="{name()}">
@@ -140,7 +145,7 @@
   </xsl:template>
 
   <xsl:template match="dbk:br" mode="hub2tei:dbk2tei">
-    <seg type="br"/>
+    <lb/>
   </xsl:template>
 
   <xsl:template match="dbk:tab" mode="hub2tei:dbk2tei">
@@ -314,7 +319,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="/*" mode="hub2tei:tidy">
+  <xsl:template match="/*" mode="hub2tei:tidy" priority="2">
     <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"</xsl:processing-instruction>
     <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"</xsl:processing-instruction>
     <xsl:copy>
