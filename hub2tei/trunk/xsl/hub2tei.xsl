@@ -87,8 +87,11 @@
           <sourceDesc>
             <p/>
           </sourceDesc>
-          <xsl:apply-templates select="/*/dbk:info/css:rules" mode="#current"></xsl:apply-templates>
         </fileDesc>
+        <encodingDesc>
+          <styleDefDecl scheme="cssa"/>
+          <xsl:apply-templates select="/*/dbk:info/css:rules" mode="#current"></xsl:apply-templates>
+        </encodingDesc>
       </teiHeader>
       <text>
         <body>
@@ -153,6 +156,11 @@
       <xsl:apply-templates mode="#current"/>
     </seg>
   </xsl:template>
+
+  <xsl:template match="css:rule//*" mode="hub2tei:dbk2tei">
+    <xsl:copy-of select="."/>
+  </xsl:template>
+  
 
   <xsl:template match="dbk:phrase" mode="hub2tei:dbk2tei">
     <seg>
@@ -320,8 +328,6 @@
   </xsl:template>
   
   <xsl:template match="/*" mode="hub2tei:tidy" priority="2">
-    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"</xsl:processing-instruction>
-    <xsl:processing-instruction name="xml-model">href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"</xsl:processing-instruction>
     <xsl:copy>
       <xsl:namespace name="edu" select="'http://www.le-tex.de/namespace/edu'"/>
       <xsl:namespace name="css" select="'http://www.w3.org/1996/css'"/>
