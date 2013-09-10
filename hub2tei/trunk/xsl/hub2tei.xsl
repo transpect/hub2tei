@@ -329,7 +329,6 @@
   
   <xsl:template match="/*" mode="hub2tei:tidy" priority="2">
     <xsl:copy>
-      <xsl:namespace name="edu" select="'http://www.le-tex.de/namespace/edu'"/>
       <xsl:namespace name="css" select="'http://www.w3.org/1996/css'"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
