@@ -94,11 +94,24 @@
         </encodingDesc>
       </teiHeader>
       <text>
+        <xsl:apply-templates select="dbk:info" mode="#current"/>
         <body>
           <xsl:apply-templates select="* except dbk:info" mode="#current"/>
         </body>
       </text>
     </TEI>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
+    <front>
+      <xsl:apply-templates select="* except (dbk:keywordset | css:rules)" mode="#current"/>
+    </front>
+  </xsl:template>
+  
+  <xsl:template match="/dbk:book/dbk:info/dbk:legalnotice" mode="hub2tei:dbk2tei">
+    <div type="imprint">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </div>
   </xsl:template>
 
   <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei"/>
