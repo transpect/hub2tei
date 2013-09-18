@@ -114,6 +114,12 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="dbk:dedication" mode="hub2tei:dbk2tei">
+    <div type="dedication">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </div>
+  </xsl:template>
+  
   <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="@css:rule-selection-attribute" mode="hub2tei:dbk2tei">
