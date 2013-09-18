@@ -119,7 +119,19 @@
   <xsl:template match="@css:rule-selection-attribute" mode="hub2tei:dbk2tei">
     <xsl:attribute name="{name()}" select="'rend'"/>
   </xsl:template>
+  
+  <xsl:template match="@xml:id" mode="hub2tei:dbk2tei">
+    <xsl:copy/>
+  </xsl:template>
 
+  <!-- (mis)used to convey original InDesign text anchor IDs in dbk:anchor. 
+        We need to further convey this because it will form the key for
+        a crossref query, enabling the crossref results to be patched into
+        the InDesign source. -->
+  <xsl:template match="dbk:anchor/@annotations" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="n" select="."/>
+  </xsl:template>
+  
   <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix" mode="hub2tei:dbk2tei">
     <div type="{name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
@@ -136,6 +148,12 @@
     <p>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </p>
+  </xsl:template>
+
+  <xsl:template match="dbk:anchor" mode="hub2tei:dbk2tei">
+    <anchor>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </anchor>
   </xsl:template>
 
   <xsl:template match="dbk:link" mode="hub2tei:dbk2tei">
@@ -321,7 +339,9 @@
     </table>
   </xsl:template>
   
-  <xsl:template match="tei:*[@css:*]" mode="hub2tei:tidy">
+  <!-- use templates from hub2html for style serializing. Thanks to the TEI+CSSa
+    schema, we don’t need to prematurely serialize CSS here -->
+  <xsl:template match="tei:*[@css:*]" mode="hub2tei:tidy_DISABLED">
     <xsl:copy>
       <xsl:attribute name="style" select="string-join(for $i in @css:* return concat($i/local-name(), ':', $i), ';')"/>
       <xsl:apply-templates select="@* except @css:*, node()" mode="#current"/>
