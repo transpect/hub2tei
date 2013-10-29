@@ -88,6 +88,7 @@
             <p/>
           </sourceDesc>
         </fileDesc>
+        <xsl:apply-templates select="dbk:info/dbk:keywordset[@role = 'hub']" mode="#current"/>
         <encodingDesc>
           <styleDefDecl scheme="cssa"/>
           <xsl:apply-templates select="/*/dbk:info/css:rules" mode="#current"></xsl:apply-templates>
@@ -106,6 +107,22 @@
     <front>
       <xsl:apply-templates select="* except (dbk:keywordset | css:rules)" mode="#current"/>
     </front>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
+    <profileDesc>
+      <textClass>
+        <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
+          <xsl:apply-templates mode="#current"/>
+        </keywords>
+      </textClass>
+    </profileDesc>
+  </xsl:template>
+  
+  <xsl:template match="dbk:keyword" mode="hub2tei:dbk2tei">
+    <term key="{@role}">
+        <xsl:apply-templates mode="#current"/>
+    </term>
   </xsl:template>
   
   <xsl:template match="/dbk:book/dbk:info/dbk:legalnotice" mode="hub2tei:dbk2tei">
