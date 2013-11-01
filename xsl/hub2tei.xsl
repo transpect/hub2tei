@@ -88,7 +88,16 @@
             <p/>
           </sourceDesc>
         </fileDesc>
-        <xsl:apply-templates select="dbk:info/dbk:keywordset[@role = 'hub']" mode="#current"/>
+        <profileDesc>
+          <xsl:apply-templates select="dbk:info/dbk:keywordset[@role = 'hub']" mode="#current"/>
+          <langUsage>
+            <language>
+              <xsl:attribute name="ident">
+                <xsl:apply-templates select="/dbk:*/@xml:lang" mode="#current"/>
+              </xsl:attribute>
+            </language>
+          </langUsage>            
+        </profileDesc>
         <encodingDesc>
           <styleDefDecl scheme="cssa"/>
           <xsl:apply-templates select="/*/dbk:info/css:rules" mode="#current"></xsl:apply-templates>
@@ -110,13 +119,11 @@
   </xsl:template>
   
   <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
-    <profileDesc>
       <textClass>
         <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
           <xsl:apply-templates mode="#current"/>
         </keywords>
       </textClass>
-    </profileDesc>
   </xsl:template>
   
   <xsl:template match="dbk:keyword" mode="hub2tei:dbk2tei">
@@ -315,16 +322,18 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="mediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" 
+  <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook">
-    <graphic url="{imageobject/imagedata/@fileref}">
-      <xsl:if test="imageobject/imagedata/@width">
-        <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
-      </xsl:if>
-      <xsl:if test="imageobject/imagedata/@depth">
-        <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) then string-join((imageobject/imagedata/@depth,'pt'),'') else imageobject/imagedata/@depth"/>
-      </xsl:if>
-    </graphic>
+    <figure>
+      <graphic url="{imageobject/imagedata/@fileref}">
+        <xsl:if test="imageobject/imagedata/@width">
+          <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
+        </xsl:if>
+        <xsl:if test="imageobject/imagedata/@depth">
+          <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) then string-join((imageobject/imagedata/@depth,'pt'),'') else imageobject/imagedata/@depth"/>
+        </xsl:if>
+      </graphic>
+    </figure>
   </xsl:template>
 
   <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei"
