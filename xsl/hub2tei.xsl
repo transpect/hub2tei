@@ -62,6 +62,7 @@
   <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei">
     <TEI>
       <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:attribute name="source-dir-uri" select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>      
       <teiHeader>
         <fileDesc>
           <titleStmt>
