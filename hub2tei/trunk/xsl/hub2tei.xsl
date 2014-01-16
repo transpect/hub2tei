@@ -284,6 +284,20 @@
     </list>
   </xsl:template>
 
+  <xsl:variable name="poem-style-regex" select="'((g|G)edicht)'"  as="xs:string"/>
+  <xsl:template match="dbk:para[matches(@role, $poem-style-regex)]" mode="hub2tei:dbk2tei">
+    <l>
+      <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </l>
+  </xsl:template>
+  
+  <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
+    <lg>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </lg>
+  </xsl:template>
+  
   <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)]|dbk:varlistentry" mode="hub2tei:dbk2tei">
     <item rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
@@ -323,9 +337,15 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" 
+  <xsl:template match="figure" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </figure>
+  </xsl:template>
+ 
+  <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" 
+    xpath-default-namespace="http://docbook.org/ns/docbook">
       <graphic url="{imageobject/imagedata/@fileref}">
         <xsl:if test="imageobject/imagedata/@width">
           <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
@@ -333,8 +353,22 @@
         <xsl:if test="imageobject/imagedata/@depth">
           <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) then string-join((imageobject/imagedata/@depth,'pt'),'') else imageobject/imagedata/@depth"/>
         </xsl:if>
+        <xsl:if test="./@role">
+          <xsl:attribute name="rend" select="@role"/>
+        </xsl:if>
       </graphic>
-    </figure>
+  </xsl:template>
+  
+  <xsl:variable name="caption-style-regex" select="'legend'" as="xs:string"/>
+  
+  <xsl:template match="para[matches(@role, $caption-style-regex)]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+    <caption>
+      <xsl:apply-templates select="@*, node()" mode="hub2tei:dbk2tei"/>
+    </caption>
+  </xsl:template>
+  
+  <xsl:template match="note[matches(para/@role, $caption-style-regex)]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+      <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
   </xsl:template>
 
   <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei"
