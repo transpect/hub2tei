@@ -113,6 +113,10 @@
     </TEI>
   </xsl:template>
   
+  <xsl:template match="/dbk:book/@xml:lang" mode="hub2tei:dbk2tei">
+      <xsl:attribute name="{name(.)}" select="replace(., '^(.+?-.+?)-.*$', '$1')"/>
+  </xsl:template>
+  
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
     <front>
       <xsl:apply-templates select="* except (dbk:keywordset | css:rules)" mode="#current"/>
