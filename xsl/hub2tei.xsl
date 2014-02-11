@@ -137,7 +137,7 @@
     </term>
   </xsl:template>
   
-  <xsl:template match="/dbk:book/dbk:info/dbk:legalnotice" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:legalnotice" mode="hub2tei:dbk2tei">
     <div type="imprint">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </div>
@@ -167,11 +167,12 @@
     <xsl:attribute name="n" select="."/>
   </xsl:template>
   
-  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:preface" mode="hub2tei:dbk2tei">
     <div type="{name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </div>
   </xsl:template>
+  
 
   <xsl:template match="dbk:title" mode="hub2tei:dbk2tei">
     <head>
@@ -234,6 +235,12 @@
     </seg>
   </xsl:template>
 
+  <xsl:template match="dbk:phrase[@role = 'hub:identifier']" mode="hub2tei:dbk2tei">
+    <label>
+      <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
+    </label>
+  </xsl:template>
+  
   <xsl:template match="dbk:superscript | dbk:subscript" mode="hub2tei:dbk2tei">
     <hi rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
@@ -245,20 +252,22 @@
     <xsl:attribute name="rend" select="."/>
   </xsl:template>
   
+  <xsl:key name="natives" match="css:rule" use="@name"/> 
+  
   <!-- handle page breaks -->
-  <xsl:template match="*[@css:page-break-before or @css:page-break-after]" mode="hub2tei:dbk2tei" priority="10">
+  <xsl:template match="*[key('natives', @role)/@*[name() =('css:page-break-before', 'css:page-break-after')]]" mode="hub2tei:dbk2tei" priority="10">
     <xsl:choose>
-      <xsl:when test="(@css:page-break-before|@css:page-break-after) = ('always', 'left', 'right')">
+      <xsl:when test="key('natives', @role)/(@css:page-break-before|@css:page-break-after) = ('always', 'left', 'right')">
         <xsl:choose>
           <xsl:when test=". eq ''">
             <pb/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="@css:page-break-before">
+            <xsl:if test="key('natives', @role)/@css:page-break-before">
               <pb/>
             </xsl:if>
             <xsl:next-match/>
-            <xsl:if test="@css:page-break-after">
+            <xsl:if test="key('natives', @role)/@css:page-break-after">
               <pb/>
             </xsl:if>  
           </xsl:otherwise>
