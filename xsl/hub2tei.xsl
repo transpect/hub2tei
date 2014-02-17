@@ -167,17 +167,37 @@
     <xsl:attribute name="n" select="."/>
   </xsl:template>
   
-  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:preface" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
+  
+  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:preface | dbk:acknowledgements | dbk:glossary" mode="hub2tei:dbk2tei">
     <div type="{name()}">
+      <xsl:if test="./dbk:title[1]/@role">
+        <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
+      </xsl:if>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </div>
   </xsl:template>
   
-
+  <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
+    <divGen type="{name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </divGen>
+  </xsl:template>
+  
+  <xsl:template match="@renderas" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="rend" select="."/>
+  </xsl:template>
+  
   <xsl:template match="dbk:title" mode="hub2tei:dbk2tei">
     <head>
-      <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
     </head>
+  </xsl:template>
+  
+  <xsl:template match="dbk:subtitle" mode="hub2tei:dbk2tei">
+    <p>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </p>
   </xsl:template>
 
   <xsl:template match="dbk:para" mode="hub2tei:dbk2tei">
@@ -196,7 +216,7 @@
     <xsl:element name="{if(
                          matches(
                            (@linkend, @xlink:href)[1], 
-                           '^(file|http|ftp)[:]//.+'
+                           '^(file|http(s)?|ftp)[:]//.+'
                          )
                         ) 
                         then 'ref' else 'link'}">
@@ -292,8 +312,10 @@
   </xsl:template>
 
   <xsl:template match="dbk:itemizedlist|dbk:orderedlist|dbk:variablelist" mode="hub2tei:dbk2tei">
-    <list rend="{local-name()}">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    <list type="{local-name()}">
+      <xsl:apply-templates select="@* except @mark"/>
+      <xsl:attribute name="style" select="@mark"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
     </list>
   </xsl:template>
 
@@ -374,14 +396,19 @@
   
   <xsl:variable name="caption-style-regex" select="'legend'" as="xs:string"/>
   
-  <xsl:template match="para[matches(@role, $caption-style-regex)]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
-    <caption>
+  <xsl:template match="dbk:para[matches(@role, $caption-style-regex)]" mode="hub2tei:dbk2tei">
+    <note>
+      <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, node()" mode="hub2tei:dbk2tei"/>
-    </caption>
+      </xsl:copy>
+    </note>
   </xsl:template>
   
-  <xsl:template match="note[matches(para/@role, $caption-style-regex)]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
-      <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
+  <xsl:template match="dbk:note[matches(dbk:para/@role, $caption-style-regex)]" mode="hub2tei:dbk2tei">
+    <note>
+      <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
+      <xsl:apply-templates select="node()"/>
+    </note> 
   </xsl:template>
 
   <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei"
@@ -391,29 +418,33 @@
       <xsl:apply-templates select="@xml:id | @role" mode="#current"/>
       <xsl:choose>
         <xsl:when test="exists(tgroup)">
+          <xsl:if test="not(@css:width)">
+            <xsl:variable name="cell-width" select="sum(for $w in tgroup/colspec return number(replace($w/@colwidth, 'mm', '')))"/>
+            <xsl:attribute name="css:width" select="concat($cell-width, 'mm')"/>
+          </xsl:if>
           <xsl:for-each select="./tgroup/(tbody union thead union tfoot)/row">
-            <tr>
+            <row>
               <xsl:for-each select="entry">
-                <td>
+                <cell>
                   <xsl:if test="@namest">
-                    <xsl:attribute name="colspan" select="number(substring-after(@nameend, 'col')) - number(substring-after(@namest, 'col')) + 1"/>
+                    <xsl:attribute name="cols" select="number(substring-after(@nameend, 'col')) - number(substring-after(@namest, 'col')) + 1"/>
                   </xsl:if>
                   <xsl:if test="@morerows &gt; 0">
-                    <xsl:attribute name="rowspan" select="@morerows + 1"/>
+                    <xsl:attribute name="rows" select="@morerows + 1"/>
                   </xsl:if>
                   <xsl:apply-templates select="@css:*" mode="#current"/>
                   <xsl:apply-templates mode="#current"/>
-                </td>
+                </cell>
               </xsl:for-each>
-            </tr>
+            </row>
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
-          <tr>
-            <td>
+          <row>
+            <cell>
               <xsl:apply-templates mode="#current"/>
-            </td>
-          </tr>
+            </cell>
+          </row>
         </xsl:otherwise>
       </xsl:choose>
     </table>
@@ -432,13 +463,13 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="tei:table[not(@type)]" mode="hub2tei:tidy">
+<!--  <xsl:template match="tei:table[not(@type)]" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:attribute name="type" select="'other'"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:copy>
-  </xsl:template>
+  </xsl:template>-->
   
   <xsl:template match="/*" mode="hub2tei:tidy" priority="2">
     <xsl:copy>
