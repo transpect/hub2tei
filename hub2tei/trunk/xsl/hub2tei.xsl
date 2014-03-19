@@ -396,19 +396,15 @@
   
   <xsl:variable name="caption-style-regex" select="'legend'" as="xs:string"/>
   
-  <xsl:template match="dbk:para[matches(@role, $caption-style-regex)]" mode="hub2tei:dbk2tei">
-    <note>
-      <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*, node()" mode="hub2tei:dbk2tei"/>
-      </xsl:copy>
-    </note>
-  </xsl:template>
-  
   <xsl:template match="dbk:note[matches(dbk:para/@role, $caption-style-regex)]" mode="hub2tei:dbk2tei">
     <note>
-      <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
-      <xsl:apply-templates select="node()"/>
+      <xsl:apply-templates select="if (@*) then @* else dbk:para/@*" mode="hub2tei:dbk2tei"/>
+      <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
     </note> 
+  </xsl:template>
+  
+  <xsl:template match="dbk:para[matches(@role, $caption-style-regex)][ancestor::*[local-name() = 'note']]" mode="hub2tei:dbk2tei">
+      <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
   </xsl:template>
 
   <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei"
