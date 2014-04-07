@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:css="http://www.w3.org/1996/css"
-  xmlns:dbk="http://docbook.org/ns/docbook"
-  xmlns:hub="http://www.le-tex.de/namespace/hub"
-  xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei"
-  xmlns:tei="http://www.tei-c.org/ns/1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:css="http://www.w3.org/1996/css" 
+  xmlns:dbk="http://docbook.org/ns/docbook" 
+  xmlns:hub="http://www.le-tex.de/namespace/hub" 
+  xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei" 
+  xmlns:tei="http://www.tei-c.org/ns/1.0" 
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:cx="http://xmlcalabash.com/ns/extensions" 
-  xmlns="http://www.tei-c.org/ns/1.0"
-  exclude-result-prefixes="dbk hub2tei hub xlink css xs cx"
+  xmlns="http://www.tei-c.org/ns/1.0" 
+  exclude-result-prefixes="dbk hub2tei hub xlink css xs cx" 
   version="2.0">
 
   <!-- see also docbook to tei:
@@ -62,7 +61,7 @@
   <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei">
     <TEI>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:attribute name="source-dir-uri" select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>      
+      <xsl:attribute name="source-dir-uri" select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
       <teiHeader>
         <fileDesc>
           <titleStmt>
@@ -97,11 +96,11 @@
                 <xsl:apply-templates select="/dbk:*/@xml:lang" mode="#current"/>
               </xsl:attribute>
             </language>
-          </langUsage>            
+          </langUsage>
         </profileDesc>
         <encodingDesc>
           <styleDefDecl scheme="cssa"/>
-          <xsl:apply-templates select="/*/dbk:info/css:rules" mode="#current"></xsl:apply-templates>
+          <xsl:apply-templates select="/*/dbk:info/css:rules" mode="#current"/>
         </encodingDesc>
       </teiHeader>
       <text>
@@ -112,31 +111,31 @@
       </text>
     </TEI>
   </xsl:template>
-  
+
   <xsl:template match="/dbk:book/@xml:lang" mode="hub2tei:dbk2tei">
-      <xsl:attribute name="{name(.)}" select="replace(., '^(.+?-.+?)-.*$', '$1')"/>
+    <xsl:attribute name="{name(.)}" select="replace(., '^(.+?-.+?)-.*$', '$1')"/>
   </xsl:template>
-  
+
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
     <front>
       <xsl:apply-templates select="* except (dbk:keywordset | css:rules)" mode="#current"/>
     </front>
   </xsl:template>
-  
+
   <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
-      <textClass>
-        <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
-          <xsl:apply-templates mode="#current"/>
-        </keywords>
-      </textClass>
+    <textClass>
+      <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
+        <xsl:apply-templates mode="#current"/>
+      </keywords>
+    </textClass>
   </xsl:template>
-  
+
   <xsl:template match="dbk:keyword" mode="hub2tei:dbk2tei">
     <term key="{@role}">
-        <xsl:apply-templates mode="#current"/>
+      <xsl:apply-templates mode="#current"/>
     </term>
   </xsl:template>
-  
+
   <xsl:template match="dbk:legalnotice" mode="hub2tei:dbk2tei">
     <div type="imprint">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
@@ -148,13 +147,13 @@
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </div>
   </xsl:template>
-  
+
   <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="@css:rule-selection-attribute" mode="hub2tei:dbk2tei">
     <xsl:attribute name="{name()}" select="'rend'"/>
   </xsl:template>
-  
+
   <xsl:template match="@xml:id" mode="hub2tei:dbk2tei">
     <xsl:copy/>
   </xsl:template>
@@ -166,9 +165,9 @@
   <xsl:template match="dbk:anchor/@annotations" mode="hub2tei:dbk2tei">
     <xsl:attribute name="n" select="."/>
   </xsl:template>
-  
+
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
-  
+
   <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:preface | dbk:acknowledgements | dbk:glossary" mode="hub2tei:dbk2tei">
     <div type="{name()}">
       <xsl:if test="./dbk:title[1]/@role">
@@ -177,30 +176,30 @@
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </div>
   </xsl:template>
-  
+
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
     <divGen type="{name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </divGen>
   </xsl:template>
-  
+
   <xsl:template match="@renderas" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rend" select="."/>
   </xsl:template>
-  
+
   <xsl:template match="dbk:title" mode="hub2tei:dbk2tei">
     <head>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </head>
   </xsl:template>
-  
+
   <xsl:template match="dbk:subtitle" mode="hub2tei:dbk2tei">
     <p>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </p>
   </xsl:template>
 
-  <xsl:template match="dbk:para" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para | dbk:simpara" mode="hub2tei:dbk2tei">
     <p>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </p>
@@ -247,7 +246,7 @@
   <xsl:template match="css:rule//*" mode="hub2tei:dbk2tei">
     <xsl:copy-of select="."/>
   </xsl:template>
-  
+
 
   <xsl:template match="dbk:phrase" mode="hub2tei:dbk2tei">
     <seg>
@@ -260,20 +259,20 @@
       <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
     </label>
   </xsl:template>
-  
+
   <xsl:template match="dbk:superscript | dbk:subscript" mode="hub2tei:dbk2tei">
     <hi rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </hi>
   </xsl:template>
-  
+
   <!-- @type is no longer supported for each element in TEI P5  -->
   <xsl:template match="@role" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rend" select="."/>
   </xsl:template>
-  
-  <xsl:key name="natives" match="css:rule" use="@name"/> 
-  
+
+  <xsl:key name="natives" match="css:rule" use="@name"/>
+
   <!-- handle page breaks -->
   <xsl:template match="*[key('natives', @role)/@*[name() =('css:page-break-before', 'css:page-break-after')]]" mode="hub2tei:dbk2tei" priority="10">
     <xsl:choose>
@@ -289,7 +288,7 @@
             <xsl:next-match/>
             <xsl:if test="key('natives', @role)/@css:page-break-after">
               <pb/>
-            </xsl:if>  
+            </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -298,7 +297,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template match="@css:page-break-after|@css:page-break-before" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="dbk:phrase[@role eq 'footnote_reference'][dbk:footnote][count(node()) eq 1]" mode="hub2tei:dbk2tei">
@@ -319,30 +318,30 @@
     </list>
   </xsl:template>
 
-  <xsl:variable name="poem-style-regex" select="'((g|G)edicht)'"  as="xs:string"/>
-  <xsl:template match="dbk:para[matches(@role, $poem-style-regex)]" mode="hub2tei:dbk2tei">
+  <xsl:variable name="hub2tei:poem-style-regex" select="'((g|G)edicht)'" as="xs:string"/>
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)]" mode="hub2tei:dbk2tei">
     <l>
       <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </l>
   </xsl:template>
-  
+
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
     <lg>
       <xsl:apply-templates select="node()" mode="#current"/>
     </lg>
   </xsl:template>
-  
+
   <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)]|dbk:varlistentry" mode="hub2tei:dbk2tei">
     <item rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </item>
   </xsl:template>
-  
+
   <xsl:template match="@override" mode="hub2tei:dbk2tei">
     <xsl:attribute name="n" select="."/>
   </xsl:template>
-  
+
   <xsl:template match="@numeration" mode="hub2tei:dbk2tei">
     <xsl:variable name="numeration-style" select="
       if(. eq 'arabic') then 'decimal' 
@@ -355,68 +354,80 @@
       <xsl:attribute name="style" select="concat('list-style-type:', $numeration-style ,';')"/>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="dbk:listitem[parent::dbk:varlistentry]" mode="hub2tei:dbk2tei">
-    <gloss rend="{local-name()}">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    <xsl:choose>
+      <xsl:when test="dbk:para">
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <gloss rend="{local-name()}">
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
+        </gloss>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="dbk:para[parent::dbk:listitem]" mode="hub2tei:dbk2tei">
+    <gloss>
+      <xsl:attribute name="rend" select=" if(@role) then  concat(@role, ' listitem') else 'listitem'"/>
+      <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
     </gloss>
   </xsl:template>
-  
+
   <xsl:template match="dbk:term" mode="hub2tei:dbk2tei">
     <term rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </term>
   </xsl:template>
-  
+
   <xsl:template match="dbk:tabs|dbk:seg" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
-  
-  <xsl:template match="figure" mode="hub2tei:dbk2tei" 
-    xpath-default-namespace="http://docbook.org/ns/docbook">
+
+  <xsl:template match="figure" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </figure>
   </xsl:template>
- 
-  <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" 
-    xpath-default-namespace="http://docbook.org/ns/docbook">
-      <graphic url="{imageobject/imagedata/@fileref}">
-        <xsl:if test="imageobject/imagedata/@width">
-          <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
-        </xsl:if>
-        <xsl:if test="imageobject/imagedata/@depth">
-          <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) then string-join((imageobject/imagedata/@depth,'pt'),'') else imageobject/imagedata/@depth"/>
-        </xsl:if>
-        <xsl:if test="./@role">
-          <xsl:attribute name="rend" select="@role"/>
-        </xsl:if>
-      </graphic>
+
+  <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+    <graphic url="{imageobject/imagedata/@fileref}">
+      <xsl:if test="imageobject/imagedata/@width">
+        <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
+      </xsl:if>
+      <xsl:if test="imageobject/imagedata/@depth">
+        <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) then string-join((imageobject/imagedata/@depth,'pt'),'') else imageobject/imagedata/@depth"/>
+      </xsl:if>
+      <xsl:if test="./@role">
+        <xsl:attribute name="rend" select="@role"/>
+      </xsl:if>
+    </graphic>
   </xsl:template>
-  
+
   <xsl:variable name="caption-style-regex" select="'legend'" as="xs:string"/>
-  
+
   <xsl:template match="dbk:note[matches(dbk:para/@role, $caption-style-regex)]" mode="hub2tei:dbk2tei">
     <note>
       <xsl:apply-templates select="if (@*) then @* else dbk:para/@*" mode="hub2tei:dbk2tei"/>
       <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
-    </note> 
-  </xsl:template>
-  
-  <xsl:template match="dbk:para[matches(@role, $caption-style-regex)][ancestor::*[local-name() = 'note']]" mode="hub2tei:dbk2tei">
-      <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
+    </note>
   </xsl:template>
 
-  <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei"
-    xpath-default-namespace="http://docbook.org/ns/docbook"
-    >
+  <xsl:template match="dbk:para[matches(@role, $caption-style-regex)][ancestor::*[local-name() = 'note']]" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
+  </xsl:template>
+
+  <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <table>
       <xsl:apply-templates select="@xml:id | @role" mode="#current"/>
       <xsl:choose>
         <xsl:when test="exists(tgroup)">
           <xsl:if test="not(@css:width)">
             <xsl:variable name="cell-width" select="sum(for $w in tgroup/colspec return number(replace($w/@colwidth, 'mm', '')))"/>
-            <xsl:attribute name="css:width" select="concat($cell-width, 'mm')"/>
+            <xsl:if test="number($cell-width)">
+              <xsl:attribute name="css:width" select="concat($cell-width, 'mm')"/>
+            </xsl:if>
           </xsl:if>
           <xsl:for-each select="./tgroup/(tbody union thead union tfoot)/row">
             <row>
@@ -445,7 +456,7 @@
       </xsl:choose>
     </table>
   </xsl:template>
-  
+
   <!-- use templates from hub2html for style serializing. Thanks to the TEI+CSSa
     schema, we don’t need to prematurely serialize CSS here -->
   <xsl:template match="tei:*[@css:*]" mode="hub2tei:tidy_DISABLED">
@@ -459,19 +470,19 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-<!--  <xsl:template match="tei:table[not(@type)]" mode="hub2tei:tidy">
+  <!--  <xsl:template match="tei:table[not(@type)]" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:attribute name="type" select="'other'"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:copy>
   </xsl:template>-->
-  
+
   <xsl:template match="/*" mode="hub2tei:tidy" priority="2">
     <xsl:copy>
       <xsl:namespace name="css" select="'http://www.w3.org/1996/css'"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
-  
+
 </xsl:stylesheet>
