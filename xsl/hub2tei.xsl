@@ -118,9 +118,28 @@
 
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
     <front>
-      <xsl:apply-templates select="* except (dbk:keywordset | css:rules)" mode="#current"/>
+      <xsl:apply-templates select="* except (dbk:keywordset | css:rules), //dbk:toc" mode="#current"/>
     </front>
   </xsl:template>
+  
+  <xsl:template match="dbk:toc" mode="hub2tei:dbk2tei">
+    <divGen type="toc" rendition="3">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:if test="not(dbk:title)">
+        <head><xsl:value-of select="(//info/keywordset/keyword[@role = 'toc-title'], 'Inhalt')[1]"/></head>
+      </xsl:if>
+    </divGen>
+  </xsl:template>
+    
+  <xsl:template match="tei:front" mode="hub2tei:tidy">
+     <xsl:apply-templates select="@*, node()" mode="#current"/>
+     <xsl:if test="not(tei:divGen)">
+       <xsl:apply-templates select="dbk:toc" mode="hub2tei:dbk2tei"/>
+     </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="tei:divGen[@type = 'toc'][not(ancestor::*[local-name() = 'front'])]" mode="hub2tei:tidy"/>
+  
 
   <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
     <textClass>
