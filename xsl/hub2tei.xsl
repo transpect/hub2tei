@@ -65,7 +65,9 @@
       <teiHeader>
         <fileDesc>
           <titleStmt>
-            <title/>
+            <title>
+              <xsl:value-of select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-basename']"/>
+            </title>
             <author/>
           </titleStmt>
           <publicationStmt>
