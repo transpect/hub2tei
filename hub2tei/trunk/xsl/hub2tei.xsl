@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-  xmlns:css="http://www.w3.org/1996/css" 
-  xmlns:dbk="http://docbook.org/ns/docbook" 
-  xmlns:hub="http://www.le-tex.de/namespace/hub" 
-  xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei" 
-  xmlns:tei="http://www.tei-c.org/ns/1.0" 
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
-  xmlns:cx="http://xmlcalabash.com/ns/extensions" 
-  xmlns="http://www.tei-c.org/ns/1.0" 
-  exclude-result-prefixes="dbk hub2tei hub xlink css xs cx" 
-  version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:css="http://www.w3.org/1996/css" xmlns:dbk="http://docbook.org/ns/docbook" xmlns:hub="http://www.le-tex.de/namespace/hub" xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns="http://www.tei-c.org/ns/1.0" exclude-result-prefixes="dbk hub2tei hub xlink css xs cx" version="2.0">
 
   <!-- see also docbook to tei:
        http://svn.le-tex.de/svn/ltxbase/DBK2TEI -->
@@ -123,25 +112,30 @@
       <xsl:apply-templates select="* except (dbk:keywordset | css:rules), //dbk:toc" mode="#current"/>
     </front>
   </xsl:template>
-  
+
   <xsl:template match="dbk:toc" mode="hub2tei:dbk2tei">
-    <divGen type="toc" rendition="3">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    <divGen type="toc">
+      <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:if test="not(dbk:title)">
-        <head><xsl:value-of select="(//info/keywordset/keyword[@role = 'toc-title'], 'Inhalt')[1]"/></head>
+        <head>
+          <xsl:value-of select="(//info/keywordset/keyword[@role = 'toc-title'], 'Inhalt')[1]"/>
+        </head>
       </xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/>
     </divGen>
   </xsl:template>
-    
+
   <xsl:template match="tei:front" mode="hub2tei:tidy">
-     <xsl:apply-templates select="@*, node()" mode="#current"/>
-     <xsl:if test="not(tei:divGen)">
-       <xsl:apply-templates select="dbk:toc" mode="hub2tei:dbk2tei"/>
-     </xsl:if>
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:if test="not(tei:divGen[@type = 'toc'])">
+        <xsl:apply-templates select="dbk:toc" mode="hub2tei:dbk2tei"/>
+      </xsl:if>
+    </xsl:copy>
   </xsl:template>
-  
+
   <xsl:template match="tei:divGen[@type = 'toc'][not(ancestor::*[local-name() = 'front'])]" mode="hub2tei:tidy"/>
-  
+
 
   <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
     <textClass>
