@@ -136,7 +136,12 @@
 
   <xsl:template match="tei:divGen[@type = 'toc'][not(ancestor::*[local-name() = 'front'])]" mode="hub2tei:tidy"/>
 
+  <xsl:template match="@condition" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="rendition" select="."/>
+  </xsl:template>
 
+  <xsl:template match="@remap[. = 'HiddenText']" mode="hub2tei:dbk2tei"/>
+  
   <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
     <textClass>
       <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
@@ -499,5 +504,5 @@
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
-
+  
 </xsl:stylesheet>
