@@ -129,7 +129,7 @@
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
       <xsl:if test="not(tei:divGen[@type = 'toc'])">
-        <xsl:apply-templates select="dbk:toc" mode="hub2tei:dbk2tei"/>
+        <xsl:copy-of select="/*//tei:divGen[@type = 'toc']"/>
       </xsl:if>
     </xsl:copy>
   </xsl:template>
