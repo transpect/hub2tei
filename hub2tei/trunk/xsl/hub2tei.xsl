@@ -333,8 +333,8 @@
   <xsl:template match="dbk:itemizedlist|dbk:orderedlist|dbk:variablelist" mode="hub2tei:dbk2tei">
     <list>
       <xsl:attribute name="type" select="local-name()"/>
-      <xsl:attribute name="style" select="@mark"/>
-      <xsl:apply-templates select="@* except @mark"/>
+      <xsl:attribute name="style" select="(@mark, @numeration)[1]"/>
+      <xsl:apply-templates select="@* except (@mark, @numeration)"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </list>
   </xsl:template>
