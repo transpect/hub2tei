@@ -20,7 +20,9 @@
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="http://transpect.le-tex.de/book-conversion/converter/xpl/dynamic-transformation-pipeline.xpl"/>
 
-  <bc:dynamic-transformation-pipeline load="hub2tei/hub2tei_driver">
+  <bc:dynamic-transformation-pipeline load="hub2tei/hub2tei_driver"
+    fallback-xsl="http://transpect.le-tex.de/hub2tei/xsl/hub2tei.xsl"
+    fallback-xpl="http://transpect.le-tex.de/hub2tei/xpl/hub2tei_default.xpl">
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:input port="additional-inputs"><p:empty/></p:input>
