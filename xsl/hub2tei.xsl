@@ -110,9 +110,16 @@
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
     <front>
       <xsl:apply-templates select="* except (dbk:keywordset | css:rules), //dbk:toc" mode="#current"/>
+      <xsl:apply-templates select="//dbk:dedication, //dbk:preface" mode="#current">
+        <xsl:with-param name="move-front-matter-parts" select="true()" tunnel="yes"/>
+      </xsl:apply-templates>
     </front>
   </xsl:template>
 
+  <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:tidy">
+    <xsl:apply-templates select="tei:epigraph" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="dbk:toc" mode="hub2tei:dbk2tei">
     <divGen type="toc">
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -125,12 +132,25 @@
     </divGen>
   </xsl:template>
 
+  <xsl:template match="dbk:div" mode="hub2tei:dbk2tei">
+    <div>
+      <xsl:if test="@rend or @type">
+        <xsl:attribute name="type">
+              <xsl:value-of select="(@type, @rend)[1]"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:apply-templates select="@* except ((@type, @rend)[1])" mode="#current"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </div>
+  </xsl:template>
+  
   <xsl:template match="tei:front" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:if test="not(tei:divGen[@type = 'toc'])">
         <xsl:copy-of select="/*//tei:divGen[@type = 'toc']"/>
       </xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
@@ -162,12 +182,27 @@
     </div>
   </xsl:template>
 
-  <xsl:template match="dbk:dedication" mode="hub2tei:dbk2tei">
-    <div type="dedication">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </div>
+  <xsl:template match="dbk:dedication | dbk:preface" mode="hub2tei:dbk2tei">
+    <xsl:param name="move-front-matter-parts" as="xs:boolean?" tunnel="yes"/>
+    <xsl:message select="'......', $move-front-matter-parts"/>
+    <xsl:if test="$move-front-matter-parts">
+      <div>
+        <xsl:attribute name="type" select="name()"/>
+        <xsl:if test="./dbk:title[1]/@role">
+          <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
+        </xsl:if>
+        <xsl:apply-templates select="@*" mode="#current"/>
+        <xsl:apply-templates select="*" mode="#current"/>
+      </div>
+    </xsl:if>
   </xsl:template>
 
+  <xsl:template match="dbk:epigraph" mode="hub2tei:dbk2tei">
+    <epigraph>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </epigraph>
+  </xsl:template>
+    
   <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="@css:rule-selection-attribute" mode="hub2tei:dbk2tei">
@@ -188,12 +223,14 @@
 
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
 
-  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:preface | dbk:acknowledgements | dbk:glossary" mode="hub2tei:dbk2tei">
-    <div type="{name()}">
+  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary" mode="hub2tei:dbk2tei">
+    <div>
+      <xsl:attribute name="type" select="name()"/>
       <xsl:if test="./dbk:title[1]/@role">
         <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
       </xsl:if>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>    
+      <xsl:apply-templates select="*" mode="#current"/>
     </div>
   </xsl:template>
 
@@ -330,35 +367,48 @@
     </quote>
   </xsl:template>
 
-  <xsl:template match="dbk:itemizedlist|dbk:orderedlist|dbk:variablelist" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:itemizedlist | dbk:orderedlist | dbk:variablelist | dbk:glosslist" mode="hub2tei:dbk2tei">
     <list>
-      <xsl:attribute name="type" select="local-name()"/>
-      <xsl:attribute name="style" select="(@mark, @numeration)[1]"/>
+      <xsl:attribute name="type">
+        <xsl:choose>
+          <xsl:when test="local-name(.) = 'itemizedlist'">
+            <xsl:value-of select="'bulleted'"/>
+          </xsl:when>
+          <xsl:when test="local-name(.) = 'orderedlist'">
+            <xsl:value-of select="'ordered'"/>
+          </xsl:when>
+          <xsl:when test="local-name(.) = ('glosslist', 'variablelist')">
+            <xsl:value-of select="'gloss'"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:if test="@mark or @numeration">
+        <xsl:attribute name="style" select="(@mark, @numeration)[1]"/>
+      </xsl:if>
       <xsl:apply-templates select="@* except (@mark, @numeration)"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </list>
   </xsl:template>
 
-  <xsl:variable name="hub2tei:poem-style-regex" select="'((g|G)edicht)'" as="xs:string"/>
-  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)]" mode="hub2tei:dbk2tei">
-    <l>
-      <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
-      <xsl:apply-templates select="node()" mode="#current"/>
-    </l>
-  </xsl:template>
-
-  <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
-    <lg>
-      <xsl:apply-templates select="node()" mode="#current"/>
-    </lg>
-  </xsl:template>
-
-  <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)]|dbk:varlistentry" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)] | dbk:varlistentry | dbk:glossentry" mode="hub2tei:dbk2tei">
     <item rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </item>
   </xsl:template>
 
+  <xsl:template match="dbk:listitem[parent::dbk:varlistentry] | dbk:glossdef" mode="hub2tei:dbk2tei">
+    <gloss rend="{local-name()}">
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </gloss>
+  </xsl:template>
+  
+  <xsl:template match="dbk:listitem[parent::dbk:varlistentry]/dbk:para | dbk:glossdef/dbk:para" mode="hub2tei:dbk2tei">
+     <xsl:apply-templates select="node()" mode="#current"/>
+    <xsl:if test="following-sibling::*[self::dbk:para]">
+      <lb/>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template match="@override" mode="hub2tei:dbk2tei">
     <xsl:attribute name="n" select="."/>
   </xsl:template>
@@ -376,33 +426,33 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="dbk:listitem[parent::dbk:varlistentry]" mode="hub2tei:dbk2tei">
-    <xsl:choose>
-      <xsl:when test="dbk:para">
-        <xsl:apply-templates select="@*, node()" mode="#current"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <gloss rend="{local-name()}">
-          <xsl:apply-templates select="@*, node()" mode="#current"/>
-        </gloss>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template match="dbk:para[parent::dbk:listitem]" mode="hub2tei:dbk2tei">
-    <gloss>
-      <xsl:attribute name="rend" select=" if(@role) then  concat(@role, ' listitem') else 'listitem'"/>
-      <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
-    </gloss>
-  </xsl:template>
-
-  <xsl:template match="dbk:term" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:term[not(parent::*[1][self::dbk:varlistentry])]" mode="hub2tei:dbk2tei">
     <term rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </term>
   </xsl:template>
+  
+  <xsl:template match="dbk:glossterm | dbk:term[parent::*[1][self::dbk:varlistentry]]" mode="hub2tei:dbk2tei">
+    <label rend="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </label>
+  </xsl:template>
 
-  <xsl:template match="dbk:tabs|dbk:seg" mode="hub2tei:dbk2tei">
+  <xsl:variable name="hub2tei:poem-style-regex" select="'((g|G)edicht)'" as="xs:string"/>
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)]" mode="hub2tei:dbk2tei">
+    <l>
+      <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </l>
+  </xsl:template>
+  
+  <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
+    <lg>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </lg>
+  </xsl:template>
+  
+  <xsl:template match="dbk:tabs | dbk:seg" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
