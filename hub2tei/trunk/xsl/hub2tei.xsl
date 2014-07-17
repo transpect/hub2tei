@@ -439,7 +439,7 @@
   </xsl:template>
 
   <xsl:variable name="hub2tei:poem-style-regex" select="'((g|G)edicht)'" as="xs:string"/>
-  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)] | dbk:poetry/dbk:para" mode="hub2tei:dbk2tei">
     <l>
       <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
       <xsl:apply-templates select="node()" mode="#current"/>
@@ -447,9 +447,27 @@
   </xsl:template>
   
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
-    <lg>
+    <lg type="poetry">
       <xsl:apply-templates select="node()" mode="#current"/>
     </lg>
+  </xsl:template>
+  
+  <xsl:template match="tei:lg" mode="hub2tei:tidy">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:for-each-group select="tei:l" group-starting-with=".[matches(@rend, 'emptyline$')]">
+        <xsl:choose>
+          <xsl:when test="current-group()[matches(@rend, 'emptyline$')]">
+            <lg type="stanza">
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+            </lg>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
   </xsl:template>
   
   <xsl:template match="dbk:tabs | dbk:seg" mode="hub2tei:dbk2tei">
@@ -536,7 +554,7 @@
       <xsl:apply-templates select="@* except @css:*, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
-
+  
   <xsl:template match="tei:seg[not(@*)]" mode="hub2tei:tidy">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
