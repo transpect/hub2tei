@@ -132,7 +132,7 @@
     </divGen>
   </xsl:template>
 
-  <xsl:template match="dbk:div" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:div[not(matches(@role, $tei:floatingTexts-role))]" mode="hub2tei:dbk2tei">
     <div>
       <xsl:if test="@rend or @type">
         <xsl:attribute name="type">
@@ -361,6 +361,20 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
+  <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^(marginal|box|letter|timetable|code|source)$'"/>
+  <xsl:template match="dbk:sidebar[not(matches(@role, $tei:floatingTexts-role))]" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] | dbk:div[matches(@role, $tei:floatingTexts-role)]" mode="hub2tei:dbk2tei">
+    <floatingText type="{@role}">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <body>
+        <xsl:apply-templates select="node()" mode="#current"/>
+      </body>
+    </floatingText>
+  </xsl:template>
+  
   <xsl:template match="dbk:blockquote" mode="hub2tei:dbk2tei">
     <quote>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
