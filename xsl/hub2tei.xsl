@@ -311,7 +311,7 @@
     </seg>
   </xsl:template>
 
-  <xsl:template match="dbk:phrase[@role = 'hub:identifier']" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:phrase[@role = 'hub:identifier'] | dbk:label" mode="hub2tei:dbk2tei">
     <label>
       <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
     </label>
