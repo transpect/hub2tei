@@ -469,7 +469,7 @@
   <xsl:template match="tei:lg" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="tei:l" group-starting-with=".[matches(@rend, 'emptyline$')]">
+      <xsl:for-each-group select="tei:l" group-starting-with="@rend[matches(., 'emptyline$')]">
         <xsl:choose>
           <xsl:when test="current-group()[matches(@rend, 'emptyline$')]">
             <lg type="stanza">
