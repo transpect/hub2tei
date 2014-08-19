@@ -304,6 +304,36 @@
     <xsl:copy-of select="."/>
   </xsl:template>
 
+  <xsl:variable name="tei:box-para-style-regex" select="'^letex_boxpara'" as="xs:string"/>
+  
+  <xsl:template match="dbk:informaltable[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]"
+    priority="2" mode="hub2tei:dbk2tei">
+    <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-para-style-regex)])[1]" as="element(dbk:para)"/>
+    <xsl:variable name="box-symbol" as="element(dbk:imagedata)?" select="$head/parent::*/preceding-sibling::*[1]//dbk:mediaobject/dbk:imageobject/dbk:imagedata"/>
+    <floatingText type="box" rend="{@role}">
+      <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>
+<!--      <xsl:call-template name="box-legend"/>-->
+      <div>
+        <head>
+          <xsl:apply-templates select="$head" mode="#current"/>
+          <xsl:if test="$box-symbol">
+            <xsl:element name="graphic">
+              <xsl:attribute name="url" select="$box-symbol/@filere"/>
+              <xsl:attribute name="id" select="$box-symbol/@xml:id"/>
+              <xsl:attribute name="css:width" select="$box-symbol/@css:width"/>
+              <xsl:attribute name="css:height" select="$box-symbol/@css:height"/>
+            </xsl:element>
+          </xsl:if>
+          <xsl:apply-templates select="$head/node()" mode="#current"/>
+        </head>
+        <xsl:apply-templates select=".//dbk:entry/*[not(. is $head) and not(./*[1]/*[1] is $box-symbol)]" mode="#current"/>
+        <xsl:apply-templates select=".//dbk:entry/*[. is $box-symbol]" mode="test"/>
+      </div>
+<!--      <xsl:apply-templates select="dbk:info[dbk:legalnotice[@role eq 'copyright']]" mode="#current"/>-->
+    </floatingText>
+  </xsl:template>
+  
+  <xsl:template match="*" mode="test"/>
 
   <xsl:template match="dbk:phrase" mode="hub2tei:dbk2tei">
     <seg>
@@ -524,8 +554,14 @@
   </xsl:template>
 
   <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+
     <table>
       <xsl:apply-templates select="@xml:id | @role" mode="#current"/>
+      <xsl:if test="title">
+        <head>
+          <xsl:apply-templates select="title/@*, title/node()" mode="#current"/>
+        </head>
+      </xsl:if>
       <xsl:choose>
         <xsl:when test="exists(tgroup)">
           <xsl:if test="not(@css:width)">
@@ -559,6 +595,11 @@
           </row>
         </xsl:otherwise>
       </xsl:choose>
+      <xsl:if test="note">
+        <note>
+          <xsl:apply-templates select="note/@*, note/node()" mode="#current"/>
+        </note>
+      </xsl:if>
     </table>
   </xsl:template>
 
