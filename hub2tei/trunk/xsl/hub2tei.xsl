@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:css="http://www.w3.org/1996/css" xmlns:dbk="http://docbook.org/ns/docbook" xmlns:hub="http://www.le-tex.de/namespace/hub" xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns="http://www.tei-c.org/ns/1.0" exclude-result-prefixes="dbk hub2tei hub xlink css xs cx" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:css="http://www.w3.org/1996/css"
+  xmlns:dbk="http://docbook.org/ns/docbook" 
+  xmlns:hub="http://www.le-tex.de/namespace/hub" 
+  xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei" 
+  xmlns:tei="http://www.tei-c.org/ns/1.0" 
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:cx="http://xmlcalabash.com/ns/extensions" 
+  xmlns="http://www.tei-c.org/ns/1.0" 
+  exclude-result-prefixes="dbk hub2tei hub xlink css xs cx"
+  version="2.0">
 
   <!-- see also docbook to tei:
        http://svn.le-tex.de/svn/ltxbase/DBK2TEI -->
@@ -184,7 +195,6 @@
 
   <xsl:template match="dbk:dedication | dbk:preface" mode="hub2tei:dbk2tei">
     <xsl:param name="move-front-matter-parts" as="xs:boolean?" tunnel="yes"/>
-    <xsl:message select="'......', $move-front-matter-parts"/>
     <xsl:if test="$move-front-matter-parts">
       <div>
         <xsl:attribute name="type" select="name()"/>
@@ -313,9 +323,10 @@
     <floatingText type="box" rend="{@role}">
       <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>
 <!--      <xsl:call-template name="box-legend"/>-->
-      <div>
+      <body>
+        <xsl:if test="(some $a in $head//text() satisfies matches($a, '\S')) or $box-symbol">
         <head>
-          <xsl:apply-templates select="$head" mode="#current"/>
+          <xsl:apply-templates select="$head/@*" mode="#current"/>
           <xsl:if test="$box-symbol">
             <xsl:element name="graphic">
               <xsl:attribute name="url" select="$box-symbol/@filere"/>
@@ -326,9 +337,10 @@
           </xsl:if>
           <xsl:apply-templates select="$head/node()" mode="#current"/>
         </head>
+        </xsl:if>
         <xsl:apply-templates select=".//dbk:entry/*[not(. is $head) and not(./*[1]/*[1] is $box-symbol)]" mode="#current"/>
         <xsl:apply-templates select=".//dbk:entry/*[. is $box-symbol]" mode="test"/>
-      </div>
+      </body>
 <!--      <xsl:apply-templates select="dbk:info[dbk:legalnotice[@role eq 'copyright']]" mode="#current"/>-->
     </floatingText>
   </xsl:template>
@@ -391,19 +403,37 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^(marginal|box|letter|timetable|code|source)$'"/>
+  <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^letex_(marginal|box|letter|timetable|code|source)$'"/>
   <xsl:template match="dbk:sidebar[not(matches(@role, $tei:floatingTexts-role))]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] | dbk:div[matches(@role, $tei:floatingTexts-role)]" mode="hub2tei:dbk2tei">
-    <floatingText type="{@role}">
+  <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] | dbk:div[matches(@role, $tei:floatingTexts-role)]" mode="hub2tei:dbk2tei" priority="5">
+    <floatingText type="{tei:floatingTexts-type(@role)}">
       <xsl:apply-templates select="@*" mode="#current"/>
       <body>
         <xsl:apply-templates select="node()" mode="#current"/>
       </body>
     </floatingText>
   </xsl:template>
+  
+  <!-- This function/variables shall be overriden in client-specific templates -->
+  <xsl:variable name="tei:box-style-role" select="'^letex_box'"  as="xs:string"/>
+  <xsl:variable name="tei:marginal-style-role" select="'^letex_marginal'"  as="xs:string"/>
+  <xsl:function name="tei:floatingTexts-type" as="xs:string">
+    <xsl:param name="role" as="xs:string?"/>
+    <xsl:choose>
+      <xsl:when test="matches($role, $tei:box-style-role)">
+        <xsl:value-of select="'box'"/>
+      </xsl:when>
+      <xsl:when test="matches($role,  $tei:marginal-style-role)">
+        <xsl:value-of select="'marginal'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$role"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
   
   <xsl:template match="dbk:blockquote" mode="hub2tei:dbk2tei">
     <quote>
