@@ -526,6 +526,7 @@
     </lg>
   </xsl:template>
   
+  <!-- emptyline has to be generalized -->
   <xsl:template match="tei:lg" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -556,6 +557,33 @@
     </figure>
   </xsl:template>
 
+  <xsl:variable name="hub2tei:drama-style-role-regex" as ="xs:string" select="'^letex_Drama'"/>
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]" mode="hub2tei:dbk2tei" priority="3">
+    <sp>
+      <xsl:next-match/>
+    </sp>
+  </xsl:template>
+  <!-- template fails :( An empty sequence is not allowed as the @group-adjacent attribute of xsl:for-each-group -->
+<!--  <xsl:template match="*[tei:sp]" mode="hub2tei:tidy">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:for-each-group select="*" group-adjacent="self::*:sp">
+        <xsl:choose>
+          <xsl:when test="current-group()[self::tei:sp]">
+            <spGrp n="{count(current-group())}">
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+            </spGrp>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="current-group()">
+              <xsl:apply-templates select="." mode="#current"/>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>-->
+  
   <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <graphic url="{imageobject/imagedata/@fileref}">
       <xsl:if test="imageobject/imagedata/@width">
