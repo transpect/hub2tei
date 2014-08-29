@@ -526,26 +526,42 @@
     </lg>
   </xsl:template>
   
-  <!-- emptyline has to be generalized -->
   <xsl:template match="tei:lg" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="tei:l" group-starting-with="@rend[matches(., 'emptyline$')]">
+      <xsl:for-each-group select="*" group-starting-with="tei:l[@rend[hub2tei:is-stanza(.)]]">
         <xsl:choose>
-          <xsl:when test="current-group()[matches(@rend, 'emptyline$')]">
+          <xsl:when test="current-group()[@rend[hub2tei:is-stanza(.)]]">
             <lg type="stanza">
-              <xsl:apply-templates select="current-group()" mode="#current"/>
+              <xsl:apply-templates select="current-group()" mode="#current">
+                <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
+              </xsl:apply-templates>
             </lg>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:for-each select="current-group()">
-              <xsl:apply-templates select="." mode="#current"/>
-            </xsl:for-each>
+              <xsl:apply-templates select="current-group()" mode="#current"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each-group>
     </xsl:copy>
   </xsl:template>
+  
+  <xsl:template match="tei:l/@rend[hub2tei:is-stanza(.)]" mode="hub2tei:tidy">
+    <xsl:param name="delete-emptyline" tunnel="yes"/>
+    <xsl:attribute name="rend" select="if ($delete-emptyline) then replace(., '_-_emptyline', '') else ."/>
+  </xsl:template>
+  
+  <xsl:function name="hub2tei:is-stanza" as="xs:boolean">
+    <xsl:param name="test"/>
+    <xsl:choose>
+      <xsl:when test="matches($test, 'emptyline$')">
+        <xsl:sequence select="true()"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="false()"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
   
   <xsl:template match="dbk:tabs | dbk:seg" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current"/>
