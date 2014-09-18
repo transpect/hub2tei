@@ -8,16 +8,18 @@
   xmlns:tei="http://www.tei-c.org/ns/1.0" 
   xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:cx="http://xmlcalabash.com/ns/extensions" 
+  xmlns:html="http://www.w3.org/1999/xhtml" 
   xmlns="http://www.tei-c.org/ns/1.0" 
   exclude-result-prefixes="dbk hub2tei hub xlink css xs cx"
   version="2.0">
 
   <!-- see also docbook to tei:
        http://svn.le-tex.de/svn/ltxbase/DBK2TEI -->
-
+  <xsl:import href="http://transpect.le-tex.de/xslt-util/cals2htmltable/cals2htmltables.xsl"/>
+  
   <xsl:param name="debug" select="'no'" as="xs:string?"/>
   <xsl:param name="debug-dir-uri" select="'debug'" as="xs:string"/>
-
+  
   <xsl:output method="xml"/>
 
   <xsl:output name="debug" method="xml" indent="yes"/>
@@ -120,8 +122,8 @@
 
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
     <front>
-      <xsl:apply-templates select="* except (dbk:keywordset | css:rules), //dbk:toc" mode="#current"/>
-      <xsl:apply-templates select="//dbk:dedication, //dbk:preface" mode="#current">
+      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | dbk:publisher), //dbk:toc" mode="#current"/>
+      <xsl:apply-templates select="//*[local-name() = ('dedication', 'preface', 'colophon')]" mode="#current">
         <xsl:with-param name="move-front-matter-parts" select="true()" tunnel="yes"/>
       </xsl:apply-templates>
     </front>
@@ -193,7 +195,7 @@
     </div>
   </xsl:template>
 
-  <xsl:template match="dbk:dedication | dbk:preface" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:dedication | dbk:preface | dbk:colophon" mode="hub2tei:dbk2tei">
     <xsl:param name="move-front-matter-parts" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="$move-front-matter-parts">
       <div>
@@ -513,6 +515,7 @@
   </xsl:template>
 
   <xsl:variable name="hub2tei:poem-style-regex" select="'((g|G)edicht)'" as="xs:string"/>
+  
   <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)] | dbk:poetry/dbk:para" mode="hub2tei:dbk2tei">
     <l>
       <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
@@ -627,55 +630,77 @@
     <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
   </xsl:template>
 
-  <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+<!--  <xsl:template match="dbk:para" mode="cals2html-table" exclude-result-prefixes="dbk">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="dbk:phrase" mode="cals2html-table"  exclude-result-prefixes="dbk">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>-->
+  
+  <xsl:template match="html:*" mode="hub2tei:tidy" xpath-default-namespace="html">
+    <xsl:element name="{local-name()}">
+       <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:element>
+  </xsl:template>  
 
-    <table>
-      <xsl:apply-templates select="@xml:id | @role" mode="#current"/>
-      <xsl:if test="title">
-        <head>
-          <xsl:apply-templates select="title/@*, title/node()" mode="#current"/>
-        </head>
-      </xsl:if>
-      <xsl:choose>
-        <xsl:when test="exists(tgroup)">
-          <xsl:if test="not(@css:width)">
-            <xsl:variable name="cell-width" select="sum(for $w in tgroup/colspec return number(replace($w/@colwidth, 'mm', '')))"/>
-            <xsl:if test="number($cell-width)">
-              <xsl:attribute name="css:width" select="concat($cell-width, 'mm')"/>
-            </xsl:if>
+  <!-- prevent boxes that are set as tables to be converted to HTML tables -->
+  <xsl:template match="*[descendant-or-self::*[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]]" mode="cals2html-table">
+    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>
+  </xsl:template>  
+  
+  <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+        <table>
+          <xsl:apply-templates select="@xml:id | @role" mode="#current"/>
+          <xsl:if test="title">
+            <head>
+              <xsl:apply-templates select="title/@*, title/node()" mode="#current"/>
+            </head>
           </xsl:if>
-          <xsl:for-each select="./tgroup/(tbody union thead union tfoot)/row">
-            <row>
-              <xsl:for-each select="entry">
+          <xsl:choose>
+            <xsl:when test="exists(tgroup)">
+              <xsl:if test="not(@css:width)">
+                <xsl:variable name="cell-width" select="sum(for $w in tgroup/colspec return number(replace($w/@colwidth, 'mm', '')))"/>
+                <xsl:if test="number($cell-width)">
+                  <xsl:attribute name="css:width" select="concat($cell-width, 'mm')"/>
+                </xsl:if>
+              </xsl:if>
+              <xsl:for-each select="./tgroup/(tbody union thead union tfoot)/row">
+                <row>
+                  <xsl:for-each select="entry">
+                    <cell>
+                      <xsl:if test="@namest">
+                        <xsl:attribute name="cols" select="number(substring-after(@nameend, 'col')) - number(substring-after(@namest, 'col')) + 1"/>
+                      </xsl:if>
+                      <xsl:if test="@morerows &gt; 0">
+                        <xsl:attribute name="rows" select="@morerows + 1"/>
+                      </xsl:if>
+                      <xsl:apply-templates select="@css:*" mode="#current"/>
+                      <xsl:apply-templates mode="#current"/>
+                    </cell>
+                  </xsl:for-each>
+                </row>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <row>
                 <cell>
-                  <xsl:if test="@namest">
-                    <xsl:attribute name="cols" select="number(substring-after(@nameend, 'col')) - number(substring-after(@namest, 'col')) + 1"/>
-                  </xsl:if>
-                  <xsl:if test="@morerows &gt; 0">
-                    <xsl:attribute name="rows" select="@morerows + 1"/>
-                  </xsl:if>
-                  <xsl:apply-templates select="@css:*" mode="#current"/>
                   <xsl:apply-templates mode="#current"/>
                 </cell>
-              </xsl:for-each>
-            </row>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:otherwise>
-          <row>
-            <cell>
-              <xsl:apply-templates mode="#current"/>
-            </cell>
-          </row>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:if test="note">
-        <note>
-          <xsl:apply-templates select="note/@*, note/node()" mode="#current"/>
-        </note>
-      </xsl:if>
-    </table>
-  </xsl:template>
+              </row>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:if test="note">
+            <note>
+              <xsl:apply-templates select="note/@*, note/node()" mode="#current"/>
+            </note>
+          </xsl:if>
+        </table>
+   </xsl:template>
 
   <!-- use templates from hub2html for style serializing. Thanks to the TEI+CSSa
     schema, we don’t need to prematurely serialize CSS here -->
@@ -705,4 +730,6 @@
     </xsl:copy>
   </xsl:template>
   
+  <xsl:template match="@remap" mode="hub2tei:dbk2tei"/>
+    
 </xsl:stylesheet>
