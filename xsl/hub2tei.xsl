@@ -122,8 +122,8 @@
 
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
     <front>
-      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | dbk:publisher), //dbk:toc" mode="#current"/>
-      <xsl:apply-templates select="//*[local-name() = ('dedication', 'preface', 'colophon')]" mode="#current">
+      <xsl:apply-templates select="* except (dbk:keywordset | css:rules), //dbk:toc" mode="#current"/>
+      <xsl:apply-templates select="//dbk:dedication, //dbk:preface" mode="#current">
         <xsl:with-param name="move-front-matter-parts" select="true()" tunnel="yes"/>
       </xsl:apply-templates>
     </front>
@@ -515,26 +515,30 @@
   </xsl:template>
 
   <xsl:variable name="hub2tei:poem-style-regex" select="'((g|G)edicht)'" as="xs:string"/>
-  
-  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)] | dbk:poetry/dbk:para" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)]" mode="hub2tei:dbk2tei">
     <l>
       <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </l>
   </xsl:template>
-  
+  <xsl:variable name="tei:poem-to-div" as ="xs:string" select="'no'"/>
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
-    <lg type="poetry">
+    <xsl:element name="{if ($tei:poem-to-div) then 'div' else 'lg'}">
+      <xsl:attribute name="type" select="'poetry'"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:apply-templates select="node()" mode="#current"/>
-    </lg>
+    </xsl:element>
   </xsl:template>
   
-  <xsl:template match="tei:lg" mode="hub2tei:tidy">
+  <xsl:template match="tei:lg | tei:div[@type = 'poetry']" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" group-starting-with="tei:l[@rend[hub2tei:is-stanza(.)]]">
+      <xsl:if test="@rend">
+        <xsl:attribute name="class" select="@rend"/>
+      </xsl:if>
+      <xsl:apply-templates select="@* except @rend" mode="#current"/>
+      <xsl:for-each-group select="*" group-adjacent="hub2tei:is-stanza(.)">
         <xsl:choose>
-          <xsl:when test="current-group()[@rend[hub2tei:is-stanza(.)]]">
+          <xsl:when test="current-group()[hub2tei:is-stanza(.)]">
             <lg type="stanza">
               <xsl:apply-templates select="current-group()" mode="#current">
                 <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
@@ -549,7 +553,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="tei:l/@rend[hub2tei:is-stanza(.)]" mode="hub2tei:tidy">
+  <xsl:template match="tei:l[hub2tei:is-stanza(.)]" mode="hub2tei:tidy">
     <xsl:param name="delete-emptyline" tunnel="yes"/>
     <xsl:attribute name="rend" select="if ($delete-emptyline) then replace(., '_-_emptyline', '') else ."/>
   </xsl:template>
@@ -557,7 +561,11 @@
   <xsl:function name="hub2tei:is-stanza" as="xs:boolean">
     <xsl:param name="test"/>
     <xsl:choose>
-      <xsl:when test="matches($test, 'emptyline$')">
+      <xsl:when test="matches($test/@rend, 'emptyline(_-_.+)?$')">
+        <xsl:sequence select="true()"/>
+      </xsl:when>
+      <xsl:when test="matches($test/@rend, 'poemline(_-_.+)?') and
+                              $test[not(.//text())]">
         <xsl:sequence select="true()"/>
       </xsl:when>
       <xsl:otherwise>
