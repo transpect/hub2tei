@@ -514,20 +514,38 @@
     </label>
   </xsl:template>
 
-  <xsl:variable name="hub2tei:poem-style-regex" select="'((g|G)edicht)'" as="xs:string"/>
+  <xsl:variable name="hub2tei:poem-style-regex" select="'letex_poem'" as="xs:string"/>
+  
   <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)]" mode="hub2tei:dbk2tei">
     <l>
       <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </l>
   </xsl:template>
+  
   <xsl:variable name="tei:poem-to-div" as ="xs:string" select="'no'"/>
+  
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
-    <xsl:element name="{if ($tei:poem-to-div) then 'div' else 'lg'}">
-      <xsl:attribute name="type" select="'poetry'"/>
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates select="node()" mode="#current"/>
-    </xsl:element>
+    <xsl:choose>
+      <xsl:when test="$tei:poem-to-div">
+        <floatingText type="poem">
+          <body>
+            <div>
+              <xsl:attribute name="type" select="'poetry'"/>
+              <xsl:apply-templates select="@*" mode="#current"/>
+              <xsl:apply-templates select="node()" mode="#current"/>
+            </div>
+          </body>
+        </floatingText>
+      </xsl:when>
+      <xsl:otherwise>
+        <lg>
+          <xsl:attribute name="type" select="'poetry'"/>
+          <xsl:apply-templates select="@*" mode="#current"/>
+          <xsl:apply-templates select="node()" mode="#current"/>
+        </lg>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template match="tei:lg | tei:div[@type = 'poetry']" mode="hub2tei:tidy">
