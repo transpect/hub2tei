@@ -157,7 +157,7 @@
     </div>
   </xsl:template>
   
-  <xsl:template match="tei:front" mode="hub2tei:tidy">
+  <xsl:template match="tei:text/tei:front" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:if test="not(tei:divGen[@type = 'toc'])">
@@ -410,13 +410,28 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
+  <xsl:variable name="tei:box-head-role-regex" select="'^letex_box_heading'"  as="xs:string"/>
+ 
   <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] | dbk:div[matches(@role, $tei:floatingTexts-role)]" mode="hub2tei:dbk2tei" priority="5">
+    <xsl:variable name="head" as="element(dbk:para)?" select="dbk:para[matches(@role, $tei:box-head-role-regex)][1]"/>
     <floatingText type="{tei:floatingTexts-type(@role)}">
       <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:if test="$head">
+        <front>
+          <xsl:apply-templates select="$head" mode="#current"/>
+        </front>
+      </xsl:if>
       <body>
-        <xsl:apply-templates select="node()" mode="#current"/>
+        <xsl:apply-templates select="node() except $head" mode="#current"/>
       </body>
     </floatingText>
+  </xsl:template>
+  
+  <xsl:template match="dbk:para[matches(@role, $tei:box-head-role-regex)]" mode="hub2tei:dbk2tei">
+    <head>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </head>
   </xsl:template>
   
   <!-- This function/variables shall be overriden in client-specific templates -->
@@ -676,7 +691,11 @@
 
   <!-- prevent boxes that are set as tables to be converted to HTML tables -->
   <xsl:template match="*[descendant-or-self::*[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]]" mode="cals2html-table">
-    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>
+<!--    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>-->
+    <xsl:copy copy-namespaces="no">
+      <xsl:copy-of select="@*"/>
+      <xsl:copy-of select="node()"/>
+    </xsl:copy>
   </xsl:template>  
   
   <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
