@@ -542,7 +542,7 @@
   
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
     <xsl:choose>
-      <xsl:when test="$tei:poem-to-div">
+      <xsl:when test="$tei:poem-to-div = 'yes'">
         <floatingText type="poem">
           <body>
             <div>
