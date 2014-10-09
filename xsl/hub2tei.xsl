@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" 
                 xmlns:css="http://www.w3.org/1996/css" 
                 xmlns:dbk="http://docbook.org/ns/docbook" 
@@ -121,14 +121,64 @@
   </xsl:template>
 
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
+    <xsl:variable name="title-page-parts" select="dbk:authorgroup, dbk:title, dbk:subtitle, dbk:publisher"/>
     <front>
-      <xsl:apply-templates select="* except (dbk:keywordset | css:rules)" mode="#current"/>
+      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | $title-page-parts)" mode="#current"/>
+      <titlePage>
+        <xsl:apply-templates select="$title-page-parts" mode="#current"/>
+      </titlePage>
       <xsl:apply-templates select="//*[local-name() = ('dedication', 'preface', 'colophon', 'toc')]" mode="#current">
         <xsl:with-param name="move-front-matter-parts" select="true()" tunnel="yes"/>
       </xsl:apply-templates>
     </front>
   </xsl:template>
 
+  <xsl:template match="dbk:info/dbk:authorgroup" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:authorgroup/*" mode="hub2tei:dbk2tei">
+    <docAuthor>
+      <persName type="{local-name()}">
+        <xsl:value-of select="*/text()"/>
+      </persName>
+    </docAuthor>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info/dbk:publisher" mode="hub2tei:dbk2tei">
+    <docImprint>
+      <publisher>
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </publisher>
+    </docImprint>
+  </xsl:template>
+
+  <xsl:template match="*:info/*:title | *:info/*:subtitle" mode="hub2tei:dbk2tei" priority="3">
+      <titlePart>
+        <xsl:apply-templates select="@*" mode="#current"/>
+        <xsl:attribute name="type" select="if (local-name(.) = 'title') then 'main' else 'sub'"/>
+        <xsl:value-of select="normalize-space(.)"/>
+      </titlePart>
+  </xsl:template>
+  
+  <xsl:template match="*:titlePage" mode="hub2tei:tidy">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:for-each-group select="node()" group-by="local-name()">
+        <xsl:choose>
+          <xsl:when test="current-grouping-key() = 'titlePart'">
+            <docTitle>
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+            </docTitle>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
+  
   <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:tidy">
     <xsl:apply-templates select="tei:epigraph" mode="#current"/>
   </xsl:template>
@@ -136,15 +186,15 @@
   <xsl:template match="dbk:toc" mode="hub2tei:dbk2tei">
     <xsl:param name="move-front-matter-parts" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="$move-front-matter-parts">
-    <divGen type="toc">
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:if test="not(dbk:title)">
-        <head>
-          <xsl:value-of select="(//info/keywordset/keyword[@role = 'toc-title'], 'Inhalt')[1]"/>
-        </head>
-      </xsl:if>
-      <xsl:apply-templates select="node()" mode="#current"/>
-    </divGen>
+      <divGen type="toc">
+        <xsl:apply-templates select="@*" mode="#current"/>
+        <xsl:if test="not(dbk:title)">
+          <head>
+            <xsl:value-of select="(//info/keywordset/keyword[@role = 'toc-title'], 'Inhalt')[1]"/>
+          </head>
+        </xsl:if>
+        <xsl:apply-templates select="node()" mode="#current"/>
+      </divGen>
     </xsl:if>
   </xsl:template>
 
@@ -694,13 +744,13 @@
         </figure>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <xsl:variable name="hub:figure-note-role-regex" select="'^letex_figure_legend'" as="xs:string"/>
 
   <xsl:template match="dbk:note[dbk:para[matches(@role, $hub:figure-note-role-regex)]]" mode="hub2tei:dbk2tei" priority="2">
-      <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
+    <xsl:apply-templates select="node()" mode="hub2tei:dbk2tei"/>
   </xsl:template>
 
   <xsl:template match="dbk:note" mode="hub2tei:dbk2tei">
