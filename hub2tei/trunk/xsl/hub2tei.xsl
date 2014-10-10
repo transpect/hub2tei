@@ -148,7 +148,7 @@
   <xsl:template match="dbk:info/dbk:publisher" mode="hub2tei:dbk2tei">
     <docImprint>
       <publisher>
-        <xsl:apply-templates select="@*, node()" mode="#current"/>
+        <xsl:apply-templates select="@*, .//text()" mode="#current"/>
       </publisher>
     </docImprint>
   </xsl:template>
