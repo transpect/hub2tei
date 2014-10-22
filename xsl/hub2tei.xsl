@@ -338,13 +338,16 @@
                          matches(
                            (@linkend, @xlink:href)[1], 
                            '^(file|http(s)?|ftp)[:]//.+'
-                         )
+                           ) or 
+                           @remap = 'ParagraphDestination'
                         ) 
                         then 'ref' else 'link'}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:element>
   </xsl:template>
 
+  <xsl:template match="dbk:link/@remap" mode="hub2tei:dbk2tei"/>
+    
   <xsl:template match="@xlink:href | dbk:link/@linkend" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="."/>
   </xsl:template>
@@ -419,6 +422,12 @@
     </hi>
   </xsl:template>
 
+  <xsl:template match="dbk:phrase[key('natives', @role)/@remap = ('superscript', 'subscript')]" mode="hub2tei:dbk2tei">
+    <hi rendition="{key('natives', @role)/@remap}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </hi>
+  </xsl:template>
+  
   <!-- @type is no longer supported for each element in TEI P5  -->
   <xsl:template match="@role" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rend" select="."/>
@@ -457,6 +466,16 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
+  <xsl:template match="dbk:footnoteref" mode="hub2tei:dbk2tei">
+    <anchor>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </anchor>
+  </xsl:template>
+  
+  <xsl:template match="dbk:footnoteref/@linkend" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="xml:id" select="."/>
+  </xsl:template>
+  
   <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^letex_(marginal|box|letter|timetable|code|source)$'"/>
   <xsl:template match="dbk:sidebar[not(matches(@role, $tei:floatingTexts-role))]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current"/>
