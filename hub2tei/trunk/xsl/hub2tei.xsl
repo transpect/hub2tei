@@ -617,11 +617,13 @@
     </label>
   </xsl:template>
 
-  <xsl:variable name="hub2tei:poem-style-regex" select="'letex_poem'" as="xs:string"/>
+  <xsl:variable name="hub:poetry-role-regex" select="'letex_poem'" as="xs:string"/>
 
-  <xsl:template match="dbk:para[matches(@role, $hub2tei:poem-style-regex)]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para[matches(@role, $hub:poetry-role-regex)]" mode="hub2tei:dbk2tei">
+    <xsl:param name="delete-emptyline" tunnel="yes"/>
     <l>
-      <xsl:apply-templates select="@*" mode="hub2tei:dbk2tei"/>
+      <xsl:apply-templates select="@* except @role" mode="hub2tei:dbk2tei"/>
+      <xsl:attribute name="rend" select="if ($delete-emptyline) then replace(@role, '_-_emptyline(_-_splitter)?', '') else @role"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </l>
   </xsl:template>
@@ -636,7 +638,20 @@
             <div>
               <xsl:attribute name="type" select="'poetry'"/>
               <xsl:apply-templates select="@*" mode="#current"/>
-              <xsl:apply-templates select="node()" mode="#current"/>
+              <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
+                <xsl:choose>
+                  <xsl:when test="current-group()[1][hub2tei:is-stanza-start(.)]">
+                    <lg type="stanza">
+                      <xsl:apply-templates select="current-group()" mode="#current">
+                        <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
+                      </xsl:apply-templates>
+                    </lg>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:apply-templates select="current-group()" mode="#current"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each-group>
             </div>
           </body>
         </floatingText>
@@ -645,13 +660,26 @@
         <lg>
           <xsl:attribute name="type" select="'poetry'"/>
           <xsl:apply-templates select="@*" mode="#current"/>
-          <xsl:apply-templates select="node()" mode="#current"/>
+          <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
+            <xsl:choose>
+              <xsl:when test="current-group()[1][hub2tei:is-stanza-start(.)]">
+                <lg type="stanza">
+                  <xsl:apply-templates select="current-group()" mode="#current">
+                    <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
+                  </xsl:apply-templates>
+                </lg>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="current-group()" mode="#current"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each-group>
         </lg>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="tei:lg | tei:div[@type = 'poetry']" mode="hub2tei:tidy">
+<!--  <xsl:template match="tei:lg | tei:div[@type = 'poetry']" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:if test="@rend">
         <xsl:attribute name="class" select="@rend"/>
@@ -672,21 +700,17 @@
         </xsl:choose>
       </xsl:for-each-group>
     </xsl:copy>
-  </xsl:template>
+  </xsl:template>-->
 
-  <xsl:template match="tei:l[hub2tei:is-stanza(.)]" mode="hub2tei:tidy">
-    <xsl:param name="delete-emptyline" tunnel="yes"/>
-    <xsl:attribute name="rend" select="if ($delete-emptyline) then replace(., '_-_emptyline', '') else ."/>
-  </xsl:template>
-
-  <xsl:function name="hub2tei:is-stanza" as="xs:boolean">
-    <xsl:param name="test"/>
+  <xsl:function name="hub2tei:is-stanza-start">
+    <xsl:param name="possible-stanza-start"/>
     <xsl:choose>
-      <xsl:when test="matches($test/@rend, 'emptyline(_-_.+)?$')">
+      <xsl:when test="$possible-stanza-start[self::dbk:para] and matches($possible-stanza-start/@role, 'emptyline(_-_.+)?$')">
         <xsl:sequence select="true()"/>
       </xsl:when>
-      <xsl:when test="matches($test/@rend, 'poemline(_-_.+)?') and
-                              $test[not(.//text())]">
+      <xsl:when test="$possible-stanza-start[self::dbk:para] and
+                      (matches($possible-stanza-start/@role, 'poemline(_-_.+)?') and
+                              $possible-stanza-start[not(.//text())])">
         <xsl:sequence select="true()"/>
       </xsl:when>
       <xsl:otherwise>
