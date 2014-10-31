@@ -633,10 +633,10 @@
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
     <xsl:choose>
       <xsl:when test="$tei:poem-to-div = 'yes'">
-        <floatingText type="poem">
+        <floatingText type="poetry">
           <body>
             <div>
-              <xsl:attribute name="type" select="'poetry'"/>
+              <xsl:attribute name="type" select="'poem'"/>
               <xsl:apply-templates select="@*" mode="#current"/>
               <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
                 <xsl:choose>
@@ -658,7 +658,7 @@
       </xsl:when>
       <xsl:otherwise>
         <lg>
-          <xsl:attribute name="type" select="'poetry'"/>
+          <xsl:attribute name="type" select="'poem'"/>
           <xsl:apply-templates select="@*" mode="#current"/>
           <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
             <xsl:choose>
