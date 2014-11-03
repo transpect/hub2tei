@@ -162,21 +162,26 @@
   </xsl:template>
   
   <xsl:template match="*:titlePage" mode="hub2tei:tidy">
-    <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="node()" group-by="local-name()">
-        <xsl:choose>
-          <xsl:when test="current-grouping-key() = 'titlePart'">
-            <docTitle>
-              <xsl:apply-templates select="current-group()" mode="#current"/>
-            </docTitle>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="current-group()" mode="#current"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each-group>
-    </xsl:copy>
+    <xsl:choose>
+      <xsl:when test="not(*)"/>
+      <xsl:otherwise>
+        <xsl:copy copy-namespaces="no">
+          <xsl:apply-templates select="@*" mode="#current"/>
+          <xsl:for-each-group select="node()" group-by="local-name()">
+            <xsl:choose>
+              <xsl:when test="current-grouping-key() = 'titlePart'">
+                <docTitle>
+                  <xsl:apply-templates select="current-group()" mode="#current"/>
+                </docTitle>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="current-group()" mode="#current"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each-group>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:tidy">
@@ -491,20 +496,20 @@
         <xsl:for-each-group select="*" group-starting-with="dbk:para[matches(@role, $tei:box-head1-role-regex)]">
           <xsl:choose>
             <xsl:when test="current-group()[self::dbk:para[matches(@role, $tei:box-head1-role-regex)]]">
-              <div1>
+              <div>
                 <xsl:for-each-group select="current-group()" group-starting-with="dbk:para[matches(@role, $tei:box-head2-role-regex)]">
                   <xsl:choose>
                     <xsl:when test="current-group()[self::dbk:para[matches(@role, $tei:box-head2-role-regex)]]">
-                      <div2>
+                      <div>
                         <xsl:apply-templates select="current-group()" mode="#current"/>
-                      </div2>
+                      </div>
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:apply-templates select="current-group()" mode="#current"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:for-each-group>
-              </div1>
+              </div>
             </xsl:when>
             <xsl:otherwise>
               <xsl:apply-templates select="current-group()" mode="#current"/>
