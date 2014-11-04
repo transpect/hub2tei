@@ -339,16 +339,18 @@
   </xsl:template>
 
   <xsl:template match="dbk:link" mode="hub2tei:dbk2tei">
-    <xsl:element name="{if(
+    <!--<xsl:element name="{if(
                          matches(
                            (@linkend, @xlink:href)[1], 
                            '^(file|http(s)?|ftp)[:]//.+'
                            ) or 
                            @remap = 'ParagraphDestination'
                         ) 
-                        then 'ref' else 'link'}">
+                        then 'ref' else 'link'}">-->
+    <ref>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </xsl:element>
+    </ref>
+    <!--</xsl:element>-->
   </xsl:template>
 
   <xsl:template match="dbk:link/@remap" mode="hub2tei:dbk2tei"/>
