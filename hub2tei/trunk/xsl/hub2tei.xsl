@@ -380,9 +380,9 @@
   </xsl:template>
 
   <xsl:variable name="tei:box-para-style-regex" select="'^letex_boxpara'" as="xs:string"/>
-
+  <!-- This template is dangerous. Here we should define exactly whcih informaltable has to be modified -->
   <xsl:template match="dbk:informaltable[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]" priority="2" mode="hub2tei:dbk2tei">
-    <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-para-style-regex)])[1]" as="element(dbk:para)"/>
+    <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
     <xsl:variable name="box-symbol" as="element(dbk:imagedata)?" select="$head/parent::*/preceding-sibling::*[1]//dbk:mediaobject/dbk:imageobject/dbk:imagedata"/>
     <floatingText type="box" rend="{@role}">
       <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>
