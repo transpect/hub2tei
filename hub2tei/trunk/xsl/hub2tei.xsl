@@ -120,7 +120,7 @@
     <xsl:attribute name="{name(.)}" select="replace(., '^(.+?-.+?)-.*$', '$1')"/>
   </xsl:template>
 
-  <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[parent::*[self::dbk:book or self::dbk:hub]]" mode="hub2tei:dbk2tei">
     <xsl:variable name="title-page-parts" select="dbk:authorgroup, dbk:title, dbk:subtitle, dbk:publisher"/>
     <front>
       <xsl:apply-templates select="* except (dbk:keywordset | css:rules | $title-page-parts)" mode="#current"/>
@@ -133,6 +133,23 @@
     </front>
   </xsl:template>
 
+
+  <xsl:template match="dbk:table | dbk:informaltable" mode="cals2html-table">
+    <table>
+      <xsl:apply-templates select="@*, node() except (dbk:caption, dbk:info, dbk:note)" mode="#current"/>
+    </table>
+    <xsl:apply-templates select="dbk:info, dbk:caption, dbk:note" mode="hub2tei:dbk2tei"/>
+  </xsl:template>
+  
+  
+  <xsl:template match="dbk:info[parent::*[self::dbk:table]][dbk:legalnotice]" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:legalnotice[parent::*[self::dbk:info]]" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="dbk:info/dbk:authorgroup" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
