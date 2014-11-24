@@ -781,8 +781,6 @@
   </xsl:template>-->
 
   <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
-    <xsl:choose>
-      <xsl:when test="parent::*[local-name() = 'figure']">
         <graphic url="{imageobject/imagedata/@fileref}">
           <xsl:if test="imageobject/imagedata/@width">
             <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
@@ -794,24 +792,6 @@
             <xsl:attribute name="rend" select="@role"/>
           </xsl:if>
         </graphic>
-      </xsl:when>
-      <xsl:otherwise>
-        <figure>
-          <graphic url="{imageobject/imagedata/@fileref}">
-            <xsl:if test="imageobject/imagedata/@width">
-              <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
-            </xsl:if>
-            <xsl:if test="imageobject/imagedata/@depth">
-              <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) then string-join((imageobject/imagedata/@depth,'pt'),'') else imageobject/imagedata/@depth"/>
-            </xsl:if>
-            <xsl:if test="./@role">
-              <xsl:attribute name="rend" select="@role"/>
-            </xsl:if>
-          </graphic>
-        </figure>
-      </xsl:otherwise>
-    </xsl:choose>
-
   </xsl:template>
 
   <xsl:variable name="hub:figure-note-role-regex" select="'^letex_figure_legend'" as="xs:string"/>
