@@ -200,10 +200,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:tidy">
-    <xsl:apply-templates select="tei:epigraph" mode="#current"/>
-  </xsl:template>
 
   <xsl:template match="dbk:toc" mode="hub2tei:dbk2tei">
     <xsl:param name="move-front-matter-parts" as="xs:boolean?" tunnel="yes"/>
@@ -284,10 +280,26 @@
     </xsl:if>
   </xsl:template>
 
+
+  <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:tidy">
+    <div type="motto">
+      <xsl:apply-templates select="tei:epigraph" mode="#current"/>
+    </div>
+  </xsl:template>
+  
   <xsl:template match="dbk:epigraph" mode="hub2tei:dbk2tei">
-    <epigraph>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </epigraph>
+    <xsl:choose>
+      <xsl:when test="parent::*[self::dbk:preface] or preceding-sibling::*[1][self::dbk:title]">
+        <epigraph>
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
+        </epigraph>
+      </xsl:when>
+      <xsl:otherwise>
+        <div type="motto">
+          <xsl:apply-templates select="node()" mode="#current"/>
+        </div>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="processing-instruction('xml-model')" mode="hub2tei:dbk2tei"/>
