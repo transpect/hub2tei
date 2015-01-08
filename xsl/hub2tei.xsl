@@ -215,7 +215,20 @@
       </divGen>
     </xsl:if>
   </xsl:template>
-
+  
+<!--
+  <xsl:template match="tei:text/tei:front" mode="hub2tei:tidy">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:if test="not(tei:divGen[@type = 'toc'])">
+        <xsl:copy-of select="/*//tei:divGen[@type = 'toc']"/>
+      </xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>-->
+    
+  <xsl:template match="tei:divGen[@type = 'toc'][not(ancestor::*[local-name() = 'front'])]" mode="hub2tei:tidy"/>
+  
   <xsl:template match="dbk:div[not(matches(@role, $tei:floatingTexts-role))]" mode="hub2tei:dbk2tei">
     <div>
       <xsl:if test="@rend or @type">
@@ -227,18 +240,6 @@
       <xsl:apply-templates select="node()" mode="#current"/>
     </div>
   </xsl:template>
-
-  <xsl:template match="tei:text/tei:front" mode="hub2tei:tidy">
-    <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:if test="not(tei:divGen[@type = 'toc'])">
-        <xsl:copy-of select="/*//tei:divGen[@type = 'toc']"/>
-      </xsl:if>
-      <xsl:apply-templates select="node()" mode="#current"/>
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="tei:divGen[@type = 'toc'][not(ancestor::*[local-name() = 'front'])]" mode="hub2tei:tidy"/>
 
   <xsl:template match="@condition" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rendition" select="."/>
