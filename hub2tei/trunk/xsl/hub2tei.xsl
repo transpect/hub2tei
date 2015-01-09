@@ -522,7 +522,7 @@
   <xsl:variable name="tei:box-head2-role-regex" select="'^letex_box_heading2(_-_.+)?$'" as="xs:string"/>
 
   <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] | dbk:div[matches(@role, $tei:floatingTexts-role)]" mode="hub2tei:dbk2tei" priority="5">
-    <floatingText type="{tei:floatingTexts-type(@role)}">
+    <floatingText type="{tei:floatingTexts-type(.)}">
       <xsl:apply-templates select="@*" mode="#current"/>
       <body>
         <xsl:for-each-group select="*" group-starting-with="dbk:para[matches(@role, $tei:box-head1-role-regex)]">
@@ -563,7 +563,8 @@
   <xsl:variable name="tei:box-style-role" select="'^letex_box'" as="xs:string"/>
   <xsl:variable name="tei:marginal-style-role" select="'^letex_marginal'" as="xs:string"/>
   <xsl:function name="tei:floatingTexts-type" as="xs:string">
-    <xsl:param name="role" as="xs:string?"/>
+    <xsl:param name="box" as="element()"/>
+    <xsl:variable name="role" select="$box/@role"/>
     <xsl:choose>
       <xsl:when test="matches($role, $tei:box-style-role)">
         <xsl:value-of select="'box'"/>
