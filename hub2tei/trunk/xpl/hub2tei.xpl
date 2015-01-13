@@ -12,6 +12,7 @@
   
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" />
+  <p:option name="status-dir-uri" required="false" select="'debug/status'"/>
   
   <p:input port="source" primary="true" />
   <p:input port="paths" kind="parameter" primary="true"/>
