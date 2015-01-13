@@ -142,7 +142,7 @@
   </xsl:template>
   
   
-  <xsl:template match="dbk:info[parent::*[self::dbk:table]][dbk:legalnotice]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[parent::*[self::dbk:table or self::dbk:figure]][dbk:legalnotice]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
@@ -763,7 +763,10 @@
 
   <xsl:template match="figure" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="title" mode="#current"/>
+      <xsl:apply-templates select="node() except (title, info)" mode="#current"/>
+      <xsl:apply-templates select="info" mode="#current"/>
     </figure>
   </xsl:template>
 
