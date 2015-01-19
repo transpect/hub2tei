@@ -453,6 +453,8 @@
     </label>
   </xsl:template>
 
+  <xsl:template match="dbk:tab[preceding-sibling::*[1][self::dbk:phrase[@role = 'hub:identifier']]]" mode="cals2html-table"/>
+  
   <xsl:template match="dbk:superscript | dbk:subscript" mode="hub2tei:dbk2tei">
     <hi rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
@@ -822,18 +824,6 @@
       <xsl:apply-templates select="@*, node()" mode="hub2tei:dbk2tei"/>
     </note>
   </xsl:template>
-
-  <!--  <xsl:template match="dbk:para" mode="cals2html-table" exclude-result-prefixes="dbk">
-    <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </xsl:copy>
-  </xsl:template>
-  
-  <xsl:template match="dbk:phrase" mode="cals2html-table"  exclude-result-prefixes="dbk">
-    <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </xsl:copy>
-  </xsl:template>-->
 
   <xsl:template match="html:*" mode="hub2tei:tidy" xpath-default-namespace="html">
     <xsl:element name="{local-name()}">
