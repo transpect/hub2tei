@@ -110,8 +110,13 @@
       <text>
         <xsl:apply-templates select="dbk:info" mode="#current"/>
         <body>
-          <xsl:apply-templates select="* except dbk:info" mode="#current"/>
+          <xsl:apply-templates select="* except (dbk:info, //*[local-name()=('appendix', 'glossary', 'bibliography')])" mode="#current"/>
         </body>
+        <xsl:if test="//*[local-name()=('appendix', 'glossary', 'bibliography')]">
+          <back>
+            <xsl:apply-templates select="//*[local-name()=('appendix', 'glossary', 'bibliography')]" mode="#current"/>
+          </back>
+        </xsl:if>
       </text>
     </TEI>
   </xsl:template>
