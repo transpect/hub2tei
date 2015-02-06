@@ -415,8 +415,14 @@
   </xsl:template>
 
   <xsl:variable name="tei:box-para-style-regex" select="'^letex_boxpara'" as="xs:string"/>
-  <!-- This template is dangerous. Here we should define exactly whcih informaltable has to be modified -->
-  <xsl:template match="dbk:informaltable[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]" priority="2" mode="hub2tei:dbk2tei">
+  
+  <xsl:function name="hub2tei:conditions-to-dissolve-box-table" as="xs:boolean">
+    <xsl:param name="context-table" as="element(dbk:informaltable)"/>
+        <xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]) then true() else false()"/>
+  </xsl:function>
+  
+  <!-- This default function dissolves tables thhat have paras with a box-style-role inside -->
+  <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
     <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
     <xsl:variable name="box-symbol" as="element(dbk:imagedata)?" select="$head/parent::*/preceding-sibling::*[1]//dbk:mediaobject/dbk:imageobject/dbk:imagedata"/>
     <floatingText type="box" rend="{@role}">
@@ -428,7 +434,7 @@
             <xsl:apply-templates select="$head/@*" mode="#current"/>
             <xsl:if test="$box-symbol">
               <xsl:element name="graphic">
-                <xsl:attribute name="url" select="$box-symbol/@filere"/>
+                <xsl:attribute name="url" select="$box-symbol/@fileref"/>
                 <xsl:attribute name="id" select="$box-symbol/@xml:id"/>
                 <xsl:attribute name="css:width" select="$box-symbol/@css:width"/>
                 <xsl:attribute name="css:height" select="$box-symbol/@css:height"/>
@@ -444,6 +450,10 @@
     </floatingText>
   </xsl:template>
 
+  <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][parent::*[matches(@role, 'Textbox')]]" priority="2" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select=".//dbk:entry/*" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="*" mode="test"/>
 
   <xsl:template match="dbk:phrase" mode="hub2tei:dbk2tei">
@@ -535,20 +545,20 @@
         <xsl:for-each-group select="*" group-starting-with="dbk:para[matches(@role, $tei:box-head1-role-regex)]">
           <xsl:choose>
             <xsl:when test="current-group()[self::dbk:para[matches(@role, $tei:box-head1-role-regex)]]">
-              <div>
+              <div1>
                 <xsl:for-each-group select="current-group()" group-starting-with="dbk:para[matches(@role, $tei:box-head2-role-regex)]">
                   <xsl:choose>
                     <xsl:when test="current-group()[self::dbk:para[matches(@role, $tei:box-head2-role-regex)]]">
-                      <div>
+                      <div2>
                         <xsl:apply-templates select="current-group()" mode="#current"/>
-                      </div>
+                      </div2>
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:apply-templates select="current-group()" mode="#current"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:for-each-group>
-              </div>
+              </div1>
             </xsl:when>
             <xsl:otherwise>
               <xsl:apply-templates select="current-group()" mode="#current"/>
