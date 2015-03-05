@@ -488,9 +488,10 @@
   </xsl:template>
 
   <xsl:key name="natives" match="css:rule" use="@name"/>
+  <xsl:variable name="tei:pagebreaks-to-real-pagebreaks" as="xs:boolean" select="true()"/>
 
   <!-- handle page breaks -->
-  <xsl:template match="*[key('natives', @role)/@*[name() =('css:page-break-before', 'css:page-break-after')]]" mode="hub2tei:dbk2tei" priority="10">
+  <xsl:template match="*[key('natives', @role)/@*[name() =('css:page-break-before', 'css:page-break-after')]][$tei:pagebreaks-to-real-pagebreaks]" mode="hub2tei:dbk2tei" priority="10">
     <xsl:choose>
       <xsl:when test="key('natives', @role)/(@css:page-break-before|@css:page-break-after) = ('always', 'left', 'right')">
         <xsl:choose>
