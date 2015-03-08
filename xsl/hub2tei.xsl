@@ -109,12 +109,17 @@
       </teiHeader>
       <text>
         <xsl:apply-templates select="dbk:info" mode="#current"/>
+        <xsl:variable name="backmatter" as="element(*)*"
+          select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography)"/>
+        <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography --> 
         <body>
-          <xsl:apply-templates select="* except (dbk:info, //*[local-name()=('appendix', 'glossary', 'bibliography')])" mode="#current"/>
+          <xsl:apply-templates select="* except dbk:info" mode="#current">
+            <xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
+          </xsl:apply-templates>
         </body>
-        <xsl:if test="//*[local-name()=('appendix', 'glossary', 'bibliography')]">
+        <xsl:if test="exists($backmatter)">
           <back>
-            <xsl:apply-templates select="//*[local-name()=('appendix', 'glossary', 'bibliography')]" mode="#current"/>
+            <xsl:apply-templates select="$backmatter" mode="#current"/>
           </back>
         </xsl:if>
       </text>
@@ -329,14 +334,17 @@
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary" mode="hub2tei:dbk2tei">
-    <div>
-      <xsl:attribute name="type" select="name()"/>
-      <xsl:if test="./dbk:title[1]/@role">
-        <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
-      </xsl:if>
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates select="*" mode="#current"/>
-    </div>
+    <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
+    <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
+      <div>
+        <xsl:attribute name="type" select="name()"/>
+        <xsl:if test="./dbk:title[1]/@role">
+          <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
+        </xsl:if>
+        <xsl:apply-templates select="@*" mode="#current"/>
+        <xsl:apply-templates select="*" mode="#current"/>
+      </div>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
