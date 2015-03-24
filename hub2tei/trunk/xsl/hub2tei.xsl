@@ -415,10 +415,14 @@
 
   <xsl:template match="dbk:link/@remap" mode="hub2tei:dbk2tei"/>
     
-  <xsl:template match="@xlink:href | dbk:link/@linkend" mode="hub2tei:dbk2tei">
+  <xsl:template match="@xlink:href " mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="."/>
   </xsl:template>
 
+  <xsl:template match="dbk:link/@linkend" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="target" select="concat('#', .)"/>
+  </xsl:template>
+  
   <xsl:template match="dbk:footnote" mode="hub2tei:dbk2tei">
     <note type="footnote">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
