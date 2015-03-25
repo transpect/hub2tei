@@ -146,7 +146,11 @@
 
   <xsl:template match="dbk:table | dbk:informaltable" mode="cals2html-table">
     <table>
-      <xsl:apply-templates select="@*, node() except (dbk:caption, dbk:info, dbk:note)" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:if test="exists(*:alt)">
+        <xsl:attribute name="rendition" select="*:alt/*:inlinemediaobject/*:imageobject/*:imagedata/@fileref"/>
+      </xsl:if>
+      <xsl:apply-templates select="node() except (dbk:caption, dbk:info, dbk:note)" mode="#current"/>
     </table>
     <xsl:apply-templates select="dbk:info, dbk:caption, dbk:note" mode="hub2tei:dbk2tei"/>
   </xsl:template>
