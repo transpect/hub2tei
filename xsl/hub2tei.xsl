@@ -160,15 +160,47 @@
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
+  <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info[parent::*[self::dbk:part or self::dbk:chapter or self::dbk:section]]" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="dbk:legalnotice[parent::*[self::dbk:info]]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="dbk:info/dbk:authorgroup" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:author" mode="hub2tei:dbk2tei">
+    <byline>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </byline>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info[not(parent::*:book)]/dbk:subtitle" priority="4" mode="hub2tei:dbk2tei">
+    <head type="sub">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </head>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info[not(parent::*:book)]/dbk:title" priority="4" mode="hub2tei:dbk2tei">
+    <head type="main">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </head>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info/dbk:abstract" mode="hub2tei:dbk2tei">
+    <argument>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </argument>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup | dbk:partintro" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:authorgroup/*" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup/*" mode="hub2tei:dbk2tei">
     <docAuthor>
       <persName type="{local-name()}">
         <xsl:value-of select="*/text()"/>
@@ -176,7 +208,7 @@
     </docAuthor>
   </xsl:template>
   
-  <xsl:template match="dbk:info/dbk:publisher" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[parent::dbk:book]/dbk:publisher" mode="hub2tei:dbk2tei">
     <docImprint>
       <publisher>
         <xsl:apply-templates select="@*, .//text()" mode="#current"/>
@@ -184,7 +216,7 @@
     </docImprint>
   </xsl:template>
 
-  <xsl:template match="*:info/*:title | *:info/*:subtitle" mode="hub2tei:dbk2tei" priority="3">
+  <xsl:template match="*:info[parent::*:book]/*:title | *:info[parent::*:book]/*:subtitle" mode="hub2tei:dbk2tei" priority="5">
       <titlePart>
         <xsl:apply-templates select="@*" mode="#current"/>
         <xsl:attribute name="type" select="if (local-name(.) = 'title') then 'main' else 'sub'"/>
