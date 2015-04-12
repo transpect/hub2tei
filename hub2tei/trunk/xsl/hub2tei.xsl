@@ -160,6 +160,10 @@
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
+  <xsl:template match="dbk:info/dbk:legalnotice" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
@@ -168,14 +172,36 @@
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="dbk:legalnotice[parent::*[self::dbk:info]]" mode="hub2tei:dbk2tei">
-    <xsl:apply-templates select="node()" mode="#current"/>
-  </xsl:template>
+  <xsl:function name="hub2tei:contains-token" as="xs:boolean">
+    <xsl:param name="tokens" as="xs:string"/>
+    <xsl:param name="token" as="xs:string?"/>
+    <xsl:sequence select="tokenize($tokens, '\s+') = $token"/>
+  </xsl:function>
   
-  <xsl:template match="dbk:info/dbk:author" mode="hub2tei:dbk2tei">
+  <xsl:function name="hub2tei:rend" as="attribute(rend)?">
+    <xsl:param name="role" as="attribute(role)?"/>
+    <xsl:param name="except" as="xs:string*"/>
+    <xsl:variable name="remaining" select="tokenize($role, '\s+')[not(. = $except)]" as="xs:string*"/>
+    <xsl:if test="exists($remaining)">
+      <xsl:attribute name="rend" select="$remaining" separator=" "/>
+    </xsl:if>
+  </xsl:function>
+
+  <xsl:template match="dbk:info/dbk:legalnotice[hub2tei:contains-token(@role, 'copyright')]/*[local-name() = ('para', 'simpara')] " mode="hub2tei:dbk2tei">
     <byline>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </byline>
+  </xsl:template>
+
+  <xsl:template match="dbk:bibliomisc[hub2tei:contains-token(@role, 'source')]" mode="hub2tei:dbk2tei">
+    <bibl type="source">
+      <xsl:sequence select="hub2tei:rend(@role, 'source')"/>
+      <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
+    </bibl>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:authorgroup" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="dbk:info[not(parent::*:book)]/dbk:subtitle" priority="4" mode="hub2tei:dbk2tei">
@@ -184,7 +210,7 @@
     </head>
   </xsl:template>
   
-  <xsl:template match="dbk:info[not(parent::*:book)]/dbk:title" priority="4" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[not(local-name(..) = ('book', 'figure'))]/dbk:title" priority="4" mode="hub2tei:dbk2tei">
     <head type="main">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </head>
@@ -200,7 +226,8 @@
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup/*" mode="hub2tei:dbk2tei">
+
+  <xsl:template match="dbk:info/dbk:authorgroup/* | dbk:info/dbk:author" mode="hub2tei:dbk2tei">
     <docAuthor>
       <persName type="{local-name()}">
         <xsl:value-of select="*/text()"/>
@@ -216,15 +243,18 @@
     </docImprint>
   </xsl:template>
 
-  <xsl:template match="*:info[parent::*:book]/*:title | *:info[parent::*:book]/*:subtitle" mode="hub2tei:dbk2tei" priority="5">
-      <titlePart>
-        <xsl:apply-templates select="@*" mode="#current"/>
-        <xsl:attribute name="type" select="if (local-name(.) = 'title') then 'main' else 'sub'"/>
-        <xsl:value-of select="normalize-space(.)"/>
-      </titlePart>
+  <xsl:variable name="hub2tei:titlePartBearers" as="xs:string+" select="('book', 'hub', 'part', 'chapter', 'section')"></xsl:variable>
+  <xsl:template match="  /*[local-name() = $hub2tei:titlePartBearers]/dbk:info/dbk:title 
+                       | /*[local-name() = $hub2tei:titlePartBearers]/dbk:info/dbk:subtitle" 
+                mode="hub2tei:dbk2tei" priority="5">
+    <titlePart>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:attribute name="type" select="if (local-name(.) = 'title') then 'main' else 'sub'"/>
+      <xsl:value-of select="normalize-space(.)"/>
+    </titlePart>
   </xsl:template>
   
-  <xsl:template match="*:titlePage" mode="hub2tei:tidy">
+  <xsl:template match="tei:titlePage" mode="hub2tei:tidy">
     <xsl:choose>
       <xsl:when test="not(*)"/>
       <xsl:otherwise>
@@ -414,6 +444,19 @@
     <head>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </head>
+  </xsl:template>
+  
+  <xsl:template match="dbk:titleabbrev" mode="hub2tei:dbk2tei">
+    <!-- Usage: For ToCs or other lists. Not intended to be rendered alongside the title proper -->
+    <head type="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </head>
+  </xsl:template>
+
+  <xsl:template match="dbk:caption" mode="hub2tei:dbk2tei">
+    <!-- This template was created with figure/caption in mind.
+      In TEI, caption-like content is just plain paragraphs within the figure. -->
+    <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
   <xsl:template match="dbk:subtitle" mode="hub2tei:dbk2tei">
@@ -847,7 +890,7 @@
   <xsl:template match="figure" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates select="title" mode="#current"/>
+      <xsl:apply-templates select="title, titleabbrev" mode="#current"/>
       <xsl:apply-templates select="node() except (title, info)" mode="#current"/>
       <xsl:apply-templates select="info" mode="#current"/>
     </figure>
@@ -859,11 +902,11 @@
       <xsl:next-match/>
     </sp>
   </xsl:template>
-  <!-- template fails :( An empty sequence is not allowed as the @group-adjacent attribute of xsl:for-each-group -->
-  <!--  <xsl:template match="*[tei:sp]" mode="hub2tei:tidy">
+
+  <xsl:template match="*[tei:sp]" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" group-adjacent="self::*:sp">
+      <xsl:for-each-group select="*" group-adjacent="boolean(self::*:sp)">
         <xsl:choose>
           <xsl:when test="current-group()[self::tei:sp]">
             <spGrp n="{count(current-group())}">
@@ -878,21 +921,47 @@
         </xsl:choose>
       </xsl:for-each-group>
     </xsl:copy>
-  </xsl:template>-->
-
-  <xsl:template match="mediaobject[imageobject/imagedata/@fileref] | inlinemediaobject[imageobject/imagedata/@fileref]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
-        <graphic url="{imageobject/imagedata/@fileref}">
-          <xsl:if test="imageobject/imagedata/@width">
-            <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) then replace(imageobject/imagedata/@width,'^\.','0.') else imageobject/imagedata/@width"/>
-          </xsl:if>
-          <xsl:if test="imageobject/imagedata/@depth">
-            <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) then string-join((imageobject/imagedata/@depth,'pt'),'') else imageobject/imagedata/@depth"/>
-          </xsl:if>
-          <xsl:if test="./@role">
-            <xsl:attribute name="rend" select="@role"/>
-          </xsl:if>
-        </graphic>
   </xsl:template>
+
+  <xsl:template match="  mediaobject[imageobject/imagedata/@fileref] 
+                       | inlinemediaobject[imageobject/imagedata/@fileref]" 
+                mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+    <graphic url="{hub2tei:image-path(imageobject/imagedata/@fileref, root(.))}">
+      <xsl:if test="imageobject/imagedata/@width">
+        <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) 
+                                            then replace(imageobject/imagedata/@width,'^\.','0.') 
+                                            else imageobject/imagedata/@width"/>
+      </xsl:if>
+      <xsl:if test="imageobject/imagedata/@depth">
+        <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) 
+                                             then string-join((imageobject/imagedata/@depth,'pt'),'') 
+                                             else imageobject/imagedata/@depth"/>
+      </xsl:if>
+      <xsl:if test="./@role">
+        <xsl:attribute name="rend" select="@role"/>
+      </xsl:if>
+      <xsl:variable name="srcpaths" select="imageobject//@srcpath" as="xs:string*"/>
+      <xsl:if test="exists($srcpaths)">
+        <xsl:attribute name="srcpath" select="$srcpaths" separator=" "/>
+      </xsl:if>
+    </graphic>
+    <xsl:apply-templates select="textobject" mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="textobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+    <!-- Assumption: only inline content in the textobject. If there is block-level content, we’d probably have to 
+      insert line breaks between them. -->
+    <figDesc>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </figDesc>
+  </xsl:template>
+
+  <!-- to be overwritten in adaptions: -->
+  <xsl:function name="hub2tei:image-path" as="xs:string">
+    <xsl:param name="path" as="xs:string"/>
+    <xsl:param name="root" as="document-node()?"/>
+    <xsl:sequence select="$path"/>
+  </xsl:function>
 
   <xsl:variable name="hub:figure-note-role-regex" select="'^letex_figure_legend'" as="xs:string"/>
 
