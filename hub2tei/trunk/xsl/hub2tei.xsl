@@ -699,7 +699,8 @@
         <xsl:value-of select="'marginal'"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$role"/>
+        <!-- Only use the base type: -->
+        <xsl:value-of select="replace($role, '_-_.*$', '')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
