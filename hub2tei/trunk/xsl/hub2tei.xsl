@@ -143,7 +143,7 @@
     </front>
   </xsl:template>
 
-
+  <!-- creates @rendition attributes from alt images-->
   <xsl:template match="dbk:table | dbk:informaltable" mode="cals2html-table">
     <table>
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -155,6 +155,9 @@
     <xsl:apply-templates select="dbk:info, dbk:caption, dbk:note" mode="hub2tei:dbk2tei"/>
   </xsl:template>
   
+  <xsl:template match="*:table/@rendition[matches(., '^.+?\.(jpe?g|tiff?|png|eps|ai)', 'i')]" mode="hub2tei:dbk2tei" priority="2">
+    <xsl:attribute name="{name()}" select="string-join(for $image in tokenize(., ' ') return hub2tei:image-path($image, root(.)), ' ')"/>
+  </xsl:template>
   
   <xsl:template match="dbk:info[parent::*[self::dbk:table or self::dbk:figure]][dbk:legalnotice]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
