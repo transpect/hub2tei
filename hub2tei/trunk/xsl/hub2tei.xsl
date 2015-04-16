@@ -188,9 +188,9 @@
   </xsl:function>
 
   <xsl:template match="dbk:info/dbk:legalnotice[hub2tei:contains-token(@role, 'copyright')]/*[local-name() = ('para', 'simpara')] " mode="hub2tei:dbk2tei">
-    <byline>
+    <bibl type="copyright">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </byline>
+    </bibl>
   </xsl:template>
 
   <xsl:template match="dbk:bibliomisc[hub2tei:contains-token(@role, 'source')]" mode="hub2tei:dbk2tei">
@@ -228,13 +228,26 @@
 
 
   <xsl:template match="dbk:info/dbk:authorgroup/* | dbk:info/dbk:author" mode="hub2tei:dbk2tei">
-    <docAuthor>
-      <persName type="{local-name()}">
-        <xsl:value-of select="*/text()"/>
-      </persName>
-    </docAuthor>
+    <xsl:element name="{if (../.. is /) then 'docAuthor' else 'byline'}">
+      <xsl:apply-templates select="parent::dbk:authorgroup/@*" mode="#current">
+        <!-- just in case the authorgroup remaps to a paragraph with @role, @srcpath, etc. -->
+      </xsl:apply-templates>
+      <xsl:apply-templates select="@*, node()" mode="#current">
+        <xsl:with-param name="type" select="local-name()" tunnel="yes"/>
+      </xsl:apply-templates>
+    </xsl:element>
   </xsl:template>
-  
+
+  <xsl:template match="dbk:personname" mode="hub2tei:dbk2tei">
+    <xsl:param name="type" as="xs:string?" tunnel="yes"/>
+    <persName>
+      <xsl:if test="$type">
+        <xsl:attribute name="type" select="$type"/>
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </xsl:if>
+    </persName>
+  </xsl:template>
+
   <xsl:template match="dbk:info[parent::dbk:book]/dbk:publisher" mode="hub2tei:dbk2tei">
     <docImprint>
       <publisher>
