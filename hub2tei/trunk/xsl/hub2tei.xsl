@@ -171,10 +171,6 @@
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="dbk:info[parent::*[self::dbk:part or self::dbk:chapter or self::dbk:section]]" mode="hub2tei:dbk2tei">
-    <xsl:apply-templates select="node()" mode="#current"/>
-  </xsl:template>
-  
   <xsl:function name="hub2tei:contains-token" as="xs:boolean">
     <xsl:param name="tokens" as="xs:string"/>
     <xsl:param name="token" as="xs:string?"/>
@@ -259,9 +255,8 @@
     </docImprint>
   </xsl:template>
 
-  <xsl:variable name="hub2tei:titlePartBearers" as="xs:string+" select="('book', 'hub', 'part', 'chapter', 'section')"></xsl:variable>
-  <xsl:template match="  /*[local-name() = $hub2tei:titlePartBearers]/dbk:info/dbk:title 
-                       | /*[local-name() = $hub2tei:titlePartBearers]/dbk:info/dbk:subtitle" 
+
+  <xsl:template match=" *:info[parent::*:book]/*:title | *:info[parent::*:book]/*:subtitle" 
                 mode="hub2tei:dbk2tei" priority="5">
     <titlePart>
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -437,8 +432,8 @@
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
       <div>
         <xsl:attribute name="type" select="name()"/>
-        <xsl:if test="./dbk:title[1]/@role">
-          <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
+        <xsl:if test="(./dbk:title[1]/@role or ./dbk:info[1]/@role)">
+          <xsl:attribute name="rend" select="(./dbk:title[1]/@role, ./dbk:info[1]/@role)[1]"/>
         </xsl:if>
         <xsl:apply-templates select="@*" mode="#current"/>
         <xsl:apply-templates select="*" mode="#current"/>
