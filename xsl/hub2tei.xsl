@@ -807,6 +807,25 @@
   <xsl:variable name="tei:poem-to-div" as="xs:string" select="'no'"/>
 
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
+    <xsl:variable name="poem-content" as="node()*">
+      <xsl:variable name="stanzas" as="element(tei:lg)*">
+        <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
+          <lg type="stanza">
+            <xsl:apply-templates select="current-group()" mode="#current">
+              <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
+            </xsl:apply-templates>
+          </lg>
+        </xsl:for-each-group>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="count($stanzas) = 1">
+          <xsl:sequence select="$stanzas/node()"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="$stanzas"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
       <xsl:when test="$tei:poem-to-div = 'yes'">
         <floatingText type="poetry">
@@ -814,20 +833,7 @@
             <div>
               <xsl:attribute name="type" select="'poem'"/>
               <xsl:apply-templates select="@*" mode="#current"/>
-              <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
-                <xsl:choose>
-                  <xsl:when test="current-group()[1][hub2tei:is-stanza-start(.)]">
-                    <lg type="stanza">
-                      <xsl:apply-templates select="current-group()" mode="#current">
-                        <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
-                      </xsl:apply-templates>
-                    </lg>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:apply-templates select="current-group()" mode="#current"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:for-each-group>
+              <xsl:sequence select="$poem-content"/>
             </div>
           </body>
         </floatingText>
@@ -836,20 +842,7 @@
         <lg>
           <xsl:attribute name="type" select="'poem'"/>
           <xsl:apply-templates select="@*" mode="#current"/>
-          <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
-            <xsl:choose>
-              <xsl:when test="current-group()[1][hub2tei:is-stanza-start(.)]">
-                <lg type="stanza">
-                  <xsl:apply-templates select="current-group()" mode="#current">
-                    <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
-                  </xsl:apply-templates>
-                </lg>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:apply-templates select="current-group()" mode="#current"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each-group>
+          <xsl:sequence select="$poem-content"/>
         </lg>
       </xsl:otherwise>
     </xsl:choose>
