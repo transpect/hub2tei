@@ -892,7 +892,7 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="figure" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+  <xsl:template match="figure | informalfigure" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:apply-templates select="title, titleabbrev" mode="#current"/>
@@ -953,11 +953,13 @@
     <xsl:apply-templates select="textobject" mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="textobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+  <xsl:template match="textobject[parent::mediaobject | parent::inlinemediaobject]" mode="hub2tei:dbk2tei" 
+    xpath-default-namespace="http://docbook.org/ns/docbook">
     <!-- Assumption: only inline content in the textobject. If there is block-level content, we’d probably have to 
       insert line breaks between them. -->
     <figDesc>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:value-of select="."/>
     </figDesc>
   </xsl:template>
 
