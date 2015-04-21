@@ -737,6 +737,11 @@
           </xsl:when>
         </xsl:choose>
       </xsl:attribute>
+      <xsl:if test="ancestor::*[local-name() = 'div'][matches(@role, ('def_flowable|def_table'))]">
+        <xsl:attribute name="rend">
+          <xsl:value-of select="ancestor::*[local-name() = 'div'][1][matches(@role, ('def_flowable|def_table'))]/@role"/>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:if test="@mark or @numeration">
         <xsl:attribute name="style" select="(@mark, @numeration)[1]"/>
       </xsl:if>
@@ -751,17 +756,14 @@
     </item>
   </xsl:template>
 
-  <xsl:template match="dbk:listitem[parent::dbk:varlistentry] | dbk:glossdef" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:listitem[parent::dbk:varlistentry]/dbk:para | dbk:glossdef | dbk:listitem[parent::dbk:varlistentry][not(dbk:para)]" mode="hub2tei:dbk2tei">
     <gloss rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </gloss>
   </xsl:template>
 
-  <xsl:template match="dbk:listitem[parent::dbk:varlistentry]/dbk:para | dbk:glossdef/dbk:para" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:listitem[parent::dbk:varlistentry][dbk:para] | dbk:glossdef/dbk:para" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
-    <xsl:if test="following-sibling::*[self::dbk:para]">
-      <lb/>
-    </xsl:if>
   </xsl:template>
 
   <xsl:template match="@override" mode="hub2tei:dbk2tei">
