@@ -293,7 +293,7 @@
     <xsl:if test="$move-front-matter-parts">
       <divGen type="toc">
         <xsl:apply-templates select="@*" mode="#current"/>
-        <xsl:if test="not(dbk:title)">
+        <xsl:if test="not(dbk:title) and not(dbk:info[dbk:title])">
           <head>
             <xsl:value-of select="(//info/keywordset/keyword[@role = 'toc-title'], 'Inhalt')[1]"/>
           </head>
@@ -394,7 +394,7 @@
   
   <xsl:template match="dbk:epigraph" mode="hub2tei:dbk2tei">
     <xsl:choose>
-      <xsl:when test="parent::*[self::dbk:preface] or preceding-sibling::*[1][self::dbk:title]">
+      <xsl:when test="parent::*[self::dbk:preface] or preceding-sibling::*[1][self::dbk:title or self::dbk:info]">
         <epigraph>
           <xsl:apply-templates select="@*, node()" mode="#current"/>
         </epigraph>
