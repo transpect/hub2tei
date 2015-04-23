@@ -596,6 +596,7 @@
   </xsl:template>
 
   <xsl:template match="dbk:phrase[key('natives', @role)/@remap = ('superscript', 'subscript')]" mode="hub2tei:dbk2tei">
+    <!-- Misuse of @rendition: It is supposed to point somewhere. See http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.rendition.html -->
     <hi rendition="{key('natives', @role)/@remap}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </hi>
@@ -810,17 +811,26 @@
 
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
     <xsl:variable name="poem-content" as="node()*">
-      <xsl:variable name="stanzas" as="element(tei:lg)*">
-        <xsl:for-each-group select="node()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
-          <lg type="stanza">
-            <xsl:apply-templates select="current-group()" mode="#current">
-              <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
-            </xsl:apply-templates>
-          </lg>
+      <xsl:variable name="stanzas" as="element(*)*"><!-- tei:lg, but also tei:p for additional text, source, etc. -->
+        <xsl:for-each-group select="*" group-adjacent="matches((@role, '')[1], $hub:poetry-role-regex)">
+          <xsl:choose>
+            <xsl:when test="current-grouping-key()">
+              <xsl:for-each-group select="current-group()" group-starting-with="*[hub2tei:is-stanza-start(.)]">
+                <lg type="stanza">
+                  <xsl:apply-templates select="current-group()" mode="#current">
+                    <xsl:with-param name="delete-emptyline" select="true()" as="xs:boolean" tunnel="yes"/>
+                  </xsl:apply-templates>
+                </lg>
+              </xsl:for-each-group>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:for-each-group>
       </xsl:variable>
       <xsl:choose>
-        <xsl:when test="count($stanzas) = 1">
+        <xsl:when test="count($stanzas) = 1 and $stanzas/self::tei:lg[@type = 'stanza']">
           <xsl:sequence select="$stanzas/node()"/>
         </xsl:when>
         <xsl:otherwise>
