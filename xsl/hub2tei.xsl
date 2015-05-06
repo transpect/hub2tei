@@ -442,9 +442,10 @@
   </xsl:template>
 
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
-    <divGen type="{name()}">
+    <xsl:element name="{if (dbk:para) then 'div' else 'divGen'}">
+      <xsl:attribute name="type" select="name()"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </divGen>
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="@renderas" mode="hub2tei:dbk2tei">
