@@ -110,7 +110,7 @@
       <text>
         <xsl:apply-templates select="dbk:info" mode="#current"/>
         <xsl:variable name="backmatter" as="element(*)*"
-          select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography)"/>
+          select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography, dbk:index)"/>
         <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography --> 
         <body>
           <xsl:apply-templates select="* except dbk:info" mode="#current">
@@ -442,10 +442,13 @@
   </xsl:template>
 
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
-    <xsl:element name="{if (dbk:para) then 'div' else 'divGen'}">
-      <xsl:attribute name="type" select="name()"/>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </xsl:element>
+    <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
+    <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
+     <xsl:element name="{if (dbk:para) then 'div' else 'divGen'}">
+       <xsl:attribute name="type" select="name()"/>
+       <xsl:apply-templates select="@*, node()" mode="#current"/>
+     </xsl:element>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="@renderas" mode="hub2tei:dbk2tei">
