@@ -47,6 +47,8 @@
     <xsl:sequence select="$hub2tei:tidy"/>
   </xsl:template>
 
+  <xsl:template match="@hub:anchored" mode="hub2tei:dbk2tei"/>
+   
   <xsl:template name="debug-hub2tei">
     <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/40.dbk2tei.xml'))}" format="debug">
       <xsl:sequence select="$hub2tei:dbk2tei"/>
