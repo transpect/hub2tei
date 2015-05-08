@@ -452,6 +452,82 @@
      </xsl:element>
     </xsl:if>
   </xsl:template>
+  
+    <!-- INDEXTERMS -->
+  
+  <xsl:template match="dbk:indexterm" mode="hub2tei:dbk2tei">
+    <index>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="dbk:primary" mode="#current"/>
+    </index>
+  </xsl:template>
+  
+  <xsl:key name="hub2tei:linking-item-by-id" match="*[@linkend | @linkends | @startref]" 
+    use="@linkend, tokenize(@linkends, '\s+'), @startref"/>
+
+  <xsl:template match="dbk:indexterm[@class = 'endofrange']" mode="hub2tei:dbk2tei">
+    <anchor xml:id="ite_{generate-id()}"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:indexterm/@pagenum" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="n" select="."/>
+  </xsl:template>
+
+  <xsl:template match="dbk:indexterm/@class[. = 'startofrange']" mode="hub2tei:dbk2tei">
+    <xsl:variable name="end" as="element(dbk:indexterm)" select="key('hub2tei:linking-item-by-id', ../@xml:id)"/>
+    <xsl:attribute name="spanTo" select="concat('ite_', $end/generate-id())"/>
+  </xsl:template>
+
+  <xsl:template match="dbk:indexterm/@type" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="indexName" select="."/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:primary" mode="hub2tei:dbk2tei">
+    <term>
+      <xsl:apply-templates select="@sortas" mode="#current"/>
+      <xsl:apply-templates mode="#current"/>
+    </term>
+    <xsl:apply-templates select="if(../dbk:secondary) then ../dbk:secondary else ( dbk:see | dbk:seealso)" mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:secondary" mode="hub2tei:dbk2tei">
+    <index>
+      <term>
+        <xsl:apply-templates select="@sortas" mode="#current"/>
+        <xsl:apply-templates select="node() except ( dbk:see, dbk:seealso)" mode="#current"/>
+      </term>
+      <xsl:apply-templates select="if(../dbk:tertiary) then ../dbk:tertiary else ( dbk:see | dbk:seealso)" mode="#current"/>
+    </index>
+  </xsl:template>
+  
+  <xsl:template match="dbk:tertiary" mode="hub2tei:dbk2tei">
+    <index>
+      <term>
+        <xsl:apply-templates select="@sortas" mode="#current"/>
+        <xsl:apply-templates select="node() except ( dbk:see, dbk:seealso)" mode="#current"/>
+      </term>
+      <xsl:apply-templates select="dbk:see | dbk:seealso" mode="#current"/>
+    </index>
+  </xsl:template>
+  
+  <xsl:template match="dbk:see" mode="hub2tei:dbk2tei">
+    <see>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </see>
+  </xsl:template>
+  
+  <xsl:template match="dbk:seealso" mode="hub2tei:dbk2tei">
+    <see-also>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </see-also>
+  </xsl:template>
+
+  <xsl:template match="@sortas" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="sortKey" select="."/>
+  </xsl:template>
+
+
+
 
   <xsl:template match="@renderas" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rend" select="."/>
