@@ -794,7 +794,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- Only use the base type: -->
-        <xsl:value-of select="replace($role, '_-_.*$', '')"/>
+        <xsl:value-of select="replace($role, '(_-_|\s).*$', '')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
