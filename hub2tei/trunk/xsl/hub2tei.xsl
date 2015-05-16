@@ -149,13 +149,21 @@
   <xsl:template match="dbk:table | dbk:informaltable" mode="cals2html-table">
     <table>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:if test="exists(*:alt)">
-        <xsl:attribute name="rendition" select="*:alt/*:inlinemediaobject/*:imageobject/*:imagedata/@fileref"/>
+      <xsl:variable name="alt-image" as="element(dbk:alt)?" 
+        select="dbk:alt[dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref][1]"/>
+      <xsl:if test="exists($alt-image)">
+        <xsl:attribute name="rendition" select="$alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref"/>
       </xsl:if>
-      <xsl:apply-templates select="node() except (dbk:caption, dbk:info, dbk:note)" mode="#current"/>
+      <xsl:variable name="postscript" as="element(*)*" select="dbk:caption | dbk:note"/>
+      <xsl:apply-templates select="* except $postscript" mode="#current"/>
+      <xsl:if test="exists($postscript)">
+        <postscript>
+          <xsl:apply-templates select="$postscript" mode="#current"/>
+        </postscript>
+      </xsl:if>
     </table>
-    <xsl:apply-templates select="dbk:info, dbk:caption, dbk:note" mode="hub2tei:dbk2tei"/>
   </xsl:template>
+  
   
   <xsl:template match="*:table/@rendition[matches(., '^.+?\.(jpe?g|tiff?|png|eps|ai)', 'i')]" mode="hub2tei:dbk2tei" priority="2">
     <xsl:attribute name="{name()}" select="string-join(for $image in tokenize(., ' ') return hub2tei:image-path($image, root(.)), ' ')"/>
