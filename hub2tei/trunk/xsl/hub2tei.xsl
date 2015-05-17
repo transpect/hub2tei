@@ -30,33 +30,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <!-- Processing pipeline: -->
-
-  <xsl:variable name="hub2tei:dbk2tei">
-    <xsl:apply-templates select="/" mode="hub2tei:dbk2tei"/>
-  </xsl:variable>
-
-  <xsl:variable name="hub2tei:tidy">
-    <xsl:apply-templates select="$hub2tei:dbk2tei" mode="hub2tei:tidy"/>
-  </xsl:variable>
-
-  <xsl:template name="main">
-    <xsl:if test="$debug = 'yes'">
-      <xsl:call-template name="debug-hub2tei"/>
-    </xsl:if>
-    <xsl:sequence select="$hub2tei:tidy"/>
-  </xsl:template>
-
   <xsl:template match="@hub:anchored" mode="hub2tei:dbk2tei"/>
-   
-  <xsl:template name="debug-hub2tei">
-    <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/40.dbk2tei.xml'))}" format="debug">
-      <xsl:sequence select="$hub2tei:dbk2tei"/>
-    </xsl:result-document>
-    <xsl:result-document href="{resolve-uri(concat($debug-dir-uri, '/99.tidy.xml'))}" format="debug">
-      <xsl:sequence select="$hub2tei:tidy"/>
-    </xsl:result-document>
-  </xsl:template>
 
   <xsl:template match="/*/@xml:base" mode="hub2tei:dbk2tei">
     <xsl:attribute name="xml:base" select="replace(., '\.hub\.xml$', '.tei.xml')"/>
@@ -302,6 +276,9 @@
     <xsl:param name="move-front-matter-parts" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="$move-front-matter-parts">
       <divGen type="toc">
+        <xsl:if test="dbk:title[1]/@role">
+          <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
+        </xsl:if>
         <xsl:apply-templates select="@*" mode="#current"/>
         <xsl:if test="not(dbk:title) and not(dbk:info[dbk:title])">
           <head>
@@ -456,6 +433,8 @@
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
      <xsl:element name="{if (dbk:para) then 'div' else 'divGen'}">
        <xsl:attribute name="type" select="name()"/>
+        <!-- If dbk:info carries a role such as p_h1_appendix_group, it may be used for later class calculation: -->
+       <xsl:apply-templates select="dbk:info/@role[1]" mode="#current"/>
        <xsl:apply-templates select="@*, node()" mode="#current"/>
      </xsl:element>
     </xsl:if>
