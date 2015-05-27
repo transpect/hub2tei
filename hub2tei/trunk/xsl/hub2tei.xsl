@@ -387,9 +387,9 @@
         </epigraph>
       </xsl:when>
       <xsl:otherwise>
-        <div type="motto">
+        <floatingText type="motto">
           <xsl:apply-templates select="node()" mode="#current"/>
-        </div>
+        </floatingText>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
