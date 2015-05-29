@@ -69,7 +69,15 @@
           </sourceDesc>
         </fileDesc>
         <profileDesc>
-          <xsl:apply-templates select="dbk:info/dbk:keywordset[@role = 'hub']" mode="#current"/>
+          <textClass>
+           <xsl:apply-templates select="dbk:info/dbk:keywordset[@role = 'hub']" mode="#current"/>
+           <xsl:apply-templates select="dbk:info/dbk:keywordset[not(@role = 'hub')]" mode="#current"/>
+          </textClass>
+          <xsl:if test="dbk:info/dbk:abstract">
+            <abstract>
+              <xsl:apply-templates select="dbk:info/dbk:abstract/node()" mode="#current"/>
+            </abstract>
+          </xsl:if>
           <langUsage>
             <language>
               <xsl:attribute name="ident">
@@ -101,7 +109,23 @@
       </text>
     </TEI>
   </xsl:template>
-
+  
+  <xsl:template match="dbk:info[parent::*[self::dbk:book or self::dbk:hub]]/dbk:keywordset[not(@role = 'hub')]" mode="hub2tei:dbk2tei">
+    <keywords>
+      <xsl:if test="@xml:lang">
+        <xsl:apply-templates select="@xml:lang" mode="#current"/>
+      </xsl:if>
+      <xsl:if test="@role">
+        <xsl:attribute name="rendition" select="encode-for-uri(@role)"/>
+      </xsl:if>
+      <xsl:for-each select="dbk:keyword">
+        <term>
+          <xsl:value-of select="."/>
+        </term>
+      </xsl:for-each>
+    </keywords>
+  </xsl:template>
+  
   <xsl:template match="/dbk:book/@xml:lang" mode="hub2tei:dbk2tei">
     <xsl:attribute name="{name(.)}" select="replace(., '^(.+?-.+?)-.*$', '$1')"/>
   </xsl:template>
@@ -109,7 +133,7 @@
   <xsl:template match="dbk:info[parent::*[self::dbk:book or self::dbk:hub]]" mode="hub2tei:dbk2tei">
     <xsl:variable name="title-page-parts" select="dbk:authorgroup, dbk:title, dbk:subtitle, dbk:publisher"/>
     <front>
-      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | $title-page-parts)" mode="#current"/>
+      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | $title-page-parts | dbk:abstract)" mode="#current"/>
       <titlePage>
         <xsl:apply-templates select="$title-page-parts" mode="#current"/>
       </titlePage>
@@ -339,11 +363,9 @@
   <xsl:template match="@remap[. = 'HiddenText']" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
-    <textClass>
       <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
         <xsl:apply-templates mode="#current"/>
       </keywords>
-    </textClass>
   </xsl:template>
 
   <xsl:template match="dbk:keyword" mode="hub2tei:dbk2tei">
