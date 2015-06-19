@@ -150,7 +150,7 @@
       <xsl:variable name="alt-image" as="element(dbk:alt)?" 
         select="dbk:alt[dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref][1]"/>
       <xsl:if test="exists($alt-image)">
-        <xsl:attribute name="rendition" select="$alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref"/>
+        <xsl:attribute name="rendition" select="string-join($alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref, ' ')"/>
       </xsl:if>
       <xsl:variable name="postscript" as="element(*)*" select="dbk:caption | dbk:note"/>
       <xsl:apply-templates select="* except $postscript" mode="#current"/>
@@ -631,11 +631,18 @@
         <xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]) then true() else false()"/>
   </xsl:function>
   
-  <!-- This default function dissolves tables thhat have paras with a box-style-role inside -->
+  <!-- This default function dissolves tables that have paras with a box-style-role inside -->
   <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
     <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
     <xsl:variable name="box-symbol" as="element(dbk:imagedata)?" select="$head/parent::*/preceding-sibling::*[1]//dbk:mediaobject/dbk:imageobject/dbk:imagedata"/>
     <floatingText type="box" rend="{@role}">
+      <xsl:if test="dbk:alt">
+        <xsl:variable name="alt-image" as="element(dbk:alt)?" 
+          select="dbk:alt[dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref][1]"/>
+        <xsl:if test="exists($alt-image)">
+          <xsl:attribute name="rendition" select="string-join($alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref, ' ')"/>
+        </xsl:if>
+      </xsl:if>
       <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>
       <!--      <xsl:call-template name="box-legend"/>-->
       <body>
@@ -787,7 +794,7 @@
       <xsl:apply-templates select="node()" mode="#current"/>
     </head>
   </xsl:template>
-
+  
   <!-- This function/variables shall be overriden in client-specific templates -->
   <xsl:variable name="tei:box-style-role" select="'^letex_box'" as="xs:string"/>
   <xsl:variable name="tei:marginal-style-role" select="'^letex_marginal'" as="xs:string"/>
