@@ -453,7 +453,7 @@
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
-     <xsl:element name="{if (dbk:para) then 'div' else 'divGen'}">
+     <xsl:element name="{if (descendant::dbk:para) then 'div' else 'divGen'}">
        <xsl:attribute name="type" select="name()"/>
         <!-- If dbk:info carries a role such as p_h1_appendix_group, it may be used for later class calculation: -->
        <xsl:apply-templates select="dbk:info/@role[1]" mode="#current"/>
