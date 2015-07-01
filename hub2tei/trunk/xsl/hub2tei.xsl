@@ -223,7 +223,25 @@
     </head>
   </xsl:template>
   
-  <xsl:template match="dbk:info/dbk:abstract" mode="hub2tei:dbk2tei">
+<!--  <xsl:template match="*[dbk:para[matches(@role, $tei:chapter-preface-role)]]" mode="cals2html-table" priority="3">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:for-each-group select="*" group-adjacent="if (matches(@role, $tei:chapter-preface-role)) then 'argument' else ''">
+        <xsl:choose>
+          <xsl:when test="current-grouping-key() = 'argument'">
+            <argument>
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+            </argument>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>-->
+  
+  <xsl:template match="dbk:info[not(parent::dbk:book)]/dbk:abstract" mode="hub2tei:dbk2tei">
     <argument>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </argument>
