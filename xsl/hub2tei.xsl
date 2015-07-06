@@ -664,22 +664,24 @@
       <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>
       <!--      <xsl:call-template name="box-legend"/>-->
       <body>
-        <xsl:if test="(some $a in $head//text() satisfies matches($a, '\S')) or $box-symbol">
-          <head>
-            <xsl:apply-templates select="$head/@*" mode="#current"/>
-            <xsl:if test="$box-symbol">
-              <xsl:element name="graphic">
-                <xsl:attribute name="url" select="$box-symbol/@fileref"/>
-                <xsl:attribute name="id" select="$box-symbol/@xml:id"/>
-                <xsl:attribute name="css:width" select="$box-symbol/@css:width"/>
-                <xsl:attribute name="css:height" select="$box-symbol/@css:height"/>
-              </xsl:element>
-            </xsl:if>
-            <xsl:apply-templates select="$head/node()" mode="#current"/>
-          </head>
-        </xsl:if>
-        <xsl:apply-templates select=".//dbk:entry/*[not(. is $head) and not(./*[1]/*[1] is $box-symbol)]" mode="#current"/>
-        <xsl:apply-templates select=".//dbk:entry/*[. is $box-symbol]" mode="test"/>
+        <div1>
+          <xsl:if test="(some $a in $head//text() satisfies matches($a, '\S')) or $box-symbol">
+            <head>
+              <xsl:apply-templates select="$head/@*" mode="#current"/>
+              <xsl:if test="$box-symbol">
+                <xsl:element name="graphic">
+                  <xsl:attribute name="url" select="$box-symbol/@fileref"/>
+                  <xsl:attribute name="id" select="$box-symbol/@xml:id"/>
+                  <xsl:attribute name="css:width" select="$box-symbol/@css:width"/>
+                  <xsl:attribute name="css:height" select="$box-symbol/@css:height"/>
+                </xsl:element>
+              </xsl:if>
+              <xsl:apply-templates select="$head/node()" mode="#current"/>
+            </head>
+          </xsl:if>
+          <xsl:apply-templates select=".//dbk:entry/*[not(. is $head) and not(./*[1]/*[1] is $box-symbol)]" mode="#current"/>
+          <xsl:apply-templates select=".//dbk:entry/*[. is $box-symbol]" mode="test"/>
+        </div1>
       </body>
       <!--      <xsl:apply-templates select="dbk:info[dbk:legalnotice[@role eq 'copyright']]" mode="#current"/>-->
     </floatingText>
@@ -798,7 +800,9 @@
               </div1>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:apply-templates select="current-group()" mode="#current"/>
+              <div1>
+                <xsl:apply-templates select="current-group()" mode="#current"/>
+              </div1>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:for-each-group>
