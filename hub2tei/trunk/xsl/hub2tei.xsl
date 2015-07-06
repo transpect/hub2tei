@@ -247,7 +247,7 @@
     </argument>
   </xsl:template>
   
-  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup | dbk:partintro" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup | dbk:partintro" mode="hub2tei:dbk2tei" priority="2">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
 
