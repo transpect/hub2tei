@@ -492,11 +492,12 @@
         <xsl:value-of select="@role"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="'subject'"/>
+        <xsl:value-of select="$hub:fallback-index-type"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   
+  <xsl:variable name="hub:fallback-index-type" as="xs:string" select="'subject'"/>
   
     <!-- INDEXTERMS -->
   
