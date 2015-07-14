@@ -473,12 +473,30 @@
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
      <xsl:element name="{if (descendant::dbk:para) then 'div' else 'divGen'}">
        <xsl:attribute name="type" select="name()"/>
+       <xsl:attribute name="property">
+         <xsl:call-template name="determine-index-type"/>
+       </xsl:attribute>
         <!-- If dbk:info carries a role such as p_h1_appendix_group, it may be used for later class calculation: -->
        <xsl:apply-templates select="dbk:info/@role[1]" mode="#current"/>
        <xsl:apply-templates select="@*, node()" mode="#current"/>
      </xsl:element>
     </xsl:if>
   </xsl:template>
+  
+  <xsl:template name="determine-index-type" as="xs:string">
+    <xsl:choose>
+      <xsl:when test="matches(descendant::dbk:phrase[@remap='HiddenText' and @condition = 'IndexType'], '^/[po]')">
+        <xsl:value-of select="if (matches(descendant::dbk:phrase, '^/p')) then 'person' else 'location'"/>
+      </xsl:when>
+      <xsl:when test="@role">
+        <xsl:value-of select="@role"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="'subject'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   
     <!-- INDEXTERMS -->
   
