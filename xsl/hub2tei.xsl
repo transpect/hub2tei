@@ -428,7 +428,11 @@
       </xsl:when>
       <xsl:otherwise>
         <floatingText type="motto">
-          <xsl:apply-templates select="node()" mode="#current"/>
+          <body>
+            <div>
+              <xsl:apply-templates select="node()" mode="#current"/>
+            </div>
+          </body>
         </floatingText>
       </xsl:otherwise>
     </xsl:choose>
@@ -663,13 +667,13 @@
   
   <xsl:function name="hub2tei:conditions-to-dissolve-box-table" as="xs:boolean">
     <xsl:param name="context-table" as="element(dbk:informaltable)"/>
+    <!-- This default function dissolves tables that have paras with a box-style-role inside -->
         <xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]) then true() else false()"/>
   </xsl:function>
   
-  <!-- This default function dissolves tables that have paras with a box-style-role inside -->
+
   <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
-    <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
-    <xsl:variable name="box-symbol" as="element(dbk:imagedata)?" select="$head/parent::*/preceding-sibling::*[1]//dbk:mediaobject/dbk:imageobject/dbk:imagedata"/>
+    <xsl:variable name="head" select="(descendant::*[self::dbk:para[matches(@role, $tei:box-head1-role-regex)]])[1]" as="element(dbk:para)?"/>
     <floatingText type="box" rend="{@role}">
       <xsl:if test="dbk:alt">
         <xsl:variable name="alt-image" as="element(dbk:alt)?" 
@@ -678,32 +682,105 @@
           <xsl:attribute name="rendition" select="string-join($alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref, ' ')"/>
         </xsl:if>
       </xsl:if>
-      <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>
-      <!--      <xsl:call-template name="box-legend"/>-->
       <body>
-        <div1>
-          <xsl:if test="(some $a in $head//text() satisfies matches($a, '\S')) or $box-symbol">
-            <head>
-              <xsl:apply-templates select="$head/@*" mode="#current"/>
-              <xsl:if test="$box-symbol">
-                <xsl:element name="graphic">
-                  <xsl:attribute name="url" select="$box-symbol/@fileref"/>
-                  <xsl:attribute name="id" select="$box-symbol/@xml:id"/>
-                  <xsl:attribute name="css:width" select="$box-symbol/@css:width"/>
-                  <xsl:attribute name="css:height" select="$box-symbol/@css:height"/>
-                </xsl:element>
-              </xsl:if>
-              <xsl:apply-templates select="$head/node()" mode="#current"/>
-            </head>
-          </xsl:if>
-          <xsl:apply-templates select=".//dbk:entry/*[not(. is $head) and not(./*[1]/*[1] is $box-symbol)]" mode="#current"/>
-          <xsl:apply-templates select=".//dbk:entry/*[. is $box-symbol]" mode="test"/>
-        </div1>
+        <xsl:choose>
+          <xsl:when test="descendant::*[self::dbk:row[dbk:entry/dbk:para[matches(@role, $tei:box-head1-role-regex)]]]">
+            <xsl:variable name="contents" select="descendant::*[self::dbk:row]/dbk:entry/node()" as="node()*"/>
+            <xsl:for-each-group select="$contents" group-starting-with="dbk:para[matches(@role, $tei:box-head1-role-regex)]">
+            <xsl:variable name="head" select="current-group()[dbk:para[matches(@role, $tei:box-head1-role-regex)]]" as="element(dbk:para)?"/>  
+              <div1>
+                <xsl:if test="$head">
+                  <head>
+                    <xsl:apply-templates select="$head/@*, $head/node() except ($head/dbk:sidebar)" mode="#current"/>
+                  </head>
+                  <!-- Marginals -->
+                  <xsl:apply-templates select="$head/dbk:sidebar" mode="#current"/>
+                </xsl:if>
+                <xsl:for-each-group select="current-group()" group-starting-with="dbk:para[matches(@role, $tei:box-head2-role-regex)]">
+                  <xsl:variable name="head2" select="current-group()[self::dbk:para[matches(@role, $tei:box-head2-role-regex)]]" as="element(dbk:para)?"/>
+                  <xsl:choose>
+                    <xsl:when test="$head2">
+                      <div2>
+                        <head>
+                          <xsl:apply-templates select="$head2/@*, $head2/node() except ($head2/dbk:sidebar)" mode="#current"/>
+                        </head>
+                        <!-- Marginals -->
+                        <xsl:apply-templates select="$head2/dbk:sidebar" mode="#current"/>
+                        <xsl:apply-templates select="current-group()[not(. is $head2)]" mode="#current"/>
+                      </div2>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:apply-templates select="current-group()" mode="#current"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each-group>
+              </div1>
+            </xsl:for-each-group>
+          </xsl:when>
+          <xsl:otherwise>
+            <div1>
+              <xsl:apply-templates select="descendant::*[self::dbk:row]/dbk:entry/node()" mode="#current"/>
+            </div1>  
+          </xsl:otherwise>
+        </xsl:choose>
       </body>
-      <!--      <xsl:apply-templates select="dbk:info[dbk:legalnotice[@role eq 'copyright']]" mode="#current"/>-->
     </floatingText>
   </xsl:template>
 
+
+ <!-- <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
+    <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
+    <floatingText type="box" rend="{@role}">
+      <xsl:if test="dbk:alt">
+        <xsl:variable name="alt-image" as="element(dbk:alt)?" 
+          select="dbk:alt[dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref][1]"/>
+        <xsl:if test="exists($alt-image)">
+          <xsl:attribute name="rendition" select="string-join($alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref, ' ')"/>
+        </xsl:if>
+      </xsl:if>
+      
+      <xsl:for-each-group select=".//dbk:row" group-starting-with="dbk:row[dbk:entry/dbk:para[matches(@role, $tei:box-head1-role-regex)]]">
+        <xsl:variable name="head" select="(current-group()//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
+        <xsl:message select="'-\-\-\-\-\-\-\-\-\-\-\-GROUP 1:', current-group()"/>
+        <body>
+          <div1>
+            <xsl:if test="$head">
+              <head>
+                <xsl:apply-templates select="$head/(@* except @role), $head/node() except ($head/dbk:sidebar)" mode="#current"/>
+              </head>
+              <!-\- Marginals -\->
+              <xsl:apply-templates select="$head/dbk:sidebar" mode="#current"/>
+            </xsl:if>
+            <xsl:for-each-group select="current-group()//dbk:row" group-starting-with="dbk:row[dbk:entry/dbk:para[matches(@role, $tei:box-head2-role-regex)]]">
+              <xsl:message select="'++++++++++GROUP 2:', current-group()"/>
+              <xsl:variable name="head2" select="(current-group()//dbk:para[matches(@role, $tei:box-head2-role-regex)])[1]" as="element(dbk:para)?"/>
+              <xsl:choose>
+                <xsl:when test="$head2">
+                  <div2>
+                    <head>
+                      <xsl:apply-templates select="$head2/(@* except @role), $head/node() except ($head2/dbk:sidebar)" mode="#current"/>
+                    </head>
+                    <!-\- Marginals -\->
+                    <xsl:apply-templates select="$head2/dbk:sidebar" mode="#current"/>
+                    <xsl:apply-templates select="current-group()//dbk:entry/node()[not(. is $head2)]" mode="#current"/>
+                  </div2>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="current-group()//dbk:entry/node()" mode="#current"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each-group>
+            
+          </div1>
+        </body>
+      </xsl:for-each-group>
+      
+      <!-\-      <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>-\->
+      <!-\-      <xsl:call-template name="box-legend"/>-\->
+      <!-\-      <xsl:apply-templates select="dbk:info[dbk:legalnotice[@role eq 'copyright']]" mode="#current"/>-\->
+    </floatingText>
+  </xsl:template>-->
+  
   <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][parent::*[matches(@role, 'Textbox')]]" priority="2" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select=".//dbk:entry/*" mode="#current"/>
   </xsl:template>
