@@ -429,9 +429,9 @@
       <xsl:otherwise>
         <floatingText type="motto">
           <body>
-            <div>
+            <div1>
               <xsl:apply-templates select="node()" mode="#current"/>
-            </div>
+            </div1>
           </body>
         </floatingText>
       </xsl:otherwise>
