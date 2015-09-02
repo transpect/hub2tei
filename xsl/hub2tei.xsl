@@ -1121,6 +1121,9 @@
   <xsl:template match="figure | informalfigure" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
       <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:if test="self::informalfigure[caption] and not(@xml:id)">
+        <xsl:attribute name="xml:id" select="concat('IFig_', generate-id())"/>
+      </xsl:if>
       <xsl:apply-templates select="title, titleabbrev" mode="#current"/>
       <xsl:apply-templates select="node() except (title, info)" mode="#current"/>
       <xsl:apply-templates select="info" mode="#current"/>
