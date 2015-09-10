@@ -152,7 +152,7 @@
       <xsl:if test="exists($alt-image)">
         <xsl:attribute name="rendition" select="string-join($alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref, ' ')"/>
       </xsl:if>
-      <xsl:variable name="postscript" as="element(*)*" select="dbk:caption | dbk:note"/>
+      <xsl:variable name="postscript" as="element(*)*" select="dbk:caption, dbk:note, dbk:info[every $c in * satisfies ($c/self::dbk:legalnotice)]"/>
       <xsl:apply-templates select="* except $postscript" mode="#current"/>
       <xsl:if test="exists($postscript)">
         <postscript>
@@ -167,7 +167,9 @@
     <xsl:attribute name="{name()}" select="string-join(for $image in tokenize(., ' ') return hub2tei:image-path($image, root(.)), ' ')"/>
   </xsl:template>
   
-  <xsl:template match="dbk:info[parent::*[self::dbk:table or self::dbk:figure]][dbk:legalnotice]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[parent::*[self::dbk:table or self::dbk:figure]]
+                               [dbk:legalnotice]
+                               [every $c in * satisfies ($c/self::dbk:legalnotice)]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
