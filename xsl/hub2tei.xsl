@@ -487,17 +487,17 @@
     </xsl:if>
   </xsl:template>
   
-  <xsl:template name="determine-index-type" as="attribute(subtype)">
+  <xsl:template name="determine-index-type" as="attribute(subtype)?">
     <xsl:choose>
       <xsl:when test="matches(descendant::dbk:phrase[@remap='HiddenText' and @condition = 'IndexType'], '^/[po]')">
         <xsl:attribute name="subtype" select="if (matches(descendant::dbk:phrase, '^/p')) then 'person' else 'location'"/>
       </xsl:when>
-      <xsl:when test="@role">
+      <xsl:when test="@role[normalize-space()]">
         <xsl:attribute name="subtype" select="@role"/>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="normalize-space($hub:fallback-index-type)">
         <xsl:attribute name="subtype" select="$hub:fallback-index-type"/>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
   
