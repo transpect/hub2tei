@@ -1176,7 +1176,7 @@
       <xsl:if test="./@role">
         <xsl:attribute name="rend" select="@role"/>
       </xsl:if>
-      <xsl:variable name="srcpaths" select="imageobject//@srcpath" as="xs:string*"/>
+      <xsl:variable name="srcpaths" select="@srcpath, imageobject//@srcpath" as="xs:string*"/>
       <xsl:if test="exists($srcpaths)">
         <xsl:attribute name="srcpath" select="$srcpaths" separator=" "/>
       </xsl:if>
