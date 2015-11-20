@@ -3,9 +3,8 @@
   xmlns:c="http://www.w3.org/ns/xproc-step"  
   xmlns:cx="http://xmlcalabash.com/ns/extensions" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:transpect="http://www.le-tex.de/namespace/transpect"  
-  xmlns:letex="http://www.le-tex.de/namespace"
-  xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei"
+  xmlns:tr="http://transpect.io" 
+  xmlns:hub2tei="http://transpect.io/hub2tei"
   version="1.0"
   name="hub2tei-driver">
   
@@ -39,31 +38,31 @@
   
   <p:sink/>
   
-  <letex:xslt-mode msg="yes" prefix="hub2tei/40" mode="hub2tei:dbk2tei">
+  <tr:xslt-mode msg="yes" prefix="hub2tei/40" mode="hub2tei:dbk2tei">
     <p:input port="source"><p:pipe port="source" step="hub2tei-driver"></p:pipe></p:input>
     <p:input port="stylesheet"><p:pipe step="hub2tei-driver" port="stylesheet"/></p:input>
     <p:input port="models"><p:pipe step="create-model" port="result"/></p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-  </letex:xslt-mode>
+  </tr:xslt-mode>
   
-  <letex:xslt-mode msg="yes" prefix="hub2tei/99" mode="hub2tei:tidy" name="tidy">
+  <tr:xslt-mode msg="yes" prefix="hub2tei/99" mode="hub2tei:tidy" name="tidy">
     <p:input port="stylesheet"><p:pipe step="hub2tei-driver" port="stylesheet"/></p:input>
     <p:input port="models"><p:pipe step="create-model" port="result"/></p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-  </letex:xslt-mode>
+  </tr:xslt-mode>
   
   <p:delete match="@srcpath" name="drop-srcpaths"/>
   
-  <letex:prepend-xml-model>
+  <tr:prepend-xml-model>
     <p:input port="models"><p:pipe step="create-model" port="result"/></p:input>
-  </letex:prepend-xml-model>
+  </tr:prepend-xml-model>
   
-  <letex:store-debug pipeline-step="hub2tei-driver/result">
+  <tr:store-debug pipeline-step="hub2tei-driver/result">
     <p:with-option name="active" select="$debug" />
     <p:with-option name="base-uri" select="$debug-dir-uri" />
-  </letex:store-debug>
+  </tr:store-debug>
   
   <p:sink/>
   
