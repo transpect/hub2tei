@@ -3,8 +3,8 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" 
                 xmlns:css="http://www.w3.org/1996/css" 
                 xmlns:dbk="http://docbook.org/ns/docbook" 
-                xmlns:hub="http://www.le-tex.de/namespace/hub" 
-                xmlns:hub2tei="http://www.le-tex.de/namespace/hub2tei" 
+                xmlns:hub="hhttp://transpect.io/hub" 
+                xmlns:hub2tei="http://transpect.io/hub2tei" 
                 xmlns:tei="http://www.tei-c.org/ns/1.0" 
                 xmlns:xlink="http://www.w3.org/1999/xlink" 
                 xmlns:cx="http://xmlcalabash.com/ns/extensions" 
@@ -15,8 +15,8 @@
 
   <!-- see also docbook to tei:
        http://svn.le-tex.de/svn/ltxbase/DBK2TEI -->
-  <xsl:import href="http://transpect.le-tex.de/xslt-util/cals2htmltable/cals2htmltables.xsl"/>
-
+  <xsl:import href="http://transpect.io/xslt-util/cals2htmltable/xsl/cals2htmltables.xsl"/>
+  
   <xsl:param name="debug" select="'no'" as="xs:string?"/>
   <xsl:param name="debug-dir-uri" select="'debug'" as="xs:string"/>
 
