@@ -1012,7 +1012,7 @@
     </label>
   </xsl:template>
 
-  <xsl:variable name="hub:poetry-role-regex" select="'letex_poem'" as="xs:string"/>
+  <xsl:variable name="hub:poetry-role-regex" select="'tr_poem'" as="xs:string"/>
 
   <xsl:template match="dbk:para[matches(@role, $hub:poetry-role-regex)]" mode="hub2tei:dbk2tei">
     <xsl:param name="delete-emptyline" tunnel="yes"/>
@@ -1099,7 +1099,7 @@
     </xsl:copy>
   </xsl:template>-->
 
-  <xsl:function name="hub2tei:is-stanza-start">
+  <xsl:function name="hub2tei:is-stanza-start" as="xs:boolean">
     <xsl:param name="possible-stanza-start"/>
     <xsl:choose>
       <xsl:when test="$possible-stanza-start[self::dbk:para] and matches($possible-stanza-start/@role, 'emptyline(_-_.+)?$')">
@@ -1132,7 +1132,7 @@
     </figure>
   </xsl:template>
 
-  <xsl:variable name="hub2tei:drama-style-role-regex" as="xs:string" select="'^letex_Drama'"/>
+  <xsl:variable name="hub2tei:drama-style-role-regex" as="xs:string" select="'^tr_Drama'"/>
   <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]" mode="hub2tei:dbk2tei" priority="3">
     <sp>
       <xsl:next-match/>
