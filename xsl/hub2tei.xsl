@@ -3,7 +3,7 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" 
                 xmlns:css="http://www.w3.org/1996/css" 
                 xmlns:dbk="http://docbook.org/ns/docbook" 
-                xmlns:hub="hhttp://transpect.io/hub" 
+                xmlns:hub="http://transpect.io/hub" 
                 xmlns:hub2tei="http://transpect.io/hub2tei" 
                 xmlns:tei="http://www.tei-c.org/ns/1.0" 
                 xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -665,7 +665,7 @@
     <xsl:copy-of select="."/>
   </xsl:template>
 
-  <xsl:variable name="tei:box-para-style-regex" select="'^letex_boxpara'" as="xs:string"/>
+  <xsl:variable name="tei:box-para-style-regex" select="'^tr_boxpara'" as="xs:string"/>
   
   <xsl:function name="hub2tei:conditions-to-dissolve-box-table" as="xs:boolean">
     <xsl:param name="context-table" as="element(dbk:informaltable)"/>
