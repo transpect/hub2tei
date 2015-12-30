@@ -7,8 +7,7 @@
   xmlns:tei="http://www.tei-c.org/ns/1.0"
   version="1.0"
   name="hub2tei"
-  type="hub2tei:hub2tei"
-  >
+  type="hub2tei:hub2tei">
   
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" select="'debug'"/>
@@ -28,6 +27,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:input port="additional-inputs"><p:empty/></p:input>
     <p:input port="options"><p:empty/></p:input>
+    <p:input port="paths"><p:pipe port="paths" step="hub2tei"/></p:input>
   </tr:dynamic-transformation-pipeline>
   
 </p:declare-step>
