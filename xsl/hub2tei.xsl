@@ -967,20 +967,26 @@
     </list>
   </xsl:template>
 
-  <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)] | dbk:varlistentry | dbk:glossentry" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)] | dbk:varlistentry" mode="hub2tei:dbk2tei">
     <item rend="{local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </item>
   </xsl:template>
 
+  <xsl:template match="dbk:varlistentry | dbk:glossentry" mode="hub2tei:dbk2tei">
+      <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="dbk:listitem[parent::dbk:varlistentry]/dbk:para | dbk:glossdef | dbk:listitem[parent::dbk:varlistentry][not(dbk:para)]" mode="hub2tei:dbk2tei">
     <gloss rend="{local-name()}">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
     </gloss>
   </xsl:template>
 
   <xsl:template match="dbk:listitem[parent::dbk:varlistentry][dbk:para] | dbk:glossdef/dbk:para" mode="hub2tei:dbk2tei">
-    <xsl:apply-templates select="node()" mode="#current"/>
+    <item rend="{local-name()}">
+       <xsl:apply-templates select="node()" mode="#current"/>
+    </item>
   </xsl:template>
 
   <xsl:template match="@override" mode="hub2tei:dbk2tei">
