@@ -967,8 +967,8 @@
     </list>
   </xsl:template>
 
-  <xsl:template match="dbk:listitem[not(parent::dbk:varlistentry)] | dbk:varlistentry" mode="hub2tei:dbk2tei">
-    <item rend="{local-name()}">
+  <xsl:template match="dbk:listitem | dbk:glossdef" mode="hub2tei:dbk2tei">
+    <item rend="{if (parent::*[self::dbk:varlistentry]) then local-name(..) else local-name()}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </item>
   </xsl:template>
@@ -977,18 +977,24 @@
       <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="dbk:listitem[parent::dbk:varlistentry]/dbk:para | dbk:glossdef | dbk:listitem[parent::dbk:varlistentry][not(dbk:para)]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para[parent::dbk:glossdef] | dbk:listitem[parent::dbk:varlistentry]/dbk:para | dbk:listitem[parent::dbk:varlistentry][not(dbk:para)]" mode="hub2tei:dbk2tei">
     <gloss rend="{local-name()}">
         <xsl:apply-templates select="@*, node()" mode="#current"/>
     </gloss>
   </xsl:template>
 
-  <xsl:template match="dbk:listitem[parent::dbk:varlistentry][dbk:para] | dbk:glossdef/dbk:para" mode="hub2tei:dbk2tei">
-    <item rend="{local-name()}">
-       <xsl:apply-templates select="node()" mode="#current"/>
-    </item>
+  <xsl:template match="dbk:term[not(parent::*[1][self::dbk:varlistentry])]" mode="hub2tei:dbk2tei">
+    <term rend="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </term>
   </xsl:template>
-
+  
+  <xsl:template match="dbk:glossterm | dbk:term[parent::*[1][self::dbk:varlistentry]]" mode="hub2tei:dbk2tei">
+    <label rend="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </label>
+  </xsl:template>
+  
   <xsl:template match="@override" mode="hub2tei:dbk2tei">
     <xsl:attribute name="n" select="."/>
   </xsl:template>
@@ -1006,17 +1012,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="dbk:term[not(parent::*[1][self::dbk:varlistentry])]" mode="hub2tei:dbk2tei">
-    <term rend="{local-name()}">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </term>
-  </xsl:template>
 
-  <xsl:template match="dbk:glossterm | dbk:term[parent::*[1][self::dbk:varlistentry]]" mode="hub2tei:dbk2tei">
-    <label rend="{local-name()}">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </label>
-  </xsl:template>
 
   <xsl:variable name="hub:poetry-role-regex" select="'tr_poem'" as="xs:string"/>
 
