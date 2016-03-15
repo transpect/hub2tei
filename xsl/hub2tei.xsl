@@ -1182,6 +1182,9 @@
       <xsl:if test="exists($srcpaths)">
         <xsl:attribute name="srcpath" select="$srcpaths" separator=" "/>
       </xsl:if>
+      <xsl:if test="exists(imageobject/imagedata/@xml:id)">
+        <xsl:attribute name="xml:id" select="imageobject/imagedata/@xml:id"/>
+      </xsl:if>
     </graphic>
     <xsl:apply-templates select="textobject" mode="#current"/>
   </xsl:template>
