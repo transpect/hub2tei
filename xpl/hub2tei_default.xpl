@@ -12,7 +12,7 @@
   <p:option name="debug-dir-uri" />
   
   <p:input port="source" primary="true"/>
-  <p:input port="paths" kind="parameter" primary="true"/>
+  <p:input port="parameters" kind="parameter" primary="true"/>
   <p:input port="stylesheet" primary="false"/>
   <p:output port="result" primary="true">
     <p:pipe port="result" step="tidy"/>
@@ -42,7 +42,7 @@
     <p:input port="source"><p:pipe port="source" step="hub2tei-driver"></p:pipe></p:input>
     <p:input port="stylesheet"><p:pipe step="hub2tei-driver" port="stylesheet"/></p:input>
     <p:input port="models"><p:pipe step="create-model" port="result"/></p:input>
-    <p:input port="parameters"><p:pipe port="paths" step="hub2tei-driver"/></p:input>
+    <p:input port="parameters"><p:pipe port="parameters" step="hub2tei-driver"/></p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tr:xslt-mode>
@@ -50,7 +50,7 @@
   <tr:xslt-mode msg="yes" prefix="hub2tei/99" mode="hub2tei:tidy" name="tidy">
     <p:input port="stylesheet"><p:pipe step="hub2tei-driver" port="stylesheet"/></p:input>
     <p:input port="models"><p:pipe step="create-model" port="result"/></p:input>
-    <p:input port="parameters"><p:pipe port="paths" step="hub2tei-driver"></p:pipe></p:input>
+    <p:input port="parameters"><p:pipe port="parameters" step="hub2tei-driver"></p:pipe></p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tr:xslt-mode>
