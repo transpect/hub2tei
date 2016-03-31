@@ -1310,6 +1310,10 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="@remap" mode="hub2tei:dbk2tei"/>
+  <xsl:template match="@remap" mode="hub2tei:dbk2tei">
+    <xsl:if test="parent::*[self::css:rule] and (. = ('subscript', 'superscript'))">
+      <xsl:attribute name="css:vertical-align" select="replace(., 'script$', '')"/>
+    </xsl:if>
+  </xsl:template>
 
 </xsl:stylesheet>
