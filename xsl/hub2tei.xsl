@@ -1262,7 +1262,7 @@
                   <xsl:if test="@morerows &gt; 0">
                     <xsl:attribute name="rows" select="@morerows + 1"/>
                   </xsl:if>
-                  <xsl:apply-templates select="@css:*" mode="#current"/>
+                  <xsl:apply-templates select="@role, @css:*" mode="#current"/>
                   <xsl:apply-templates mode="#current"/>
                 </cell>
               </xsl:for-each>
