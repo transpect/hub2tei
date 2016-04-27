@@ -15,6 +15,10 @@
   
   <p:input port="source" primary="true" />
   <p:input port="paths" kind="parameter" primary="true"/>
+  <p:input port="additional-inputs" sequence="true">
+    <p:empty/>
+  </p:input>
+  
   <p:output port="result" primary="true" />
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
@@ -25,7 +29,9 @@
     fallback-xpl="http://transpect.io/hub2tei/xpl/hub2tei_default.xpl">
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:input port="additional-inputs"><p:empty/></p:input>
+    <p:input port="additional-inputs">
+      <p:pipe port="additional-inputs" step="hub2tei"/>
+    </p:input>
     <p:input port="options"><p:empty/></p:input>
     <p:input port="paths"><p:pipe port="paths" step="hub2tei"/></p:input>
   </tr:dynamic-transformation-pipeline>
