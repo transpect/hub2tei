@@ -537,7 +537,7 @@
       <xsl:apply-templates select="@sortas" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
     </term>
-    <xsl:apply-templates select="if(../dbk:secondary) then ../dbk:secondary else ( dbk:see | dbk:seealso)" mode="#current"/>
+    <xsl:apply-templates select="if(../dbk:secondary) then ../dbk:secondary else ( ../dbk:see | ../dbk:seealso)" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="dbk:secondary" mode="hub2tei:dbk2tei">
@@ -546,7 +546,7 @@
         <xsl:apply-templates select="@sortas" mode="#current"/>
         <xsl:apply-templates select="node() except ( dbk:see, dbk:seealso)" mode="#current"/>
       </term>
-      <xsl:apply-templates select="if(../dbk:tertiary) then ../dbk:tertiary else ( dbk:see | dbk:seealso)" mode="#current"/>
+      <xsl:apply-templates select="if(../dbk:tertiary) then ../dbk:tertiary else ( ../dbk:see | ../dbk:seealso)" mode="#current"/>
     </index>
   </xsl:template>
   
@@ -554,22 +554,19 @@
     <index>
       <term>
         <xsl:apply-templates select="@sortas" mode="#current"/>
-        <xsl:apply-templates select="node() except ( dbk:see, dbk:seealso)" mode="#current"/>
+        <xsl:apply-templates select="node() except ( ../dbk:see, ../dbk:seealso)" mode="#current"/>
       </term>
       <xsl:apply-templates select="dbk:see | dbk:seealso" mode="#current"/>
     </index>
   </xsl:template>
   
-  <xsl:template match="dbk:see" mode="hub2tei:dbk2tei">
-    <see>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </see>
-  </xsl:template>
-  
-  <xsl:template match="dbk:seealso" mode="hub2tei:dbk2tei">
-    <see-also>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </see-also>
+  <xsl:template match="dbk:see | dbk:seealso" mode="hub2tei:dbk2tei">
+    <!-- there is no see/seealso in tei. therefore we create a subindex entry with special type attribute-->
+    <index>
+      <term type="{name()}">
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </term>
+    </index>
   </xsl:template>
 
   <xsl:template match="@sortas" mode="hub2tei:dbk2tei">
