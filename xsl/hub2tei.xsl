@@ -209,6 +209,12 @@
     </bibl>
   </xsl:template>
 
+	<xsl:template match="dbk:bibliomixed | dbk:biblioentry" mode="hub2tei:dbk2tei">
+		<bibl>
+			<xsl:apply-templates select="@*, node()" mode="#current"/>
+		</bibl>
+	</xsl:template>
+	
   <xsl:template match="dbk:info/dbk:authorgroup" mode="hub2tei:dbk2tei">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
@@ -224,7 +230,31 @@
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </head>
   </xsl:template>
+	
+	<xsl:template match="dbk:bibliodiv[every $entry in * satisfies $entry[self::dbk:bibliomixed | self::dbk:biblioentry | self::dbk:title]]" mode="hub2tei:dbk2tei">
+		<listBibl>
+			<xsl:apply-templates select="@*, node()" mode="#current"/>
+		</listBibl>
+	</xsl:template>
   
+	<xsl:template match="dbk:personname" mode="hub2tei:dbk2tei">
+		<persName>
+			<xsl:apply-templates select="@*, node()" mode="#current"/>
+		</persName>
+	</xsl:template>
+  
+	<xsl:template match="dbk:surname" mode="hub2tei:dbk2tei">
+		<surname>
+			<xsl:apply-templates select="@*, node()" mode="#current"/>
+		</surname>
+	</xsl:template>
+	
+	<xsl:template match="dbk:givenname" mode="hub2tei:dbk2tei">
+		<forename>
+			<xsl:apply-templates select="@*, node()" mode="#current"/>
+		</forename>
+	</xsl:template>
+	
 <!--  <xsl:template match="*[dbk:para[matches(@role, $tei:chapter-preface-role)]]" mode="cals2html-table" priority="3">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -460,7 +490,7 @@
 
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
 
-  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary" mode="hub2tei:dbk2tei">
+	<xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary | dbk:bibliography" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
       <div>
