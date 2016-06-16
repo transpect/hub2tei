@@ -10,7 +10,7 @@
                 xmlns:cx="http://xmlcalabash.com/ns/extensions" 
                 xmlns:html="http://www.w3.org/1999/xhtml" 
                 xmlns="http://www.tei-c.org/ns/1.0" 
-                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx" 
+                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx html tei" 
                 version="2.0">
 
   <!-- see also docbook to tei:
@@ -43,29 +43,13 @@
       <teiHeader>
         <fileDesc>
           <titleStmt>
-            <title>
-              <xsl:value-of select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-basename']"/>
-            </title>
-            <author/>
+            	<xsl:call-template name="title-stm"/>
           </titleStmt>
           <publicationStmt>
-            <distributor>
-              <address>
-                <addrLine>
-                  <name type="organisation"/>
-                </addrLine>
-                <addrLine>
-                  <name type="place"/>
-                </addrLine>
-              </address>
-            </distributor>
-            <idno type="book"/>
-            <date/>
-            <pubPlace/>
-            <publisher/>
+            <xsl:call-template name="publication-stm"/>
           </publicationStmt>
           <sourceDesc>
-            <p/>
+          	<xsl:call-template name="source-desc"/>
           </sourceDesc>
         </fileDesc>
         <profileDesc>
@@ -109,7 +93,35 @@
       </text>
     </TEI>
   </xsl:template>
+	
+	<xsl:template name="source-desc">
+		<p/>
+	</xsl:template>
+	
+	<xsl:template name="title-stm">
+		<title>
+			<xsl:value-of select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-basename']"/>
+		</title>
+		<author/>
+	</xsl:template>
   
+  <xsl:template name="publication-stm">
+  	<distributor>
+  		<address>
+  			<addrLine>
+  				<name type="organisation"/>
+  			</addrLine>
+  			<addrLine>
+  				<name type="place"/>
+  			</addrLine>
+  		</address>
+  	</distributor>
+  	<idno type="book"/>
+  	<date/>
+  	<pubPlace/>
+  	<publisher/>
+  </xsl:template>
+	
   <xsl:template match="dbk:info[parent::*[self::dbk:book or self::dbk:hub]]/dbk:keywordset[not(@role = 'hub')]" mode="hub2tei:dbk2tei">
     <keywords>
       <xsl:if test="@xml:lang">
