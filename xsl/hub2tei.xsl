@@ -982,6 +982,9 @@
     <list>
       <xsl:attribute name="type">
         <xsl:choose>
+        	<xsl:when test="(local-name(.) = 'itemizedlist') and (@mark = 'none')">
+        		<xsl:value-of select="'simple'"/>
+        	</xsl:when>
           <xsl:when test="local-name(.) = 'itemizedlist'">
             <xsl:value-of select="'bulleted'"/>
           </xsl:when>
