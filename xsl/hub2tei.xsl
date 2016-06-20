@@ -221,10 +221,22 @@
     </bibl>
   </xsl:template>
 
-	<xsl:template match="dbk:bibliomixed | dbk:biblioentry" mode="hub2tei:dbk2tei">
+	<xsl:template match="dbk:bibliomixed" mode="hub2tei:dbk2tei">
 		<bibl>
 			<xsl:apply-templates select="@*, node()" mode="#current"/>
 		</bibl>
+	</xsl:template>
+	
+	<xsl:template match="dbk:bibliomisc" mode="hub2tei:dbk2tei">
+		<unclear>
+			<xsl:apply-templates select="@*, node()" mode="#current"/>
+		</unclear>
+	</xsl:template>
+	
+	<xsl:template match="dbk:biblioentry" mode="hub2tei:dbk2tei">
+		<biblFull>
+			<xsl:apply-templates select="@*, node()" mode="#current"/>
+		</biblFull>
 	</xsl:template>
 	
   <xsl:template match="dbk:info/dbk:authorgroup" mode="hub2tei:dbk2tei">
@@ -291,11 +303,10 @@
     </argument>
   </xsl:template>
   
-  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup | dbk:partintro" mode="hub2tei:dbk2tei" priority="2">
+  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup | dbk:partintro | dbk:bibliodiv" mode="hub2tei:dbk2tei" priority="2">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
-
-
+	
   <xsl:template match="dbk:info/dbk:authorgroup/* | dbk:info/dbk:author" mode="hub2tei:dbk2tei">
     <xsl:element name="{if (../.. is /) then 'docAuthor' else 'byline'}">
       <xsl:apply-templates select="parent::dbk:authorgroup/@*" mode="#current">
@@ -502,7 +513,7 @@
 
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
 
-	<xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary | dbk:bibliography" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary | dbk:bibliography" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
       <div>
