@@ -273,7 +273,7 @@
 		</surname>
 	</xsl:template>
 	
-	<xsl:template match="dbk:givenname" mode="hub2tei:dbk2tei">
+	<xsl:template match="dbk:givenname | dbk:firstname" mode="hub2tei:dbk2tei">
 		<forename>
 			<xsl:apply-templates select="@*, node()" mode="#current"/>
 		</forename>
@@ -321,10 +321,11 @@
   <xsl:template match="dbk:personname" mode="hub2tei:dbk2tei">
     <xsl:param name="type" as="xs:string?" tunnel="yes"/>
     <persName>
+    	<xsl:apply-templates select="@*" mode="#current"/>
       <xsl:if test="$type">
         <xsl:attribute name="type" select="$type"/>
-        <xsl:apply-templates select="@*, node()" mode="#current"/>
       </xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/>
     </persName>
   </xsl:template>
 
