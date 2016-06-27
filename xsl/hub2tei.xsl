@@ -262,11 +262,16 @@
 	</xsl:template>
   
 	<xsl:template match="dbk:personname" mode="hub2tei:dbk2tei">
+		<xsl:param name="type" as="xs:string?" tunnel="yes"/>
 		<persName>
-			<xsl:apply-templates select="@*, node()" mode="#current"/>
+			<xsl:apply-templates select="@*" mode="#current"/>
+			<xsl:if test="$type">
+				<xsl:attribute name="type" select="$type"/>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="#current"/>
 		</persName>
 	</xsl:template>
-  
+	
 	<xsl:template match="dbk:surname" mode="hub2tei:dbk2tei">
 		<surname>
 			<xsl:apply-templates select="@*, node()" mode="#current"/>
@@ -318,16 +323,6 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="dbk:personname" mode="hub2tei:dbk2tei">
-    <xsl:param name="type" as="xs:string?" tunnel="yes"/>
-    <persName>
-    	<xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:if test="$type">
-        <xsl:attribute name="type" select="$type"/>
-      </xsl:if>
-      <xsl:apply-templates select="node()" mode="#current"/>
-    </persName>
-  </xsl:template>
 
   <xsl:template match="dbk:info[parent::dbk:book]/dbk:publisher" mode="hub2tei:dbk2tei">
     <docImprint>
