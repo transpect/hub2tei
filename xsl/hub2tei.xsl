@@ -81,9 +81,19 @@
           select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography, dbk:index)"/>
         <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography --> 
         <body>
-          <xsl:apply-templates select="* except dbk:info" mode="#current">
-            <xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
-          </xsl:apply-templates>
+        	<xsl:variable name="body" as="element(*)*">
+        		<xsl:apply-templates select="* except dbk:info" mode="#current">
+        			<xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
+        		</xsl:apply-templates>
+        	</xsl:variable>
+        	<xsl:choose>
+        		<xsl:when test="$body[node()]">
+        			<xsl:sequence select="$body"/>
+        		</xsl:when>
+        		<xsl:otherwise>
+        			<p srcpath="{generate-id()}"/>
+        		</xsl:otherwise>
+        	</xsl:choose>
         </body>
         <xsl:if test="exists($backmatter)">
           <back>
