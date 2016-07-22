@@ -89,19 +89,20 @@
       		<xsl:choose>
       			<xsl:when test="$body[node()]">
       				<xsl:choose>
-      					<xsl:when test="$body[not(*:p | *:div | *:ab | *:bibl | *:biblStruct |  *:castList |  *:classSpec |  *:constraintSpec | 
+      					<xsl:when test="$body[exists(*:p | *:div | *:ab | *:bibl | *:biblStruct |  *:castList |  *:classSpec |  *:constraintSpec | 
       						*:desc |  *:div |  *:div1 |  *:divGen | *:eTree |  *:eg |  *:elementSpec |  *:entry |  *:entryFree |  *:floatingText |
       						*:forest |  *:graph  |  *:l |  *:label |  *:lg | *:list |  *:listApp |  *:listBibl |  *:listEvent |  *:listForest | 
       						*:listNym |  *:listOrg |  *:listPerson |  *:listPlace |  *:listRef |  *:listTranspose |  *:listWit |  *:macroSpec | 
       						*:moduleSpec |  *:move | *:msDesc |  *:q |  *:quote |  *:said | *:schemaSpec |  *:sound |  *:sp |  *:spGrp | *:specGrp | 
       						*:specGrpRef |  *:stage |  *:superEntry |  *:table |  *:tech |  *:tree |  *:u |  *:view)]">
+      						
+      						<xsl:sequence select="$body"/>
+      					</xsl:when>
+      					<xsl:otherwise>
       						<!-- if a body contains neither paras nor divs etc., it is a schema error (case: only sidebars in image parts)-->
       						<div type="chapter" rend="virtual">
       							<xsl:sequence select="$body"/>
       						</div>
-      					</xsl:when>
-      					<xsl:otherwise>
-      						<xsl:sequence select="$body"/>
       					</xsl:otherwise>
       				</xsl:choose>
       			</xsl:when>
