@@ -80,21 +80,36 @@
         <xsl:variable name="backmatter" as="element(*)*"
           select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography, dbk:index)"/>
         <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography --> 
-        <body>
-        	<xsl:variable name="body" as="element(*)*">
-        		<xsl:apply-templates select="* except dbk:info" mode="#current">
-        			<xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
-        		</xsl:apply-templates>
-        	</xsl:variable>
-        	<xsl:choose>
-        		<xsl:when test="$body[node()]">
-        			<xsl:sequence select="$body"/>
-        		</xsl:when>
-        		<xsl:otherwise>
-        			<p srcpath="{generate-id()}"/>
-        		</xsl:otherwise>
-        	</xsl:choose>
-        </body>
+      	<body>
+      		<xsl:variable name="body" as="element(*)*">
+      			<xsl:apply-templates select="* except dbk:info" mode="#current">
+      				<xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
+      			</xsl:apply-templates>
+      		</xsl:variable>
+      		<xsl:choose>
+      			<xsl:when test="$body[node()]">
+      				<xsl:choose>
+      					<xsl:when test="$body[not(*:p | *:div | *:ab | *:bibl | *:biblStruct |  *:castList |  *:classSpec |  *:constraintSpec | 
+      						*:desc |  *:div |  *:div1 |  *:divGen | *:eTree |  *:eg |  *:elementSpec |  *:entry |  *:entryFree |  *:floatingText |
+      						*:forest |  *:graph  |  *:l |  *:label |  *:lg | *:list |  *:listApp |  *:listBibl |  *:listEvent |  *:listForest | 
+      						*:listNym |  *:listOrg |  *:listPerson |  *:listPlace |  *:listRef |  *:listTranspose |  *:listWit |  *:macroSpec | 
+      						*:moduleSpec |  *:move | *:msDesc |  *:q |  *:quote |  *:said | *:schemaSpec |  *:sound |  *:sp |  *:spGrp | *:specGrp | 
+      						*:specGrpRef |  *:stage |  *:superEntry |  *:table |  *:tech |  *:tree |  *:u |  *:view)]">
+      						<!-- if a body contains neither paras nor divs etc., it is a schema error (case: only sidebars in image parts)-->
+      						<div type="chapter" rend="virtual">
+      							<xsl:sequence select="$body"/>
+      						</div>
+      					</xsl:when>
+      					<xsl:otherwise>
+      						<xsl:sequence select="$body"/>
+      					</xsl:otherwise>
+      				</xsl:choose>
+      			</xsl:when>
+      			<xsl:otherwise>
+      				<p srcpath="{generate-id()}"/>
+      			</xsl:otherwise>
+      		</xsl:choose>
+      	</body>
         <xsl:if test="exists($backmatter)">
           <back>
             <xsl:apply-templates select="$backmatter" mode="#current"/>
