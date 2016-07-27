@@ -31,7 +31,11 @@
   </xsl:template>
 
   <xsl:template match="@hub:anchored" mode="hub2tei:dbk2tei"/>
-
+  
+  <xsl:template match="*[@remap = 'HiddenText'][@condition = ('StoryID', 'FigureRef', 'StoryRef')]" mode="hub2tei:dbk2tei">
+    <!-- When not resolved in idml2xml it makes problems later.-->
+  </xsl:template>
+  
   <xsl:template match="/*/@xml:base" mode="hub2tei:dbk2tei">
     <xsl:attribute name="xml:base" select="replace(., '\.hub\.xml$', '.tei.xml')"/>
   </xsl:template>
