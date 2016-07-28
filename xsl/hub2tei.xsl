@@ -93,13 +93,12 @@
       		<xsl:choose>
       			<xsl:when test="$body[node()]">
       				<xsl:choose>
-      					<xsl:when test="$body[exists(*:p | *:div | *:ab | *:bibl | *:biblStruct |  *:castList |  *:classSpec |  *:constraintSpec | 
-      						*:desc |  *:div |  *:div1 |  *:divGen | *:eTree |  *:eg |  *:elementSpec |  *:entry |  *:entryFree |  *:floatingText |
-      						*:forest |  *:graph  |  *:l |  *:label |  *:lg | *:list |  *:listApp |  *:listBibl |  *:listEvent |  *:listForest | 
-      						*:listNym |  *:listOrg |  *:listPerson |  *:listPlace |  *:listRef |  *:listTranspose |  *:listWit |  *:macroSpec | 
-      						*:moduleSpec |  *:move | *:msDesc |  *:q |  *:quote |  *:said | *:schemaSpec |  *:sound |  *:sp |  *:spGrp | *:specGrp | 
-      						*:specGrpRef |  *:stage |  *:superEntry |  *:table |  *:tech |  *:tree |  *:u |  *:view)]">
-      						
+      				  <xsl:when test="exists($body[self::*[local-name() = ('p', 'div', 'ab', 'bibl', 'biblStruct', 'castList', 'classSpec', 'constraintSpec',  
+      				    'desc', 'div', 'div1', 'divGen', 'eTree', 'eg', 'elementSpec', 'entry', 'entryFree', 'floatingText', 
+      				    'forest', 'graph ', 'l', 'label', 'lg', 'list', 'listApp', 'listBibl', 'listEvent', 'listForest', 
+      				    'listNym', 'listOrg', 'listPerson', 'listPlace', 'listRef', 'listTranspose', 'listWit', 'macroSpec', 
+      				    'moduleSpec', 'move', 'msDesc', 'q', 'quote', 'said', 'schemaSpec', 'sound', 'sp', 'spGrp', 'specGrp',  
+      				    'specGrpRef', 'stage', 'superEntry', 'table', 'tech', 'tree', 'u', 'view')]])">
       						<xsl:sequence select="$body"/>
       					</xsl:when>
       					<xsl:otherwise>
