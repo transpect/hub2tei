@@ -551,6 +551,31 @@
       </div>
     </xsl:if>
   </xsl:template>
+  
+  <!-- Unwrap newly created glossary div if it only contains the list itself.
+    Reason: If the glossary div doesn’t contain a title or additional paras, it is highly likely
+    that it has been created from a “floating” glossary environment that is part of a backmatter
+    section. If this containing backmatter section contains additional paras, the TEI will become
+    invalid because there is para content after the glossary div. -->
+  <xsl:template match="tei:div[@type = 'glossary']
+                              [tei:list[@type = 'gloss']]
+                              [every $child in * satisfies $child/self::tei:list[@type = 'gloss']]
+                              [parent::tei:div[@type = ('appendix', 'chapter')]]"
+                mode="hub2tei:tidy">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="tei:div[@type = ('appendix', 'chapter')]
+                              [tei:div[@type = 'glossary']
+                                      [tei:list[@type = 'gloss']]
+                                      [every $child in * satisfies $child/self::tei:list[@type = 'gloss']]
+                              ]/@type"
+                mode="hub2tei:tidy">
+    <xsl:copy/>
+    <xsl:attribute name="subtype" select="'glossary'"/>
+  </xsl:template>
+  
+
 
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
