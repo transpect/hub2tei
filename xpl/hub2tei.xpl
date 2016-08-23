@@ -20,11 +20,14 @@
   </p:input>
   
   <p:output port="result" primary="true" />
+  <p:output port="report" sequence="true">
+    <p:pipe port="report" step="dtp"/>
+  </p:output>
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="http://transpect.io/cascade/xpl/dynamic-transformation-pipeline.xpl"/>
 
-  <tr:dynamic-transformation-pipeline load="hub2tei/hub2tei_driver"
+  <tr:dynamic-transformation-pipeline load="hub2tei/hub2tei_driver" name="dtp"
     fallback-xsl="http://transpect.io/hub2tei/xsl/hub2tei.xsl"
     fallback-xpl="http://transpect.io/hub2tei/xpl/hub2tei_default.xpl">
     <p:with-option name="debug" select="$debug"/>

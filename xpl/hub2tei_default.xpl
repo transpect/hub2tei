@@ -17,6 +17,10 @@
   <p:output port="result" primary="true">
     <p:pipe port="result" step="tidy"/>
   </p:output>
+  <p:output port="report" sequence="true">
+    <p:pipe port="report" step="dbk2tei"/>
+    <p:pipe port="report" step="tidy"/>
+  </p:output>
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="http://transpect.io/xproc-util/xslt-mode/xpl/xslt-mode.xpl"/>
@@ -38,7 +42,7 @@
   
   <p:sink/>
   
-  <tr:xslt-mode msg="yes" prefix="hub2tei/40" mode="hub2tei:dbk2tei">
+  <tr:xslt-mode msg="yes" prefix="hub2tei/40" mode="hub2tei:dbk2tei" name="dbk2tei">
     <p:input port="source"><p:pipe port="source" step="hub2tei-driver"></p:pipe></p:input>
     <p:input port="stylesheet"><p:pipe step="hub2tei-driver" port="stylesheet"/></p:input>
     <p:input port="models"><p:pipe step="create-model" port="result"/></p:input>
