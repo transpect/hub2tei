@@ -770,11 +770,15 @@
   <xsl:function name="hub2tei:conditions-to-dissolve-box-table" as="xs:boolean">
     <xsl:param name="context-table" as="element(dbk:informaltable)"/>
     <!-- This default function dissolves tables that have paras with a box-style-role inside -->
-        <xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]) then true() else false()"/>
+  	<xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))] and $context-table[not(parent::*[matches(@role, '^Textbox')])]) then true() else false()"/>
   </xsl:function>
   
-
-  <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
+	<xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)]" priority="2" mode="hub2tei:dbk2tei">
+		<xsl:apply-templates select=".//dbk:entry/*" mode="#current"/>
+	</xsl:template>
+	
+	
+  <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)]" priority="2" mode="hub2tei:dbk2tei">
     <xsl:variable name="head" select="(descendant::*[self::dbk:para[matches(@role, $tei:box-head1-role-regex)]])[1]" as="element(dbk:para)?"/>
     <floatingText type="box" rend="{@role}">
       <xsl:if test="dbk:alt">
@@ -883,10 +887,7 @@
     </floatingText>
   </xsl:template>-->
   
-  <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][parent::*[matches(@role, 'Textbox')]]" priority="2" mode="hub2tei:dbk2tei">
-    <xsl:apply-templates select=".//dbk:entry/*" mode="#current"/>
-  </xsl:template>
-  
+
   <xsl:template match="*" mode="test"/>
 
   <xsl:template match="dbk:phrase" mode="hub2tei:dbk2tei">
@@ -1331,7 +1332,7 @@
   </xsl:template>
 
   <!-- prevent boxes that are set as tables to be converted to HTML tables -->
-	<xsl:template match="*[local-name() = ('table', 'informaltable')][descendant-or-self::*[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))] and not(parent::*[matches(@role, 'Textbox')])]" mode="cals2html-table">
+	<xsl:template match="*[local-name() = ('table', 'informaltable')][descendant-or-self::*[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))] and not(parent::*[sidebar][matches(@role, '^Textbox')])]" mode="cals2html-table">
     <!--    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>-->
     <xsl:copy copy-namespaces="no">
       <xsl:copy-of select="@*"/>
