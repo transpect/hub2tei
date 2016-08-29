@@ -1331,7 +1331,7 @@
   </xsl:template>
 
   <!-- prevent boxes that are set as tables to be converted to HTML tables -->
-  <xsl:template match="*[local-name() = ('table', 'informaltable')][descendant-or-self::*[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))]]" mode="cals2html-table">
+	<xsl:template match="*[local-name() = ('table', 'informaltable')][descendant-or-self::*[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))] and not(parent::*[matches(@role, 'Textbox')])]" mode="cals2html-table">
     <!--    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>-->
     <xsl:copy copy-namespaces="no">
       <xsl:copy-of select="@*"/>
