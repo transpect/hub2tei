@@ -766,19 +766,21 @@
   </xsl:template>
 
   <xsl:variable name="tei:box-para-style-regex" select="'^tr_boxpara'" as="xs:string"/>
-  
+	
+	<xsl:variable name="tei:normal-table-para-role-regex" select="'transpect_table_text'" as="xs:string"/>
+	
   <xsl:function name="hub2tei:conditions-to-dissolve-box-table" as="xs:boolean">
     <xsl:param name="context-table" as="element(dbk:informaltable)"/>
     <!-- This default function dissolves tables that have paras with a box-style-role inside -->
-  	<xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex))] and $context-table[not(parent::*[@role = 'Textbox'])]) then true() else false()"/>
+  	<xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex)) and (every $r in .//dbk:para/@role satisfies not(matches($r, $tei:normal-table-para-role-regex)))]) then true() else false()"/>
   </xsl:function>
   
-	<xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)]" priority="2" mode="hub2tei:dbk2tei">
+	<xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
 		<xsl:apply-templates select=".//dbk:entry/*" mode="#current"/>
 	</xsl:template>
 	
 	
-  <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)]" priority="2" mode="hub2tei:dbk2tei">
+	<xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
     <xsl:variable name="head" select="(descendant::*[self::dbk:para[matches(@role, $tei:box-head1-role-regex)]])[1]" as="element(dbk:para)?"/>
     <floatingText type="box" rend="{@role}">
       <xsl:if test="dbk:alt">
