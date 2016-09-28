@@ -1237,7 +1237,7 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="figure | informalfigure" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+  <xsl:template match="figure | informalfigure | table[every $child in node() satisfies $child[self::mediaobject | self::title]]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:if test="self::informalfigure[caption] and not(@xml:id)">
@@ -1342,7 +1342,7 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="informaltable | table" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+  <xsl:template match="informaltable | table[not(every $child in node() satisfies $child[self::mediaobject | self::title])]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <table>
       <xsl:apply-templates select="@xml:id | @role" mode="#current"/>
       <xsl:if test="title">
