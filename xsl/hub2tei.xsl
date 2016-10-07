@@ -1360,6 +1360,9 @@
           </xsl:if>
           <xsl:for-each select="./tgroup/(tbody union thead union tfoot)/row">
             <row>
+            	<xsl:if test="parent::*[self::thead]">
+            		<xsl:attribute name="role" select="'label'"/>
+            	</xsl:if>
               <xsl:for-each select="entry">
                 <cell>
                   <xsl:if test="@namest">
