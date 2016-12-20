@@ -493,15 +493,19 @@
   </xsl:template>
 
 
-  <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:tidy">
+  <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:dbk2tei">
     <div type="motto">
       <xsl:apply-templates select="tei:epigraph" mode="#current"/>
     </div>
   </xsl:template>
   
+   <xsl:template match="dbk:info/dbk:abstract[every $elt in node() satisfies $elt[self::dbk:epigraph]]" mode="hub2tei:dbk2tei">
+      <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+	
   <xsl:template match="dbk:epigraph" mode="hub2tei:dbk2tei">
     <xsl:choose>
-      <xsl:when test="parent::*[self::dbk:preface] or preceding-sibling::*[1][self::dbk:title or self::dbk:info]">
+      <xsl:when test="parent::*[self::dbk:preface | self::dbk:abstract[parent::*[self::dbk:info]]] or preceding-sibling::*[1][self::dbk:title or self::dbk:info]">
         <epigraph>
           <xsl:apply-templates select="@*, node()" mode="#current"/>
         </epigraph>
