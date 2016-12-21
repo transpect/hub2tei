@@ -493,7 +493,7 @@
   </xsl:template>
 
 
-  <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:dbk2tei">
+  <xsl:template match="tei:div[@type = 'preface'][count(*) = 2][tei:head][tei:epigraph]" mode="hub2tei:tidy">
     <div type="motto">
       <xsl:apply-templates select="tei:epigraph" mode="#current"/>
     </div>
