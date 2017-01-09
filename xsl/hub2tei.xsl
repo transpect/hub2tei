@@ -1254,32 +1254,89 @@
   </xsl:template>
 
   <xsl:variable name="hub2tei:drama-style-role-regex" as="xs:string" select="'^tr_Drama'"/>
-  <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]" mode="hub2tei:dbk2tei" priority="3">
-    <sp>
-      <xsl:next-match/>
-    </sp>
+	<xsl:variable name="hub2tei:drama-speaker-style-role-regex" as ="xs:string" select="'^tr_Speaker'"/>
+	<xsl:variable name="hub2tei:drama-head-style-role-regex" as ="xs:string" select="'^tr_DramaHead'"/>
+	<xsl:variable name="hub2tei:drama-stage-style-role-regex" as ="xs:string" select="'^tr_Stage'"/>
+	
+	<xsl:template match="dbk:div[@role = 'drama'][dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]]" 
+		             mode="hub2tei:dbk2tei">
+		<div rend="drama">
+			<xsl:for-each-group select="node()"
+				group-starting-with="dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]
+																		[not(preceding-sibling::*[1][matches(@role, $hub2tei:drama-head-style-role-regex)])]">
+				<xsl:choose>
+					<xsl:when test="current-group()[self::dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]]">
+						<spGrp>
+							<xsl:for-each select="current-group()">
+								<xsl:apply-templates select="." mode="#current"/>
+							</xsl:for-each>
+						</spGrp>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:for-each select="current-group()">
+							<xsl:apply-templates select="." mode="#current"/>
+						</xsl:for-each>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each-group>
+		</div>
+	</xsl:template>
+	
+	<xsl:template match="dbk:para[matches(@role, $hub2tei:drama-stage-style-role-regex)]" mode="hub2tei:dbk2tei" priority="3">
+    <stage>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </stage>
   </xsl:template>
-
-  <xsl:template match="*[tei:sp]" mode="hub2tei:tidy">
-    <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" group-adjacent="boolean(self::*:sp)">
-        <xsl:choose>
-          <xsl:when test="current-group()[self::tei:sp]">
-            <spGrp n="{count(current-group())}">
-              <xsl:apply-templates select="current-group()" mode="#current"/>
-            </spGrp>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:for-each select="current-group()">
-              <xsl:apply-templates select="." mode="#current"/>
-            </xsl:for-each>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each-group>
-    </xsl:copy>
+	
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)]" mode="hub2tei:dbk2tei">
+    <speaker>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </speaker>
   </xsl:template>
+	
+	 <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]" mode="hub2tei:dbk2tei">
+	 	<head>
+	 		<xsl:apply-templates select="@*, node()" mode="#current"/>
+	 	</head>
+	 </xsl:template>
 
+	<xsl:template match="tei:div[@rend = 'drama'] | tei:spGrp" mode="hub2tei:tidy" priority="2">
+		<xsl:choose>
+			<xsl:when test="tei:spGrp">
+				<xsl:call-template name="group-speeches"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<spGrp>
+					<xsl:call-template name="group-speeches"/>
+				</spGrp>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="group-speeches">
+		<xsl:for-each-group select="*" group-starting-with="*[self::tei:speaker | self::tei:p[matches(@rend, $hub2tei:drama-style-role-regex)][preceding-sibling::*[1][self::tei:stage | self::tei:head]]]">
+			<xsl:choose>
+				<xsl:when test="current-group()[self::tei:speaker | self::tei:p[matches(@rend, $hub2tei:drama-style-role-regex)]]">
+					<!--            <spGrp n="{count(current-group())}">-->
+					<sp>
+						<xsl:apply-templates select="current-group()" mode="#current"/>	
+					</sp>
+					
+					<!--</spGrp>-->
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:for-each select="current-group()">
+						<xsl:apply-templates select="." mode="#current"/>
+					</xsl:for-each>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:for-each-group>
+	</xsl:template>
+	
+ <xsl:template match="*[tei:sp][not(@type)]/@rend" mode="hub2tei:tidy">
+ 	<xsl:attribute name="type" select="../@rend"/>
+ </xsl:template>
+ 	
   <xsl:template match="  mediaobject[imageobject/imagedata/@fileref] 
                        | inlinemediaobject[imageobject/imagedata/@fileref]" 
                 mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
