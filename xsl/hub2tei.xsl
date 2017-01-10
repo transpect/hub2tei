@@ -1253,91 +1253,81 @@
     </figure>
   </xsl:template>
 
-  <xsl:variable name="hub2tei:drama-style-role-regex" as="xs:string" select="'^tr_Drama'"/>
+	<xsl:variable name="hub2tei:drama-style-role-regex" as="xs:string" select="'^tr_Drama'"/>
 	<xsl:variable name="hub2tei:drama-speaker-style-role-regex" as ="xs:string" select="'^tr_Speaker(_-_.+?)?$'"/>
 	<xsl:variable name="hub2tei:drama-speaker-phrase-style-role-regex" as ="xs:string" select="'^tr_SpeakerPhrase(_-_.+?)?$'"/>
 	<xsl:variable name="hub2tei:drama-head-style-role-regex" as ="xs:string" select="'^tr_DramaHead'"/>
 	<xsl:variable name="hub2tei:drama-stage-style-role-regex" as ="xs:string" select="'^tr_Stage'"/>
 	
-	<xsl:template match="dbk:div[@role = 'drama'][dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]]" 
-		             mode="hub2tei:dbk2tei">
-		<div rend="drama">
-			<xsl:for-each-group select="node()"
-				group-starting-with="dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]
-																		[not(preceding-sibling::*[1][matches(@role, $hub2tei:drama-head-style-role-regex)])]">
-				<xsl:choose>
-					<xsl:when test="current-group()[self::dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]]">
-						<spGrp>
-							<xsl:for-each select="current-group()">
-								<xsl:apply-templates select="." mode="#current"/>
-							</xsl:for-each>
-						</spGrp>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:for-each select="current-group()">
-							<xsl:apply-templates select="." mode="#current"/>
-						</xsl:for-each>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:for-each-group>
-		</div>
-	</xsl:template>
+	<xsl:template match="*[tei:sp]" mode="hub2tei:tidy">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
+    	
+      <xsl:for-each-group select="*" group-adjacent="boolean(self::*:sp)">
+        <xsl:choose>
+          <xsl:when test="current-group()[self::tei:sp]">
+            <spGrp>
+             <xsl:call-template name="group-speeches"/>
+            </spGrp>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="current-group()">
+              <xsl:apply-templates select="." mode="#current"/>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
+	
 	
 	<xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)][dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]]" mode="hub2tei:dbk2tei" priority="3">
 		<xsl:apply-templates select="dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]" mode="#current"/>
-		<xsl:next-match>
-			<xsl:with-param name="discard-speaker" select="true()" as="xs:boolean" tunnel="yes"/>
- 		</xsl:next-match>
+			<xsl:next-match>
+				<xsl:with-param name="discard-speaker" select="true()" as="xs:boolean" tunnel="yes"/>
+	 		</xsl:next-match>
   </xsl:template>
 	
-	<xsl:template match="dbk:para[matches(@role, $hub2tei:drama-stage-style-role-regex)]" mode="hub2tei:dbk2tei" priority="3">
-    <stage>
+	<xsl:template match="dbk:para[matches(@role, $hub2tei:drama-stage-style-role-regex)]" mode="hub2tei:dbk2tei" priority="2">
+		<sp>
+		 <stage>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </stage>
+		</sp>
   </xsl:template>
 	
-  <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)] | dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)] | dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]" mode="hub2tei:dbk2tei" priority="2">
   	<xsl:param name="discard-speaker" tunnel="yes" as="xs:boolean?"/>
     <xsl:if test="not($discard-speaker)">
-			<speaker>
-				<xsl:apply-templates select="@*" mode="#current"/>
-					<xsl:if test="self::dbk:phrase">
-						<xsl:attribute name="rendition" select="'inline'"/>
-					</xsl:if>
-					<xsl:apply-templates select="node()" mode="#current"/>
-			</speaker>
+    	<sp>
+				<speaker>
+					<xsl:apply-templates select="@*" mode="#current"/>
+						<xsl:if test="self::dbk:phrase">
+							<xsl:attribute name="rendition" select="'inline'"/>
+						</xsl:if>
+						<xsl:apply-templates select="node()" mode="#current"/>
+				</speaker>
+    	</sp>
     </xsl:if>
   </xsl:template>
 	
-	 <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-head-style-role-regex)]" mode="hub2tei:dbk2tei">
-	 	<head>
-	 		<xsl:apply-templates select="@*, node()" mode="#current"/>
-	 	</head>
+	 <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]" mode="hub2tei:dbk2tei">
+	 	<sp>
+	 		<xsl:next-match/>
+	 	</sp>
 	 </xsl:template>
 
-	<xsl:template match="tei:div[@rend = 'drama'] | tei:spGrp" mode="hub2tei:tidy" priority="2">
-		<xsl:choose>
-			<xsl:when test="tei:spGrp">
-				<xsl:call-template name="group-speeches"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<spGrp>
-					<xsl:call-template name="group-speeches"/>
-				</spGrp>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
 	
 	<xsl:template name="group-speeches">
-		<xsl:for-each-group select="*" group-starting-with="*[hub2tei:start-speech(.)]">
+		<xsl:for-each-group select="current-group()" group-starting-with="*[hub2tei:start-speech(.)]">
 			<xsl:choose>
-				<xsl:when test="current-group()[self::tei:speaker | self::tei:p[matches(@rend, $hub2tei:drama-style-role-regex)]]">
+				<xsl:when test="current-group()[tei:speaker |tei:p[matches(@rend, $hub2tei:drama-style-role-regex)]]">
 					<sp>
-						<xsl:apply-templates select="current-group()" mode="#current"/>	
+						<xsl:apply-templates select="current-group()/node()" mode="#current"/>	
 					</sp>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:for-each select="current-group()">
+					<xsl:for-each select="current-group()/node()">
 						<xsl:apply-templates select="." mode="#current"/>
 					</xsl:for-each>
 				</xsl:otherwise>
@@ -1348,11 +1338,11 @@
 	<xsl:function name="hub2tei:start-speech" as="xs:boolean">
 		<xsl:param name="elt" as="element(*)"/>
 		<xsl:choose>
-			<xsl:when test="$elt[self::tei:speaker]">
+			<xsl:when test="$elt[tei:speaker]">
 				<xsl:sequence select="true()"/>
 			</xsl:when>
-			<xsl:when test="$elt[self::tei:p][matches(@rend, $hub2tei:drama-style-role-regex)]
-																			[preceding-sibling::*[1][self::tei:stage[preceding-sibling::*[1][self::tei:head]] | self::tei:head]]">
+			<xsl:when test="$elt[tei:p][matches(@rend, $hub2tei:drama-style-role-regex)]
+																			[preceding-sibling::*[1][tei:stage[../preceding-sibling::*[1][self::tei:head]] | self::tei:head]]">
 				<xsl:sequence select="true()"/>
 			</xsl:when>
 			<xsl:otherwise>
