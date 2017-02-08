@@ -989,7 +989,8 @@
   <xsl:variable name="tei:box-head1-role-regex" select="'^letex_box_heading(_-_.+)?$'" as="xs:string"/>
   <xsl:variable name="tei:box-head2-role-regex" select="'^letex_box_heading2(_-_.+)?$'" as="xs:string"/>
 
-  <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] | dbk:div[matches(@role, $tei:floatingTexts-role)]" mode="hub2tei:dbk2tei" priority="5">
+  <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] | dbk:div[matches(@role, $tei:floatingTexts-role)] | 
+                       dbk:div[@role = 'drama'][exists(preceding-sibling::*[not(name() = ('dbk:div', 'dbk:section', 'dbk:chapter', 'dbk:chapter'))])]" mode="hub2tei:dbk2tei" priority="5">
     <floatingText type="{tei:floatingTexts-type(.)}">
       <xsl:apply-templates select="@*" mode="#current"/>
       <body>
@@ -1144,7 +1145,7 @@
     </l>
   </xsl:template>
 
-  <xsl:variable name="tei:poem-to-div" as="xs:string" select="'no'"/>
+ <xsl:variable name="tei:poem-to-div" as="xs:string" select="'no'"/>
 
   <xsl:template match="dbk:poetry" mode="hub2tei:dbk2tei">
     <xsl:variable name="poem-content" as="node()*">
