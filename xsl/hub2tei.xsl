@@ -848,61 +848,6 @@
     </floatingText>
   </xsl:template>
 
-
- <!-- <xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][not(parent::*[matches(@role, 'Textbox')])]" priority="2" mode="hub2tei:dbk2tei">
-    <xsl:variable name="head" select="(.//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
-    <floatingText type="box" rend="{@role}">
-      <xsl:if test="dbk:alt">
-        <xsl:variable name="alt-image" as="element(dbk:alt)?" 
-          select="dbk:alt[dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref][1]"/>
-        <xsl:if test="exists($alt-image)">
-          <xsl:attribute name="rendition" select="string-join($alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref, ' ')"/>
-        </xsl:if>
-      </xsl:if>
-      
-      <xsl:for-each-group select=".//dbk:row" group-starting-with="dbk:row[dbk:entry/dbk:para[matches(@role, $tei:box-head1-role-regex)]]">
-        <xsl:variable name="head" select="(current-group()//dbk:para[matches(@role, $tei:box-head1-role-regex)])[1]" as="element(dbk:para)?"/>
-        <xsl:message select="'-\-\-\-\-\-\-\-\-\-\-\-GROUP 1:', current-group()"/>
-        <body>
-          <div1>
-            <xsl:if test="$head">
-              <head>
-                <xsl:apply-templates select="$head/(@* except @role), $head/node() except ($head/dbk:sidebar)" mode="#current"/>
-              </head>
-              <!-\- Marginals -\->
-              <xsl:apply-templates select="$head/dbk:sidebar" mode="#current"/>
-            </xsl:if>
-            <xsl:for-each-group select="current-group()//dbk:row" group-starting-with="dbk:row[dbk:entry/dbk:para[matches(@role, $tei:box-head2-role-regex)]]">
-              <xsl:message select="'++++++++++GROUP 2:', current-group()"/>
-              <xsl:variable name="head2" select="(current-group()//dbk:para[matches(@role, $tei:box-head2-role-regex)])[1]" as="element(dbk:para)?"/>
-              <xsl:choose>
-                <xsl:when test="$head2">
-                  <div2>
-                    <head>
-                      <xsl:apply-templates select="$head2/(@* except @role), $head/node() except ($head2/dbk:sidebar)" mode="#current"/>
-                    </head>
-                    <!-\- Marginals -\->
-                    <xsl:apply-templates select="$head2/dbk:sidebar" mode="#current"/>
-                    <xsl:apply-templates select="current-group()//dbk:entry/node()[not(. is $head2)]" mode="#current"/>
-                  </div2>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:apply-templates select="current-group()//dbk:entry/node()" mode="#current"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each-group>
-            
-          </div1>
-        </body>
-      </xsl:for-each-group>
-      
-      <!-\-      <xsl:apply-templates select="($head//dbk:anchor)[1]/@xml:id" mode="#current"/>-\->
-      <!-\-      <xsl:call-template name="box-legend"/>-\->
-      <!-\-      <xsl:apply-templates select="dbk:info[dbk:legalnotice[@role eq 'copyright']]" mode="#current"/>-\->
-    </floatingText>
-  </xsl:template>-->
-  
-
   <xsl:template match="*" mode="test"/>
 
   <xsl:template match="dbk:phrase" mode="hub2tei:dbk2tei">
