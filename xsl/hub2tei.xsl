@@ -1242,7 +1242,7 @@
 		</sp>
   </xsl:template>
 	
-  <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)] | dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]" mode="hub2tei:dbk2tei" priority="2">
+  <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)] | dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)][parent::*[self::dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)]]]" mode="hub2tei:dbk2tei" priority="2">
   	<xsl:param name="discard-speaker" tunnel="yes" as="xs:boolean?"/>
     <xsl:if test="not($discard-speaker)">
     	<sp>
