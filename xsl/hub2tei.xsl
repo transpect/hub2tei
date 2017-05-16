@@ -756,7 +756,9 @@
   </xsl:template>
 
   <xsl:template match="dbk:br" mode="hub2tei:dbk2tei">
-    <lb/>
+    <lb>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </lb>
   </xsl:template>
 
   <xsl:template match="dbk:tab" mode="hub2tei:dbk2tei">
