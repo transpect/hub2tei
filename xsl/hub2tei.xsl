@@ -40,39 +40,33 @@
     <xsl:attribute name="xml:base" select="replace(., '\.hub\.xml$', '.tei.xml')"/>
   </xsl:template>
 
-  <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei">
+    <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei">
     <TEI>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:attribute name="source-dir-uri" select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
       <teiHeader>
         <fileDesc>
           <titleStmt>
-            	<xsl:call-template name="title-stm"/>
+            <xsl:call-template name="title-stm"/>
           </titleStmt>
+          <xsl:call-template name="edition-stm"/>
           <publicationStmt>
             <xsl:call-template name="publication-stm"/>
           </publicationStmt>
           <sourceDesc>
-          	<xsl:call-template name="source-desc"/>
+            <xsl:call-template name="source-desc"/>
           </sourceDesc>
         </fileDesc>
         <profileDesc>
           <textClass>
-           <xsl:apply-templates select="dbk:info/dbk:keywordset[@role = 'hub']" mode="#current"/>
-           <xsl:apply-templates select="dbk:info/dbk:keywordset[not(@role = 'hub')]" mode="#current"/>
+            <xsl:call-template name="keywords"/>
           </textClass>
           <xsl:if test="dbk:info/dbk:abstract">
             <abstract>
               <xsl:apply-templates select="dbk:info/dbk:abstract/node()" mode="#current"/>
             </abstract>
           </xsl:if>
-          <langUsage>
-            <language>
-              <xsl:attribute name="ident">
-                <xsl:apply-templates select="/dbk:*/@xml:lang" mode="#current"/>
-              </xsl:attribute>
-            </language>
-          </langUsage>
+          <xsl:call-template name="lang-usage"/>
         </profileDesc>
         <encodingDesc>
           <styleDefDecl scheme="cssa"/>
@@ -83,37 +77,37 @@
         <xsl:apply-templates select="dbk:info" mode="#current"/>
         <xsl:variable name="backmatter" as="element(*)*"
           select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography, dbk:index)"/>
-        <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography --> 
-      	<body>
-      		<xsl:variable name="body" as="element(*)*">
-      			<xsl:apply-templates select="* except dbk:info" mode="#current">
-      				<xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
-      			</xsl:apply-templates>
-      		</xsl:variable>
-      		<xsl:choose>
-      			<xsl:when test="$body[node()]">
-      				<xsl:choose>
-      				  <xsl:when test="exists($body[self::*[local-name() = ('p', 'div', 'ab', 'bibl', 'biblStruct', 'castList', 'classSpec', 'constraintSpec',  
-      				    'desc', 'div', 'div1', 'divGen', 'eTree', 'eg', 'elementSpec', 'entry', 'entryFree', 'floatingText', 
-      				    'forest', 'graph ', 'l', 'label', 'lg', 'list', 'listApp', 'listBibl', 'listEvent', 'listForest', 
-      				    'listNym', 'listOrg', 'listPerson', 'listPlace', 'listRef', 'listTranspose', 'listWit', 'macroSpec', 
-      				    'moduleSpec', 'move', 'msDesc', 'q', 'quote', 'said', 'schemaSpec', 'sound', 'sp', 'spGrp', 'specGrp',  
-      				    'specGrpRef', 'stage', 'superEntry', 'table', 'tech', 'tree', 'u', 'view')]])">
-      						<xsl:sequence select="$body"/>
-      					</xsl:when>
-      					<xsl:otherwise>
-      						<!-- if a body contains neither paras nor divs etc., it is a schema error (case: only sidebars in image parts)-->
-      						<div type="chapter" rend="virtual">
-      							<xsl:sequence select="$body"/>
-      						</div>
-      					</xsl:otherwise>
-      				</xsl:choose>
-      			</xsl:when>
-      			<xsl:otherwise>
-      				<p srcpath="{generate-id()}"/>
-      			</xsl:otherwise>
-      		</xsl:choose>
-      	</body>
+        <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography -->
+        <body>
+          <xsl:variable name="body" as="element(*)*">
+            <xsl:apply-templates select="* except dbk:info" mode="#current">
+              <xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
+            </xsl:apply-templates>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="$body[node()]">
+              <xsl:choose>
+                <xsl:when test="exists($body[self::*[local-name() = ('p', 'div', 'ab', 'bibl', 'biblStruct', 'castList', 'classSpec', 'constraintSpec',
+                                                                    'desc', 'div', 'div1', 'divGen', 'eTree', 'eg', 'elementSpec', 'entry', 'entryFree', 'floatingText',
+                                                                    'forest', 'graph ', 'l', 'label', 'lg', 'list', 'listApp', 'listBibl', 'listEvent', 'listForest',
+                                                                    'listNym', 'listOrg', 'listPerson', 'listPlace', 'listRef', 'listTranspose', 'listWit', 'macroSpec',
+                                                                    'moduleSpec', 'move', 'msDesc', 'q', 'quote', 'said', 'schemaSpec', 'sound', 'sp', 'spGrp', 'specGrp',
+                                                                    'specGrpRef', 'stage', 'superEntry', 'table', 'tech', 'tree', 'u', 'view')]])">
+                  <xsl:sequence select="$body"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- if a body contains neither paras nor divs etc., it is a schema error (case: only sidebars in image parts)-->
+                  <div type="chapter" rend="virtual">
+                    <xsl:sequence select="$body"/>
+                  </div>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <p srcpath="{generate-id()}"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </body>
         <xsl:if test="exists($backmatter)">
           <back>
             <xsl:apply-templates select="$backmatter" mode="#current"/>
@@ -122,10 +116,27 @@
       </text>
     </TEI>
   </xsl:template>
-	
-	<xsl:template name="source-desc">
-		<p/>
-	</xsl:template>
+
+  <xsl:template name="lang-usage">
+    <langUsage>
+      <language>
+        <xsl:attribute name="ident">
+          <xsl:apply-templates select="/dbk:*/@xml:lang" mode="#current"/>
+        </xsl:attribute>
+      </language>
+    </langUsage>
+  </xsl:template>
+
+  <xsl:template name="source-desc">
+    <p/>
+  </xsl:template>
+
+  <xsl:template name="edition-stm"/>
+
+  <xsl:template name="keywords">
+    <xsl:apply-templates select="dbk:info/dbk:keywordset[@role = 'hub']" mode="#current"/>
+    <xsl:apply-templates select="dbk:info/dbk:keywordset[not(@role = 'hub')]" mode="#current"/>
+  </xsl:template>
 	
 	<xsl:template name="title-stm">
 		<title>
