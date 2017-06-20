@@ -172,6 +172,9 @@
       </xsl:if>
       <xsl:for-each select="dbk:keyword">
         <term>
+          <xsl:if test="@role">
+            <xsl:attribute name="key" select="encode-for-uri(@role)"/>
+          </xsl:if>
           <xsl:value-of select="."/>
         </term>
       </xsl:for-each>
