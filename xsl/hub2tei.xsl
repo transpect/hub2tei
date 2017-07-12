@@ -53,6 +53,7 @@
           <publicationStmt>
             <xsl:call-template name="publication-stm"/>
           </publicationStmt>
+          <xsl:call-template name="series-stm"/>
           <sourceDesc>
             <xsl:call-template name="source-desc"/>
           </sourceDesc>
@@ -138,30 +139,75 @@
     <xsl:apply-templates select="dbk:info/dbk:keywordset[not(@role = 'hub')]" mode="#current"/>
   </xsl:template>
 	
-	<xsl:template name="title-stm">
-		<title>
-			<xsl:value-of select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-basename']"/>
-		</title>
-		<author/>
-	</xsl:template>
+  <xsl:template name="title-stm">
+    <title>
+      <xsl:value-of select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-basename']"/>
+    </title>
+    <author/>
+  </xsl:template>
   
   <xsl:template name="publication-stm">
-  	<distributor>
-  		<address>
-  			<addrLine>
-  				<name type="organisation"/>
-  			</addrLine>
-  			<addrLine>
-  				<name type="place"/>
-  			</addrLine>
-  		</address>
-  	</distributor>
-  	<idno type="book"/>
-  	<date/>
-  	<pubPlace/>
-  	<publisher/>
+    <distributor>
+      <address>
+        <addrLine>
+          <name type="organisation"/>
+        </addrLine>
+        <addrLine>
+          <name type="place"/>
+        </addrLine>
+      </address>
+    </distributor>
+    <idno type="book"/>
+    <date>
+      <xsl:apply-templates select="/*/dbk:info/dbk:date" mode="#current"/>  
+    </date>
+    <pubPlace/>
+    <publisher/>
   </xsl:template>
 	
+  <xsl:template name="series-stm">
+    <xsl:if test="dbk:info[dbk:issuenum or dbk:volumenum or dbk:biblioid]">
+      <seriesStmt>
+        <title/>
+        <xsl:apply-templates select="dbk:info/dbk:volumenum, dbk:info/dbk:issuenum, dbk:info/dbk:biblioid" mode="#current"/>
+      </seriesStmt>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:issuenum" mode="hub2tei:dbk2tei" priority="2">
+    <biblScope unit="issue"><xsl:apply-templates select="node()" mode="#current"/></biblScope>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:volumenum" mode="hub2tei:dbk2tei" priority="2">
+    <biblScope unit="volume"><xsl:apply-templates select="node()" mode="#current"/></biblScope>
+  </xsl:template>
+
+  <xsl:template match="dbk:info[dbk:keywordset[@role = 'hub']]/dbk:biblioid" mode="hub2tei:dbk2tei" priority="3">
+    <idno><xsl:apply-templates select="@*, node()" mode="#current"/></idno>
+  </xsl:template>
+
+  <xsl:template match="dbk:info[not(dbk:keywordset[@role = 'hub'])]/dbk:biblioid" mode="hub2tei:dbk2tei" priority="2">
+    <!-- chapters etc-->
+    <opener>
+      <idno><xsl:apply-templates select="@*, node()" mode="#current"/></idno>
+    </opener>
+  </xsl:template>
+
+  <xsl:template match="dbk:info[not(dbk:keywordset[@role = 'hub'])]/dbk:artpagenums" mode="hub2tei:dbk2tei" priority="2">
+    <!-- chapters etc-->
+    <p rend="{local-name()}" rendition="none">
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </p>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:biblioid/@class" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="type" select="."/>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:biblioid/@otherclass" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="subtype" select="."/>
+  </xsl:template>
+
   <xsl:template match="dbk:info[parent::*[self::dbk:book or self::dbk:hub]]/dbk:keywordset[not(@role = 'hub')]" mode="hub2tei:dbk2tei">
     <keywords>
       <xsl:if test="@xml:lang">
@@ -172,6 +218,9 @@
       </xsl:if>
       <xsl:for-each select="dbk:keyword">
         <term>
+          <xsl:if test="@xml:lang">
+            <xsl:attribute name="xml:lang" select="@xml:lang"/>
+          </xsl:if>
           <xsl:if test="@role">
             <xsl:attribute name="key" select="encode-for-uri(@role)"/>
           </xsl:if>
@@ -187,8 +236,11 @@
 
   <xsl:template match="dbk:info[parent::*[self::dbk:book or self::dbk:hub]]" mode="hub2tei:dbk2tei">
     <xsl:variable name="title-page-parts" select="dbk:authorgroup, dbk:title, dbk:subtitle, dbk:publisher"/>
+    <xsl:variable name="tei-header-elements" select="dbk:volumenum, dbk:issuenum, dbk:biblioid, dbk:date">
+    <!-- handled in template series-stm already --> 
+     </xsl:variable>
     <front>
-      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | $title-page-parts | dbk:abstract)" mode="#current"/>
+      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | $title-page-parts | dbk:abstract | $tei-header-elements)" mode="#current"/>
       <titlePage>
         <xsl:apply-templates select="$title-page-parts" mode="#current"/>
       </titlePage>
@@ -233,7 +285,7 @@
   </xsl:template>
 
   <xsl:template match="dbk:info" mode="hub2tei:dbk2tei">
-    <xsl:apply-templates select="node()" mode="#current"/>
+    <xsl:apply-templates select="node() except (*[self::dbk:artpagenums]), dbk:artpagenums" mode="#current"/>
   </xsl:template>
   
   <xsl:function name="hub2tei:contains-token" as="xs:boolean">
@@ -251,7 +303,7 @@
     </xsl:if>
   </xsl:function>
 
-  <xsl:template match="dbk:info/dbk:legalnotice[hub2tei:contains-token(@role, 'copyright')]/*[local-name() = ('para', 'simpara')] " mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:legalnotice[hub2tei:contains-token(@role, 'copyright')]/*[local-name() = ('para', 'simpara')] " mode="hub2tei:dbk2tei" priority="2">
     <bibl type="copyright">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </bibl>
@@ -482,7 +534,7 @@
 
   <xsl:template match="dbk:keyword" mode="hub2tei:dbk2tei">
     <term key="{@role}">
-      <xsl:apply-templates mode="#current"/>
+      <xsl:apply-templates select="@xml:lang, node()" mode="#current"/>
     </term>
   </xsl:template>
 
@@ -767,6 +819,10 @@
     <note type="footnote">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </note>
+  </xsl:template>
+
+  <xsl:template match="dbk:footnote/@label" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="n" select="."/>
   </xsl:template>
 
   <xsl:template match="dbk:br" mode="hub2tei:dbk2tei">
