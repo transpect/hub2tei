@@ -482,19 +482,25 @@
   
   <xsl:template match="dbk:div[not(matches(@role, $tei:floatingTexts-role))]" mode="hub2tei:dbk2tei">
     <div>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:if test="@rend or @type">
+        <xsl:attribute name="type">
+          <xsl:value-of select="(@type, @rend)[1]"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:apply-templates select="@* except ((@type, @rend)[1])" mode="#current"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
     </div>
   </xsl:template>
 
-  <xsl:template match="tei:div[not(@type)][@rend]" mode="hub2tei:tidy">
-  <!--a  div must have a type attribute -->
+<!--  <xsl:template match="tei:div[not(@type)][@rend]" mode="hub2tei:tidy">
+  <!-\-a  div must have a type attribute -\->
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:attribute name="type" select="@rend"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
-
+-->
   <!-- Equations -->
   
   <xsl:template match="dbk:inlineequation" mode="hub2tei:dbk2tei">
@@ -642,7 +648,8 @@
                               [tei:div[@type = 'glossary']
                                       [tei:list[@type = 'gloss']]
                                       [every $child in * satisfies $child/self::tei:list[@type = 'gloss']]
-                              ]/@type"
+                              ]
+                              [every $child in * satisfies $child/self::tei:div[@type = 'glossary']]/@type"
                 mode="hub2tei:tidy">
     <xsl:copy/>
     <xsl:attribute name="subtype" select="'glossary'"/>
