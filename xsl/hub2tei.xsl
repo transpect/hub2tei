@@ -648,8 +648,7 @@
                               [tei:div[@type = 'glossary']
                                       [tei:list[@type = 'gloss']]
                                       [every $child in * satisfies $child/self::tei:list[@type = 'gloss']]
-                              ]
-                              [every $child in * satisfies $child/self::tei:div[@type = 'glossary']]/@type"
+                              ]/@type"
                 mode="hub2tei:tidy">
     <xsl:copy/>
     <xsl:attribute name="subtype" select="'glossary'"/>
