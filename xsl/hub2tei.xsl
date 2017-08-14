@@ -967,19 +967,19 @@
   <xsl:variable name="tei:pagebreaks-to-real-pagebreaks" as="xs:boolean" select="true()"/>
 
   <!-- handle page breaks -->
-  <xsl:template match="*[key('natives', @role)/@*[name() =('css:page-break-before', 'css:page-break-after')]][$tei:pagebreaks-to-real-pagebreaks]" mode="hub2tei:dbk2tei" priority="10">
+  <xsl:template match="*[key('natives', @role)/@*[name() =('css:page-break-before', 'css:page-break-after', 'css:break-after', 'css:break-before')]][$tei:pagebreaks-to-real-pagebreaks]" mode="hub2tei:dbk2tei" priority="10">
     <xsl:choose>
-      <xsl:when test="key('natives', @role)/(@css:page-break-before|@css:page-break-after) = ('always', 'left', 'right')">
+      <xsl:when test="key('natives', @role)/(@css:page-break-before|@css:page-break-after|@css:break-after|@css:break-before) = ('always', 'left', 'right', 'column')">
         <xsl:choose>
           <xsl:when test=". eq ''">
             <pb/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="key('natives', @role)/@css:page-break-before">
+            <xsl:if test="key('natives', @role)/(@css:page-break-before|@css:break-before)">
               <pb/>
             </xsl:if>
             <xsl:next-match/>
-            <xsl:if test="key('natives', @role)/@css:page-break-after">
+            <xsl:if test="key('natives', @role)/(@css:page-break-after|@css:break-after)">
               <pb/>
             </xsl:if>
           </xsl:otherwise>
