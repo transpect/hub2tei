@@ -991,7 +991,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="@css:page-break-after|@css:page-break-before" mode="hub2tei:dbk2tei"/>
+  <xsl:template match="@css:page-break-after|@css:page-break-before|@css:break-before|@css:page-break-after" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="dbk:phrase[@role eq 'footnote_reference'][dbk:footnote][count(node()) eq 1]" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current"/>
