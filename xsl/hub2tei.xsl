@@ -418,6 +418,21 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:template match="dbk:info/dbk:author/dbk:address" mode="hub2tei:dbk2tei">
+    <xsl:element name="location">
+      <xsl:element name="address">
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </xsl:element>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="dbk:address/dbk:city" mode="hub2tei:dbk2tei">
+    <xsl:element name="settlement">
+      <xsl:attribute name="type" select="'city'"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:value-of select="normalize-space(text())"/>
+    </xsl:element>
+  </xsl:template>
 
   <xsl:template match="dbk:info[parent::dbk:book]/dbk:publisher" mode="hub2tei:dbk2tei">
     <docImprint>
