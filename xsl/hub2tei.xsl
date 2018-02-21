@@ -1406,32 +1406,36 @@
   <xsl:template match="  mediaobject[imageobject/imagedata/@fileref] 
                        | inlinemediaobject[imageobject/imagedata/@fileref]" 
                 mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
-    <graphic url="{hub2tei:image-path(imageobject/imagedata/@fileref, root(.))}">
-      <xsl:if test="imageobject/imagedata/@width">
-        <xsl:attribute name="width" select="if (matches(imageobject/imagedata/@width,'^\.')) 
-                                            then replace(imageobject/imagedata/@width,'^\.','0.') 
-                                            else imageobject/imagedata/@width"/>
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="imageobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+    <graphic url="{if(@condition eq 'print')
+                   then hub2tei:original-image-path(imagedata/@fileref, root(.)) 
+                   else hub2tei:image-path(imagedata/@fileref, root(.))}">
+      <xsl:if test="imagedata/@width">
+        <xsl:attribute name="width" select="if (matches(imagedata/@width,'^\.')) 
+                                            then replace(imagedata/@width,'^\.','0.') 
+                                            else imagedata/@width"/>
       </xsl:if>
-      <xsl:if test="imageobject/imagedata/@depth">
-        <xsl:attribute name="height" select="if (matches(imageobject/imagedata/@depth,'[0-9]$')) 
-                                             then string-join((imageobject/imagedata/@depth,'pt'),'') 
-                                             else imageobject/imagedata/@depth"/>
+      <xsl:if test="imagedata/@depth">
+        <xsl:attribute name="height" select="if (matches(imagedata/@depth,'[0-9]$')) 
+                                             then string-join((imagedata/@depth,'pt'),'') 
+                                             else imagedata/@depth"/>
       </xsl:if>
-      <xsl:if test="./@role">
-        <xsl:attribute name="rend" select="@role"/>
+      <xsl:if test="parent::mediaobject/@role or @condition">
+        <xsl:attribute name="rend" select="string-join((parent::mediaobject/@role, @condition), ' ')"/>
       </xsl:if>
-      <xsl:variable name="srcpaths" select="@srcpath, imageobject//@srcpath" as="xs:string*"/>
+      <xsl:variable name="srcpaths" select="if(position() eq 1 or count(parent::mediaobject/imageobject) eq 1) then parent::mediaobject/@srcpath else (), 
+                                            @srcpath, 
+                                            .//@srcpath" as="xs:string*"/>
       <xsl:if test="exists($srcpaths)">
         <xsl:attribute name="srcpath" select="$srcpaths" separator=" "/>
       </xsl:if>
-<!--      <xsl:if test="exists(imageobject[@role = 'hub:embedded'])">
-        <xsl:attribute name="rendition" select="'embedded'"/>
-      </xsl:if>-->
-      <xsl:if test="exists(imageobject/imagedata/@xml:id)">
-        <xsl:attribute name="xml:id" select="imageobject/imagedata/@xml:id"/>
+      <xsl:if test="exists(imagedata/@xml:id)">
+        <xsl:attribute name="xml:id" select="imagedata/@xml:id"/>
       </xsl:if>
     </graphic>
-    <xsl:apply-templates select="textobject" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="textobject[parent::mediaobject | parent::inlinemediaobject]" mode="hub2tei:dbk2tei" 
@@ -1446,6 +1450,12 @@
 
   <!-- to be overwritten in adaptions: -->
   <xsl:function name="hub2tei:image-path" as="xs:string">
+    <xsl:param name="path" as="xs:string"/>
+    <xsl:param name="root" as="document-node()?"/>
+    <xsl:sequence select="$path"/>
+  </xsl:function>
+  
+  <xsl:function name="hub2tei:original-image-path" as="xs:string">
     <xsl:param name="path" as="xs:string"/>
     <xsl:param name="root" as="document-node()?"/>
     <xsl:sequence select="$path"/>
