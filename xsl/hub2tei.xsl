@@ -1423,10 +1423,10 @@
                                              then string-join((imagedata/@depth,'pt'),'') 
                                              else imagedata/@depth"/>
       </xsl:if>
-      <xsl:if test="parent::mediaobject/@role or @condition">
-        <xsl:attribute name="rend" select="string-join((parent::mediaobject/@role, @condition), ' ')"/>
+      <xsl:if test="parent::*/@role  or @condition">
+        <xsl:attribute name="rend" select="string-join((parent::*/@role, @condition), ' ')"/>
       </xsl:if>
-      <xsl:variable name="srcpaths" select="if(position() eq 1 or count(parent::mediaobject/imageobject) eq 1) then parent::mediaobject/@srcpath else (), 
+      <xsl:variable name="srcpaths" select="if(position() eq 1 or count(parent::*/imageobject) eq 1) then parent::*/@srcpath else (),
                                             @srcpath, 
                                             .//@srcpath" as="xs:string*"/>
       <xsl:if test="exists($srcpaths)">
