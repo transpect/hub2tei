@@ -1435,9 +1435,17 @@
       <xsl:if test="exists(imagedata/@xml:id)">
         <xsl:attribute name="xml:id" select="imagedata/@xml:id"/>
       </xsl:if>
+      <xsl:apply-templates select="alt" mode="#current"/>
     </graphic>
   </xsl:template>
   
+  <xsl:template match="alt[parent::mediaobject | parent::inlinemediaobject]" mode="hub2tei:dbk2tei" 
+    xpath-default-namespace="http://docbook.org/ns/docbook">
+    <desc>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </desc>
+  </xsl:template>
+
   <xsl:template match="textobject[parent::mediaobject | parent::inlinemediaobject]" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook">
     <!-- Assumption: only inline content in the textobject. If there is block-level content, we’d probably have to 
