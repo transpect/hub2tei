@@ -1406,7 +1406,7 @@
   <xsl:template match="  mediaobject[imageobject/imagedata/@fileref] 
                        | inlinemediaobject[imageobject/imagedata/@fileref]" 
                 mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
-    <xsl:apply-templates mode="#current"/>
+    <xsl:apply-templates select="node() except alt" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="imageobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
@@ -1435,7 +1435,7 @@
       <xsl:if test="exists(imagedata/@xml:id)">
         <xsl:attribute name="xml:id" select="imagedata/@xml:id"/>
       </xsl:if>
-      <xsl:apply-templates select="alt" mode="#current"/>
+      <xsl:apply-templates select="../alt" mode="#current"/>
     </graphic>
   </xsl:template>
   
