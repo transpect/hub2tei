@@ -1435,6 +1435,7 @@
       <xsl:if test="exists(imagedata/@xml:id)">
         <xsl:attribute name="xml:id" select="imagedata/@xml:id"/>
       </xsl:if>
+      <xsl:apply-templates select="imagedata/@css:*" mode="#current"/>
       <xsl:apply-templates select="../alt" mode="#current"/>
     </graphic>
   </xsl:template>
