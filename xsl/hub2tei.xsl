@@ -210,7 +210,10 @@
 
   <xsl:template match="dbk:info[parent::*[self::dbk:book or self::dbk:hub]]/dbk:keywordset[not(@role = 'hub')]" mode="hub2tei:dbk2tei">
     <keywords>
-      <xsl:if test="@xml:lang">
+      <xsl:if test="@xml:lang or @linkend">
+        <xsl:apply-templates select="@xml:lang, @linkend" mode="#current"/>
+      </xsl:if>
+      <xsl:if test="@linkend">
         <xsl:apply-templates select="@xml:lang" mode="#current"/>
       </xsl:if>
       <xsl:if test="@role">
@@ -229,7 +232,11 @@
       </xsl:for-each>
     </keywords>
   </xsl:template>
-  
+
+   <xsl:template match="dbk:keywordset/@linkend" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="corresp" select="concat('#', .)"></xsl:attribute>
+   </xsl:template>
+
   <xsl:template match="/dbk:book/@xml:lang" mode="hub2tei:dbk2tei">
     <xsl:attribute name="{name(.)}" select="replace(., '^(.+?-.+?)-.*$', '$1')"/>
   </xsl:template>
@@ -519,7 +526,7 @@
   <!-- Equations -->
   
   <xsl:template match="dbk:inlineequation" mode="hub2tei:dbk2tei">
-      <xsl:apply-templates select="node()" mode="#current"/>
+      <formula><xsl:apply-templates select="node()" mode="#current"/></formula>
   </xsl:template>
   
   <xsl:template match="dbk:informalequation" mode="hub2tei:dbk2tei">
@@ -632,7 +639,7 @@
 
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
 
-  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary | dbk:bibliography" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary | dbk:bibliography[dbk:bibliodiv][not(dbk:biblioentry | dbk:biblomixed)]" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
       <div>
@@ -646,6 +653,22 @@
     </xsl:if>
   </xsl:template>
   
+  <xsl:template match="dbk:bibliography[dbk:biblioentry | dbk:bibliomixed]" mode="hub2tei:dbk2tei" priority="5">
+    <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
+    <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
+      <div>
+        <xsl:attribute name="type" select="name()"/>
+        <xsl:if test="(./dbk:title[1]/@role or ./dbk:info[1]/@role)">
+          <xsl:attribute name="rend" select="(./dbk:title[1]/@role, ./dbk:info[1]/@role)[1]"/>
+        </xsl:if>
+        <xsl:apply-templates select="@*" mode="#current"/>
+        <listBibl>
+          <xsl:apply-templates select="node()" mode="#current"/>
+        </listBibl>      
+      </div>
+    </xsl:if>
+  </xsl:template>
+
   <!-- Unwrap newly created glossary div if it only contains the list itself.
     Reason: If the glossary div doesn’t contain a title or additional paras, it is highly likely
     that it has been created from a “floating” glossary environment that is part of a backmatter
