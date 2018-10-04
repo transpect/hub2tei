@@ -40,7 +40,7 @@
     <xsl:attribute name="xml:base" select="replace(., '\.hub\.xml$', '.tei.xml')"/>
   </xsl:template>
 
-    <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei">
+  <xsl:template match="/dbk:*" mode="hub2tei:dbk2tei">
     <TEI>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:attribute name="source-dir-uri" select="dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
