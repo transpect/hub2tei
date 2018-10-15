@@ -858,7 +858,7 @@
     <xsl:attribute name="target" select="."/>
   </xsl:template>
 
-  <xsl:template match="dbk:link/@linkend" mode="hub2tei:dbk2tei">
+  <xsl:template match="@linkend" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="concat('#', .)"/>
   </xsl:template>
   
@@ -1043,7 +1043,7 @@
     </anchor>
   </xsl:template>
   
-  <xsl:template match="dbk:footnoteref/@linkend" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:footnoteref/@linkend" mode="hub2tei:dbk2tei" priority="1">
     <xsl:attribute name="xml:id" select="."/>
   </xsl:template>
   
