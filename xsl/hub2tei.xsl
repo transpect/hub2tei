@@ -633,9 +633,10 @@
         We need to further convey this because it will form the key for
         a crossref query, enabling the crossref results to be patched into
         the InDesign source. -->
-  <xsl:template match="dbk:anchor/@annotations" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:anchor/@annotations" mode="hub2tei:dbk2tei" priority="1">
     <xsl:attribute name="n" select="."/>
   </xsl:template>
+  <xsl:template match="@annotations" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
 
