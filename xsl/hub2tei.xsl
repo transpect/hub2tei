@@ -1427,16 +1427,20 @@
  	<xsl:attribute name="type" select="../@rend"/>
  </xsl:template>
  	
-  <xsl:template match="  mediaobject[imageobject/imagedata/@fileref] 
-                       | inlinemediaobject[imageobject/imagedata/@fileref]" 
+  <xsl:template match="  mediaobject[imageobject/imagedata] 
+                       | inlinemediaobject[imageobject/imagedata]" 
                 mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <xsl:apply-templates select="node() except alt" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="imageobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
-    <graphic url="{if(@condition eq 'print')
-                   then hub2tei:original-image-path(imagedata/@fileref, root(.)) 
-                   else hub2tei:image-path(imagedata/@fileref, root(.))}">
+    <graphic>
+      <xsl:if test="@fileref">
+        <xsl:attribute name="url" 
+          select="if(@condition eq 'print')
+          then hub2tei:original-image-path(imagedata/@fileref, root(.)) 
+          else hub2tei:image-path(imagedata/@fileref, root(.))"/>
+      </xsl:if>
       <xsl:if test="imagedata/@width">
         <xsl:attribute name="width" select="if (matches(imagedata/@width,'^\.')) 
                                             then replace(imagedata/@width,'^\.','0.') 
@@ -1459,8 +1463,7 @@
       <xsl:if test="exists(imagedata/@xml:id)">
         <xsl:attribute name="xml:id" select="imagedata/@xml:id"/>
       </xsl:if>
-      <xsl:apply-templates select="imagedata/@css:*" mode="#current"/>
-      <xsl:apply-templates select="../alt" mode="#current"/>
+      <xsl:apply-templates select="imagedata/@css:*, imagedata/*, ../alt" mode="#current"/>
     </graphic>
   </xsl:template>
   
