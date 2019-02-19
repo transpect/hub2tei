@@ -1515,7 +1515,7 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="informaltable | table[not(every $child in node() satisfies $child[self::mediaobject | self::title])]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+  <xsl:template match="informaltable | table[not(every $child in node() satisfies $child[self::mediaobject | self::title])]" mode="hub2tei:dbk2tei" name="table_hub2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <table>
       <xsl:apply-templates select="@xml:id | @role" mode="#current"/>
       <xsl:if test="title">
