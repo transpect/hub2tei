@@ -1435,7 +1435,7 @@
   
   <xsl:template match="imageobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <graphic>
-      <xsl:if test="@fileref">
+      <xsl:if test="imagedata/@fileref">
         <xsl:attribute name="url" 
           select="if(@condition eq 'print')
           then hub2tei:original-image-path(imagedata/@fileref, root(.)) 
