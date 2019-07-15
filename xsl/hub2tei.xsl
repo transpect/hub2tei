@@ -640,7 +640,13 @@
 
   <xsl:template match="dbk:anchor/@xreflabel" mode="hub2tei:dbk2tei"/>
 
-  <xsl:template match="dbk:part | dbk:chapter | dbk:section | dbk:appendix | dbk:acknowledgements | dbk:glossary | dbk:bibliography[dbk:bibliodiv][not(dbk:biblioentry | dbk:biblomixed)]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:part
+                      |dbk:chapter
+                      |dbk:section
+                      |dbk:appendix
+                      |dbk:acknowledgements
+                      |dbk:glossary
+                      |dbk:bibliography[dbk:bibliodiv][not(dbk:biblioentry | dbk:biblomixed)]" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
       <div>
