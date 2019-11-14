@@ -1356,7 +1356,16 @@
   
   
   <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)][dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]]" mode="hub2tei:dbk2tei" priority="3">
-    <xsl:apply-templates select="dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]" mode="#current"/>
+    <sp>
+      <speaker>
+        <xsl:if test="count(dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]) eq 1">
+          <!-- several speaker phrases are possible if differently styled-->
+          <xsl:apply-templates select="dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]/@*" mode="#current"/>
+          <xsl:attribute name="rendition" select="'inline'"/>
+        </xsl:if>
+        <xsl:apply-templates select="dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]" mode="#current"/>
+      </speaker>
+    </sp>
     <xsl:next-match>
       <xsl:with-param name="discard-speaker" select="true()" as="xs:boolean" tunnel="yes"/>
     </xsl:next-match>
@@ -1369,26 +1378,37 @@
       </stage>
     </sp>
   </xsl:template>
-	
-  <xsl:template match="  dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)] 
-                       | dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]
-                                   [parent::*[self::dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]]
-                                    ]" 
-                mode="hub2tei:dbk2tei" priority="2">
+
+  <xsl:template match="  dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)]" mode="hub2tei:dbk2tei" priority="2">
   	<xsl:param name="discard-speaker" tunnel="yes" as="xs:boolean?"/>
     <xsl:if test="not($discard-speaker)">
       <sp>
         <speaker>
-          <xsl:apply-templates select="@*" mode="#current"/>
-          <xsl:if test="self::dbk:phrase">
-            <xsl:attribute name="rendition" select="'inline'"/>
-          </xsl:if>
-          <xsl:apply-templates select="node()" mode="#current"/>
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
         </speaker>
       </sp>
     </xsl:if>
   </xsl:template>
   
+  <xsl:template match="dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]
+    [parent::*[self::dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]]
+    ]" 
+    mode="hub2tei:dbk2tei" priority="2">
+    <xsl:param name="discard-speaker" tunnel="yes" as="xs:boolean?"/>
+    <xsl:if test="not($discard-speaker)">
+      <xsl:choose>
+        <xsl:when test="count(../dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]) eq 1">
+          <xsl:apply-templates select="node()" mode="#current"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:next-match/>
+          <!-- create seg elements to preserve styling-->
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  
+ 
   <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]" mode="hub2tei:dbk2tei">
     <sp>
       <xsl:next-match/>
