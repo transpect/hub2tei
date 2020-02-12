@@ -146,13 +146,6 @@
     <author/>
   </xsl:template>
   
-  <xsl:template match="dbk:info/dbk:title
-                      |dbk:info/dbk:subtitle" mode="hub2tei:dbk2tei">
-    <title type="{local-name()}">
-      <xsl:apply-templates mode="#current"/>
-    </title>
-  </xsl:template>
-  
   <xsl:template name="publication-stm">
     <distributor>
       <address>
@@ -179,6 +172,13 @@
         <xsl:apply-templates select="dbk:info/dbk:volumenum, dbk:info/dbk:issuenum, dbk:info/dbk:biblioid" mode="#current"/>
       </seriesStmt>
     </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info/dbk:title
+                      |dbk:info/dbk:subtitle" mode="hub2tei:dbk2tei">
+    <title type="{local-name()}">
+      <xsl:apply-templates mode="#current"/>
+    </title>
   </xsl:template>
   
   <xsl:template match="dbk:info/dbk:author" mode="hub2tei:dbk2tei">
