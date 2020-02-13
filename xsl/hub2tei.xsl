@@ -59,15 +59,7 @@
           </sourceDesc>
         </fileDesc>
         <profileDesc>
-          <textClass>
-            <xsl:call-template name="keywords"/>
-          </textClass>
-          <xsl:if test="dbk:info/dbk:abstract">
-            <abstract>
-              <xsl:apply-templates select="dbk:info/dbk:abstract/node()" mode="#current"/>
-            </abstract>
-          </xsl:if>
-          <xsl:call-template name="lang-usage"/>
+          <xsl:call-template name="profile-desc"/>
         </profileDesc>
         <encodingDesc>
           <styleDefDecl scheme="cssa"/>
@@ -130,6 +122,18 @@
 
   <xsl:template name="source-desc">
     <p/>
+  </xsl:template>
+  
+  <xsl:template name="profile-desc">
+    <textClass>
+      <xsl:call-template name="keywords"/>
+    </textClass>
+    <xsl:for-each select="dbk:info/dbk:abstract">
+      <abstract rend="{@role}">
+        <xsl:apply-templates mode="#current"/>
+      </abstract>
+    </xsl:for-each>
+    <xsl:call-template name="lang-usage"/>
   </xsl:template>
 
   <xsl:template name="edition-stm"/>
