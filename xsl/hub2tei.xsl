@@ -1412,13 +1412,39 @@
     </xsl:if>
   </xsl:template>
   
- 
   <xsl:template match="dbk:para[matches(@role, $hub2tei:drama-style-role-regex)]" mode="hub2tei:dbk2tei">
     <sp>
       <xsl:next-match/>
     </sp>
   </xsl:template>
 
+  <xsl:template match="dbk:annotation" mode="hub2tei:dbk2tei">
+    <note type="comment">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </note>
+  </xsl:template>
+  
+  <xsl:template match="dbk:annotation/dbk:info" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:annotation/dbk:info/*" mode="hub2tei:dbk2tei"/>
+  
+  <xsl:template match="dbk:annotation/dbk:info/dbk:author" mode="hub2tei:dbk2tei" priority="5">
+    <xsl:apply-templates select="dbk:personname/dbk:othername" mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:annotation/dbk:info/dbk:author/dbk:personname/dbk:othername" mode="hub2tei:dbk2tei">
+    <name>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </name>
+  </xsl:template>
+  
+  <xsl:template match="dbk:annotation/dbk:info/dbk:date" mode="hub2tei:dbk2tei" priority="5">
+    <date>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </date>
+  </xsl:template>
 
   <xsl:template name="group-speeches">
     <xsl:for-each-group select="current-group()" group-starting-with="*[hub2tei:start-speech(.)]">
