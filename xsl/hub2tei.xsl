@@ -129,8 +129,8 @@
       <xsl:call-template name="keywords"/>
     </textClass>
     <xsl:for-each select="dbk:info/dbk:abstract">
-      <abstract rend="{@role}">
-        <xsl:apply-templates mode="#current"/>
+      <abstract>
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
       </abstract>
     </xsl:for-each>
     <xsl:call-template name="lang-usage"/>
