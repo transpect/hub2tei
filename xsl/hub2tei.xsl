@@ -355,7 +355,10 @@
     </head>
   </xsl:template>
   
-  <xsl:template match="dbk:info[not(local-name(..) = ('book', 'figure'))]/dbk:title" priority="4" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info[not(local-name(..) = ('book', 'figure'))]/dbk:title
+                      |dbk:part/title
+                      |dbk:chapter/title
+                      |dbk:section/title" priority="4" mode="hub2tei:dbk2tei">
     <head type="main">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </head>
