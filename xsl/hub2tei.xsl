@@ -25,7 +25,7 @@
   <xsl:output name="debug" method="xml" indent="yes"/>
 
   <!-- override this regex to resolve sidebars with a specific @role -->
-  <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'.+'"/>
+  <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^letex_(marginal|box|letter|timetable|code|source)$'"/>
 
   <xsl:template match="* | @* | processing-instruction()" mode="hub2tei:dbk2tei hub2tei:tidy" priority="-1">
     <xsl:copy copy-namespaces="no">
