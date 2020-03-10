@@ -1113,23 +1113,38 @@
   </xsl:template>
   
   <!-- This function/variables shall be overriden in client-specific templates -->
-  <xsl:variable name="tei:box-style-role" select="'^letex_box'" as="xs:string"/>
-  <xsl:variable name="tei:marginal-style-role" select="'^letex_marginal'" as="xs:string"/>
+  <xsl:variable name="tei:box-style-role" select="'^letex_box$'" as="xs:string"/>
+  <xsl:variable name="tei:marginal-style-role" select="'^letex_marginal$'" as="xs:string"/>
+  <xsl:variable name="tei:poetry-style-role" select="'^letex_poetry$'" as="xs:string"/>
+  <xsl:variable name="tei:drama-style-role" select="'^letex_drama$'" as="xs:string"/>
+  <xsl:variable name="tei:freeform-style-role" select="'^letex_freeform$'" as="xs:string"/>
+  <xsl:variable name="tei:indent-style-role" select="'^letex_indent$'" as="xs:string"/>
+  <xsl:variable name="tei:source-style-role" select="'^letex_source$'" as="xs:string"/>
+  <xsl:variable name="tei:letter-style-role" select="'^letex_letter$'" as="xs:string"/>
+  <xsl:variable name="tei:code-style-role" select="'^letex_code$'" as="xs:string"/>
+  
   <xsl:function name="tei:floatingTexts-type" as="xs:string">
     <xsl:param name="box" as="element()"/>
     <xsl:variable name="role" select="$box/@role"/>
-    <xsl:choose>
-      <xsl:when test="matches($role, $tei:box-style-role)">
-        <xsl:value-of select="'box'"/>
-      </xsl:when>
-      <xsl:when test="matches($role,  $tei:marginal-style-role)">
-        <xsl:value-of select="'marginal'"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <!-- Only use the base type: -->
-        <xsl:value-of select="replace($role, '(_-_|\s).*$', '')"/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:value-of select="     if(matches($role, $tei:box-style-role))
+                                 then 'box'
+                          else if(matches($role, $tei:marginal-style-role))
+                                 then 'marginal'
+                          else if(matches($role, $tei:poetry-style-role))
+                                 then 'poetry'
+                          else if(matches($role, $tei:drama-style-role))
+                                 then 'drama'
+                          else if(matches($role, $tei:freeform-style-role))
+                                 then 'freeform'
+                          else if(matches($role, $tei:indent-style-role))
+                                 then 'indent'
+                          else if(matches($role, $tei:source-style-role))
+                                 then 'source'
+                          else if(matches($role, $tei:letter-style-role))
+                                 then 'letter'
+                          else if(matches($role, $tei:code-style-role))
+                                 then 'code'
+                          else        replace($role, '(_-_|\s).*$', '')"/>
   </xsl:function>
 
   <xsl:template match="dbk:blockquote" mode="hub2tei:dbk2tei">
