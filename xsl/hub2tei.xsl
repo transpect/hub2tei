@@ -751,6 +751,7 @@
   
   <xsl:key name="hub2tei:linking-item-by-id" match="*[@linkend | @linkends | @startref]" 
     use="@linkend, tokenize(@linkends, '\s+'), @startref"/>
+  <xsl:key name="hub2tei:by-id" match="*[@xml:id]" use="@xml:id"/>
 
   <xsl:template match="dbk:indexterm[@class = 'endofrange']" mode="hub2tei:dbk2tei">
     <anchor xml:id="ite_{generate-id()}"/>
@@ -864,9 +865,16 @@
                         ) 
                         then 'ref' else 'link'}">-->
     <ref>
+      <xsl:apply-templates select="key('hub2tei:by-id', @linkend)" mode="ref-type"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </ref>
     <!--</xsl:element>-->
+  </xsl:template>
+  
+  <xsl:template match="*" mode="ref-type" as="attribute(type)?"/>
+  
+  <xsl:template match="*[@role = 'hub:endnote']" mode="ref-type" as="attribute(type)" priority="1">
+    <xsl:attribute name="type" select="'endnote'"/>
   </xsl:template>
 
   <xsl:template match="dbk:link/@remap" mode="hub2tei:dbk2tei"/>
