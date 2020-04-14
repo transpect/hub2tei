@@ -1079,7 +1079,8 @@
   <xsl:variable name="tei:box-head1-role-regex" select="'^letex_box_heading(_-_.+)?$'" as="xs:string"/>
   <xsl:variable name="tei:box-head2-role-regex" select="'^letex_box_heading2(_-_.+)?$'" as="xs:string"/>
 
-  <xsl:template match="dbk:sidebar[matches(@role, $tei:floatingTexts-role)] 
+  <xsl:template match="dbk:sidebar[   matches(@role, $tei:floatingTexts-role)
+                                   or tokenize(@remap, '\s') = ('hub:para-background', 'hub:para-border')] 
                       |dbk:div[matches(@role, $tei:floatingTexts-role)]
                       |dbk:div[@role = 'drama']
                               [exists(preceding-sibling::*[not(name() = ('dbk:div', 
