@@ -897,6 +897,10 @@
     <xsl:attribute name="n" select="."/>
   </xsl:template>
 
+  <xsl:template match="dbk:footnote/@id" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="xml:id" select="."/>
+  </xsl:template>
+  
   <xsl:template match="dbk:br" mode="hub2tei:dbk2tei">
     <lb>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
