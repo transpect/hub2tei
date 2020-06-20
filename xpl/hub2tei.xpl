@@ -9,6 +9,12 @@
   name="hub2tei"
   type="hub2tei:hub2tei">
   
+  <p:documentation>
+    This step takes Hub XML and converts it to TEI. The parameter input
+    port expects a transpect paths document. Pipeline and XSLT stylesheet 
+    can be overwritten according to a transpect cascaded configuration.
+  </p:documentation>
+  
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" select="'debug'"/>
   <p:option name="status-dir-uri" required="false" select="'debug/status'"/>
