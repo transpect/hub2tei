@@ -33,7 +33,8 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="@hub:anchored" mode="hub2tei:dbk2tei"/>
+  <xsl:template match=" @hub:anchored
+                      | @hub:para-background[.='false']" mode="hub2tei:dbk2tei"/>
   
   <xsl:template match="*[@remap = 'HiddenText'][@condition = ('StoryID', 'FigureRef', 'StoryRef')]" mode="hub2tei:dbk2tei">
     <!-- When not resolved in idml2xml it makes problems later.-->
