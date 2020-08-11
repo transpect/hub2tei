@@ -194,13 +194,13 @@
     <idno><xsl:apply-templates select="@*, node()" mode="#current"/></idno>
   </xsl:template>
 
-  <xsl:template match="dbk:info[not(dbk:keywordset[@role = 'hub'])]/dbk:biblioid" mode="hub2tei:dbk2tei" priority="2">
+  <xsl:template match="  dbk:info[not(dbk:keywordset[@role = 'hub'])]/dbk:biblioid" mode="hub2tei:dbk2tei" priority="2">
     <!-- chapters etc-->
     <opener>
       <idno><xsl:apply-templates select="@*, node()" mode="#current"/></idno>
     </opener>
   </xsl:template>
-
+  
   <xsl:template match="dbk:info[not(dbk:keywordset[@role = 'hub'])]/dbk:artpagenums" mode="hub2tei:dbk2tei" priority="2">
     <!-- chapters etc-->
     <p rend="{local-name()}" rendition="none">
@@ -414,10 +414,15 @@
       </xsl:for-each-group>
     </xsl:copy>
   </xsl:template>-->
-  
+
   <xsl:template match="dbk:info[not(parent::dbk:book)]/dbk:abstract" mode="hub2tei:dbk2tei">
     <argument>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:if test="not(dbk:p) and not(dbk:title)">
+            <!-- abstract without common elements are not allowed as argument in TEI -->
+        <p/>
+      </xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/>
     </argument>
   </xsl:template>
   
