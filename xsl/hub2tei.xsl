@@ -418,7 +418,7 @@
   <xsl:template match="dbk:info[not(parent::dbk:book)]/dbk:abstract" mode="hub2tei:dbk2tei">
     <argument>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:if test="not(dbk:p) and not(dbk:title)">
+      <xsl:if test="not(dbk:para) and not(dbk:title)">
             <!-- abstract without common elements are not allowed as argument in TEI -->
         <p/>
       </xsl:if>
