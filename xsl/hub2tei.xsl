@@ -77,6 +77,7 @@
         <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography -->
         <body>
           <xsl:variable name="body" as="element(*)*">
+            <xsl:apply-templates select="dbk:info/dbk:itermset/*" mode="#current"/>
             <xsl:apply-templates select="* except dbk:info" mode="#current">
               <xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
             </xsl:apply-templates>
@@ -86,7 +87,7 @@
               <xsl:choose>
                 <xsl:when test="exists($body[self::*[local-name() = ('p', 'div', 'ab', 'bibl', 'biblStruct', 'castList', 'classSpec', 'constraintSpec',
                                                                     'desc', 'div', 'div1', 'divGen', 'eTree', 'eg', 'elementSpec', 'entry', 'entryFree', 'floatingText',
-                                                                    'forest', 'graph ', 'l', 'label', 'lg', 'list', 'listApp', 'listBibl', 'listEvent', 'listForest',
+                                                                    'forest', 'graph ', 'index', 'l', 'label', 'lg', 'list', 'listApp', 'listBibl', 'listEvent', 'listForest',
                                                                     'listNym', 'listOrg', 'listPerson', 'listPlace', 'listRef', 'listTranspose', 'listWit', 'macroSpec',
                                                                     'moduleSpec', 'move', 'msDesc', 'q', 'quote', 'said', 'schemaSpec', 'sound', 'sp', 'spGrp', 'specGrp',
                                                                     'specGrpRef', 'stage', 'superEntry', 'table', 'tech', 'tree', 'u', 'view')]])">
@@ -113,6 +114,8 @@
       </text>
     </TEI>
   </xsl:template>
+  
+  <xsl:template match="dbk:itermset" mode="hub2tei:dbk2tei"/>
 
   <xsl:template name="lang-usage">
     <langUsage>
