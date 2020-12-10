@@ -76,7 +76,7 @@
           select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography, dbk:index)"/>
         <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography -->
         <body>
-          <xsl:variable name="body" as="element(*)*">
+          <xsl:variable name="body">
             <xsl:apply-templates select="dbk:info/dbk:itermset/*" mode="#current"/>
             <xsl:apply-templates select="* except dbk:info" mode="#current">
               <xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
@@ -1641,9 +1641,13 @@
             		<xsl:attribute name="role" select="'label'"/>
             	</xsl:if>
               <xsl:for-each select="entry">
+                <xsl:variable name="cols" as="xs:integer" 
+                              select="  xs:integer(replace(@nameend, '[a-z]+', '')) 
+                                      - xs:integer(replace(@namest,  '[a-z]+', '')) 
+                                      + 1"/>
                 <cell>
                   <xsl:if test="@namest">
-                    <xsl:attribute name="cols" select="number(substring-after(@nameend, 'col')) - number(substring-after(@namest, 'col')) + 1"/>
+                    <xsl:attribute name="cols" select="$cols"/>
                   </xsl:if>
                   <xsl:if test="@morerows &gt; 0">
                     <xsl:attribute name="rows" select="@morerows + 1"/>
