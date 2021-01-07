@@ -927,23 +927,31 @@
   </xsl:template>
 
   <xsl:variable name="tei:box-para-style-regex" select="'^tr_boxpara'" as="xs:string"/>
-	
-	<!-- prevent boxes that are set as tables to be converted to HTML tables -->
-	<xsl:template match="*[local-name() = ('table', 'informaltable')][hub2tei:conditions-to-dissolve-box-table(.)]" mode="cals2html-table">
-		<!--    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>-->
-		<xsl:copy copy-namespaces="no">
-			<xsl:copy-of select="@*"/>
-			<xsl:copy-of select="node()"/>
-		</xsl:copy>
-	</xsl:template>
-	
-	<xsl:variable name="tei:normal-table-para-role-regex" select="'transpect_table_text'" as="xs:string"/>
-	
+  
+  <!-- prevent boxes that are set as tables to be converted to HTML tables -->
+  <xsl:template match="*[local-name() = ('table', 'informaltable')][hub2tei:conditions-to-dissolve-box-table(.)]" mode="cals2html-table">
+    <!--    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>-->
+    <xsl:copy copy-namespaces="no">
+      <xsl:copy-of select="@*"/>
+      <xsl:copy-of select="node()"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:variable name="tei:normal-table-para-role-regex" select="'transpect_table_text'" as="xs:string"/>
+  
   <xsl:function name="hub2tei:conditions-to-dissolve-box-table" as="xs:boolean">
     <xsl:param name="context-table" as="element(*)"/>
-    <!-- This default function dissolves tables that have paras with a box-style-role inside, bt not with only proper table styles -->
-  	<xsl:sequence select="if ($context-table[some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex)) and not(every $t in .//dbk:para/@role satisfies matches($t, $tei:normal-table-para-role-regex))]) then true() else false()"/>
-  </xsl:function>
+    <!-- This default function dissolves tables that have paras with a box-style-role inside, but not with only proper table styles -->
+    <xsl:sequence select="if ($context-table
+                                 [
+                                      some $r in .//dbk:para/@role satisfies (matches($r, $tei:box-para-style-regex)) 
+                                  and not(every $t in .//dbk:para/@role satisfies matches($t, $tei:normal-table-para-role-regex))
+                                  ]
+                                  [not(ancestor::*[local-name() = ('div', 'sidebar', 'blockquote')][@role[matches(., $hub:default-textbox-type)]])]
+                              ) 
+                             then true() 
+                             else false()"/>
+    </xsl:function>
   
   <xsl:variable name="hub:default-textbox-type" as="xs:string" select="'Textbox'"/>
 
