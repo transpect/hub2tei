@@ -864,7 +864,7 @@
     </anchor>
   </xsl:template>
 
-  <xsl:template match="dbk:link" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:link|dbk:biblioref" mode="hub2tei:dbk2tei">
     <!--<xsl:element name="{if(
                          matches(
                            (@linkend, @xlink:href)[1], 
@@ -874,7 +874,7 @@
                         ) 
                         then 'ref' else 'link'}">-->
     <ref>
-      <xsl:apply-templates select="key('hub2tei:by-id', @linkend)" mode="ref-type"/>
+      <xsl:apply-templates select="key('hub2tei:by-id', (@linkend, @linkends))" mode="ref-type"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </ref>
     <!--</xsl:element>-->
@@ -884,6 +884,10 @@
   
   <xsl:template match="*[@role = 'hub:endnote']" mode="ref-type" as="attribute(type)" priority="1">
     <xsl:attribute name="type" select="'endnote'"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:biblioentry" mode="ref-type" as="attribute(type)" priority="1">
+    <xsl:attribute name="type" select="'biblioref'"/>
   </xsl:template>
 
   <xsl:template match="dbk:link/@remap" mode="hub2tei:dbk2tei"/>
