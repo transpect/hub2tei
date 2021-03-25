@@ -1249,7 +1249,7 @@
       <xsl:if test="@mark or @numeration">
         <xsl:attribute name="style" select="(@mark, @numeration)[1]"/>
       </xsl:if>
-      <xsl:apply-templates select="@* except (@mark, @numeration)"/>
+      <xsl:apply-templates select="@* except (@mark, @numeration)" mode="#current"/>
       <xsl:apply-templates select="node()" mode="#current"/>
     </list>
   </xsl:template>
