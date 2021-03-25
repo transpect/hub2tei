@@ -211,11 +211,11 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:biblioid/@class" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:biblioid/@class | dbk:info/dbk:author/dbk:uri[not(@class)]/@otherclass | dbk:info/dbk:author/uri/@class" mode="hub2tei:dbk2tei">
     <xsl:attribute name="type" select="."/>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:biblioid/@otherclass" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:biblioid/@otherclass | dbk:info/dbk:author/dbk:uri[@class]/@otherclass" mode="hub2tei:dbk2tei">
     <xsl:attribute name="subtype" select="."/>
   </xsl:template>
 
@@ -371,35 +371,39 @@
     </head>
   </xsl:template>
 	
-	<xsl:template match="dbk:bibliodiv[every $entry in * satisfies $entry[self::dbk:bibliomixed | self::dbk:biblioentry | self::dbk:title]]" mode="hub2tei:dbk2tei" priority="3">
-		<listBibl>
-			<xsl:apply-templates select="@*, node()" mode="#current"/>
-		</listBibl>
-	</xsl:template>
+  <xsl:template match="dbk:bibliodiv[every $entry in * satisfies $entry[self::dbk:bibliomixed | self::dbk:biblioentry | self::dbk:title]]" mode="hub2tei:dbk2tei" priority="3">
+    <listBibl>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </listBibl>
+  </xsl:template>
   
-	<xsl:template match="dbk:personname" mode="hub2tei:dbk2tei">
-		<xsl:param name="type" as="xs:string?" tunnel="yes"/>
-		<persName>
-			<xsl:apply-templates select="@*" mode="#current"/>
-			<xsl:if test="$type">
-				<xsl:attribute name="type" select="$type"/>
-			</xsl:if>
-			<xsl:apply-templates select="node()" mode="#current"/>
-		</persName>
-	</xsl:template>
-	
-	<xsl:template match="dbk:surname" mode="hub2tei:dbk2tei">
-		<surname>
-			<xsl:apply-templates select="@*, node()" mode="#current"/>
-		</surname>
-	</xsl:template>
-	
-	<xsl:template match="dbk:givenname | dbk:firstname" mode="hub2tei:dbk2tei">
-		<forename>
-			<xsl:apply-templates select="@*, node()" mode="#current"/>
-		</forename>
-	</xsl:template>
-	
+  <xsl:template match="dbk:othername" mode="hub2tei:dbk2tei" priority="3">
+      <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+
+  <xsl:template match="dbk:personname" mode="hub2tei:dbk2tei">
+    <xsl:param name="type" as="xs:string?" tunnel="yes"/>
+    <persName>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:if test="$type">
+        <xsl:attribute name="type" select="$type"/>
+      </xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </persName>
+  </xsl:template>
+  
+  <xsl:template match="dbk:surname" mode="hub2tei:dbk2tei">
+    <surname>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </surname>
+  </xsl:template>
+  
+  <xsl:template match="dbk:givenname | dbk:firstname" mode="hub2tei:dbk2tei">
+    <forename>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </forename>
+  </xsl:template>
+  
 <!--  <xsl:template match="*[dbk:para[matches(@role, $tei:chapter-preface-role)]]" mode="cals2html-table" priority="3">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -442,6 +446,32 @@
         <xsl:with-param name="type" select="local-name()" tunnel="yes"/>
       </xsl:apply-templates>
     </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:author/dbk:affiliation" mode="hub2tei:dbk2tei">
+    <xsl:element name="affiliation">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:element>
+  </xsl:template>
+  
+  <xsl:template match="dbk:info/dbk:author/dbk:affiliation/dbk:orgname" mode="hub2tei:dbk2tei">
+    <xsl:element name="orgName">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:author/dbk:email" mode="hub2tei:dbk2tei">
+    <xsl:element name="email">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:author/dbk:uri" mode="hub2tei:dbk2tei" priority="3">
+    <ref><xsl:apply-templates select="@*, dbk:link/@*, node()" mode="#current"/></ref>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:author/dbk:uri/dbk:link" mode="hub2tei:dbk2tei" priority="3">
+    <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
 
   <xsl:template match="dbk:info/dbk:author/dbk:address" mode="hub2tei:dbk2tei">
