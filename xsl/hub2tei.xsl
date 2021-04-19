@@ -8,9 +8,10 @@
                 xmlns:tei="http://www.tei-c.org/ns/1.0" 
                 xmlns:xlink="http://www.w3.org/1999/xlink" 
                 xmlns:cx="http://xmlcalabash.com/ns/extensions" 
-                xmlns:html="http://www.w3.org/1999/xhtml" 
+                xmlns:html="http://www.w3.org/1999/xhtml"
+                xmlns:b64="net.sf.saxon.value.Base64BinaryValue"
                 xmlns="http://www.tei-c.org/ns/1.0" 
-                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx html tei" 
+                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx html tei b64" 
                 version="2.0">
 
   <!-- see also docbook to tei:
@@ -76,7 +77,7 @@
           select="(., .[count(dbk:part) = 1]/dbk:part)/(dbk:appendix, dbk:glossary, dbk:bibliography, dbk:index)"/>
         <!-- TO DO: include and respect exclude param in future template that processes dbk:bibliography -->
         <body>
-          <xsl:variable name="body" as="element(*)*">
+          <xsl:variable name="body" as="node()*">
             <xsl:apply-templates select="dbk:info/dbk:itermset/*" mode="#current"/>
             <xsl:apply-templates select="* except dbk:info" mode="#current">
               <xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
@@ -370,8 +371,8 @@
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </head>
   </xsl:template>
-	
-  <xsl:template match="dbk:bibliodiv[every $entry in * satisfies $entry[self::dbk:bibliomixed | self::dbk:biblioentry | self::dbk:title]]" mode="hub2tei:dbk2tei" priority="3">
+  
+  <xsl:template match="dbk:bibliodiv[every $entry in * satisfies $entry[self::dbk:bibliomixed | self::dbk:biblioentry | self::dbk:title | self::dbk:info]]" mode="hub2tei:dbk2tei" priority="3">
     <listBibl>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </listBibl>
@@ -1609,10 +1610,31 @@
       <xsl:if test="exists(imagedata/@xml:id)">
         <xsl:attribute name="xml:id" select="imagedata/@xml:id"/>
       </xsl:if>
+      <xsl:if test="imagedata[*:svg]">
+        <xsl:attribute name="url" select="'inline-svg'"/>
+      </xsl:if>      
       <xsl:apply-templates select="imagedata/@css:*, imagedata/*, ../alt" mode="#current"/>
     </graphic>
   </xsl:template>
   
+  <xsl:template match="imagedata/*:svg" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
+    <binaryObject mimeType="image/svg">
+      <xsl:apply-templates select="." mode="xml2text"/>
+    </binaryObject>
+  </xsl:template>
+  
+  <xsl:template mode="xml2text" match="*">
+    <xsl:value-of select="concat('&lt;', name())"/>
+    <xsl:apply-templates select="@*" mode="#current"/>
+    <xsl:text>&gt;</xsl:text>
+     <xsl:apply-templates select="node()" mode="#current"/>
+    <xsl:value-of select="concat('&lt;/', name(), '&gt;')"/>
+  </xsl:template>
+
+  <xsl:template mode="xml2text" match="@*">
+    <xsl:value-of select="concat(' ', name(), '=&quot;',., '&quot;')"/>
+  </xsl:template>
+
   <xsl:template match="alt[parent::mediaobject | parent::inlinemediaobject]" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook">
     <desc>
