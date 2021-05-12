@@ -931,6 +931,11 @@
     <xsl:attribute name="target" select="concat('#', .)"/>
   </xsl:template>
   
+  <xsl:template match="@linkends" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="target" select="for $i in tokenize(., '\s+') return concat('#', $i)" separator=" "/>
+  </xsl:template>
+
+
   <xsl:template match="dbk:footnote" mode="hub2tei:dbk2tei">
     <note type="footnote">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
