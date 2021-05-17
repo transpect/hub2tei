@@ -372,7 +372,8 @@
     </head>
   </xsl:template>
   
-  <xsl:template match="dbk:bibliodiv[every $entry in * satisfies $entry[self::dbk:bibliomixed | self::dbk:biblioentry | self::dbk:bibliodiv | self::dbk:title | self::dbk:info]]" mode="hub2tei:dbk2tei" priority="3">
+  <xsl:template match="dbk:bibliolist | 
+                       dbk:bibliodiv[every $entry in * satisfies $entry[self::dbk:bibliomixed | self::dbk:biblioentry | self::dbk:title | self::dbk:info | self::dbk:bibliolist]]" mode="hub2tei:dbk2tei" priority="3">
     <listBibl>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </listBibl>
