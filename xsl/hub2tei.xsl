@@ -79,7 +79,7 @@
         <body>
           <xsl:variable name="body" as="node()*">
             <xsl:apply-templates select="dbk:info/dbk:itermset/*" mode="#current"/>
-            <xsl:apply-templates select="* except dbk:info" mode="#current">
+            <xsl:apply-templates select="node() except dbk:info" mode="#current">
               <xsl:with-param name="exclude" select="$backmatter" tunnel="yes"/>
             </xsl:apply-templates>
           </xsl:variable>
@@ -259,7 +259,7 @@
     <!-- handled in template series-stm already --> 
      </xsl:variable>
     <front>
-      <xsl:apply-templates select="* except (dbk:keywordset | css:rules | $title-page-parts | dbk:abstract | $tei-header-elements)" mode="#current"/>
+      <xsl:apply-templates select="node() except (dbk:keywordset | css:rules | $title-page-parts | dbk:abstract | $tei-header-elements)" mode="#current"/>
       <titlePage>
         <xsl:apply-templates select="$title-page-parts" mode="#current"/>
       </titlePage>
@@ -279,7 +279,7 @@
         <xsl:attribute name="rendition" select="string-join($alt-image/dbk:inlinemediaobject/dbk:imageobject/dbk:imagedata/@fileref, ' ')"/>
       </xsl:if>
       <xsl:variable name="postscript" as="element(*)*" select="dbk:caption, dbk:note, dbk:info[every $c in * satisfies ($c/self::dbk:legalnotice)]"/>
-      <xsl:apply-templates select="* except $postscript" mode="#current"/>
+      <xsl:apply-templates select="node() except $postscript" mode="#current"/>
       <xsl:if test="exists($postscript)">
         <postscript>
           <xsl:apply-templates select="$postscript" mode="#current"/>
@@ -634,8 +634,7 @@
         <xsl:if test="./dbk:title[1]/@role">
           <xsl:attribute name="rend" select="./dbk:title[1]/@role"/>
         </xsl:if>
-        <xsl:apply-templates select="@*" mode="#current"/>
-        <xsl:apply-templates select="*" mode="#current"/>
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
       </div>
     </xsl:if>
   </xsl:template>
@@ -705,8 +704,7 @@
         <xsl:if test="(./dbk:title[1]/@role or ./dbk:info[1]/@role)">
           <xsl:attribute name="rend" select="(./dbk:title[1]/@role, ./dbk:info[1]/@role)[1]"/>
         </xsl:if>
-        <xsl:apply-templates select="@*" mode="#current"/>
-        <xsl:apply-templates select="*" mode="#current"/>
+        <xsl:apply-templates select="@*,node()" mode="#current"/>
       </div>
     </xsl:if>
   </xsl:template>
