@@ -1587,10 +1587,11 @@
   <xsl:template match="imageobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <graphic>
       <xsl:if test="imagedata/@fileref">
+        <xsl:variable name="fileref" select="(imagedata[@role = 'hub:embedded'], imagedata[@role='hub:linked' or not(@role)])[1]"/>
         <xsl:attribute name="url" 
           select="if(@condition eq 'print')
-          then hub2tei:original-image-path(imagedata/@fileref, root(.)) 
-          else hub2tei:image-path(imagedata/@fileref, root(.))"/>
+          then hub2tei:original-image-path(imagedata/$fileref, root(.)) 
+          else hub2tei:image-path(imagedata/$fileref, root(.))"/>
       </xsl:if>
       <xsl:if test="imagedata/@width">
         <xsl:attribute name="width" select="if (matches(imagedata/@width,'^\.')) 
@@ -1658,9 +1659,9 @@
 
   <!-- to be overwritten in adaptions: -->
   <xsl:function name="hub2tei:image-path" as="xs:string">
-    <xsl:param name="path" as="xs:string"/>
+    <xsl:param name="path" as="xs:string*"/>
     <xsl:param name="root" as="document-node()?"/>
-    <xsl:sequence select="$path"/>
+    <xsl:sequence select="string-join($path, ' ')"/>
   </xsl:function>
   
   <xsl:function name="hub2tei:original-image-path" as="xs:string">
