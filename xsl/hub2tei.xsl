@@ -1587,7 +1587,7 @@
   <xsl:template match="imageobject" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <graphic>
       <xsl:if test="imagedata/@fileref">
-        <xsl:variable name="fileref" select="(imagedata[@role = 'hub:embedded'], imagedata[@role='hub:linked' or not(@role)])[1]"/>
+        <xsl:variable name="fileref" select="(imagedata[@role = 'hub:embedded'], imagedata[not(@role = 'hub:embedded')])[1]/@fileref"/>
         <xsl:attribute name="url" 
           select="if(@condition eq 'print')
           then hub2tei:original-image-path(imagedata/$fileref, root(.)) 
