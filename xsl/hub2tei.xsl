@@ -718,9 +718,16 @@
           <xsl:attribute name="rend" select="(./dbk:title[1]/@role, ./dbk:info[1]/@role)[1]"/>
         </xsl:if>
         <xsl:apply-templates select="@*" mode="#current"/>
-        <listBibl>
-          <xsl:apply-templates select="node()" mode="#current"/>
-        </listBibl>      
+        <xsl:choose>
+          <xsl:when test="every $child in * satisfies $child/local-name() = ('biblioentry', 'bibliomixed', 'title', 'info', 'bibliodiv')">
+            <listBibl>
+              <xsl:apply-templates select="node()" mode="#current"/>
+            </listBibl>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="node()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>     
       </div>
     </xsl:if>
   </xsl:template>
