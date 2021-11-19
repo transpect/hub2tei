@@ -435,7 +435,7 @@
     </argument>
   </xsl:template>
   
-  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup | dbk:partintro | dbk:bibliodiv" mode="hub2tei:dbk2tei" priority="2">
+  <xsl:template match="dbk:info[parent::dbk:book]/dbk:authorgroup | dbk:partintro | dbk:bibliodiv[not(dbk:info)][not(dbk:title)]" mode="hub2tei:dbk2tei" priority="2">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
 	
@@ -696,7 +696,9 @@
                       |dbk:appendix
                       |dbk:acknowledgements
                       |dbk:glossary
-                      |dbk:bibliography[dbk:bibliodiv][not(dbk:biblioentry | dbk:biblomixed)]" mode="hub2tei:dbk2tei">
+                      |dbk:bibliography[dbk:bibliodiv][not(dbk:biblioentry | dbk:biblomixed)] 
+                      |dbk:bibliodiv[dbk:para | dbk:simpara]
+                      " mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
       <div>
@@ -732,6 +734,10 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="tei:div[@type = 'bibliodiv']/@type" mode="hub2tei:tidy">
+    <xsl:attribute name="type" select="'bibliography'"/>
+  </xsl:template>
+  
   <!-- Unwrap newly created glossary div if it only contains the list itself.
     Reason: If the glossary div doesn’t contain a title or additional paras, it is highly likely
     that it has been created from a “floating” glossary environment that is part of a backmatter
