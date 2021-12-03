@@ -1091,6 +1091,7 @@
 
   <xsl:template match="dbk:phrase[key('natives', @role)/@remap = ('superscript', 'subscript')]" mode="hub2tei:dbk2tei">
     <!-- Misuse of @rendition: It is supposed to point somewhere. See http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-att.global.rendition.html -->
+      <!-- also problematic if conditional texts are used -->
     <hi rendition="{key('natives', @role)/@remap}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </hi>
