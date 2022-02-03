@@ -901,6 +901,14 @@
     </p>
   </xsl:template>
 
+  <xsl:template match="dbk:bridgehead" mode="hub2tei:dbk2tei">
+    <p>
+      <xsl:apply-templates select="@* except @role" mode="#current"/>
+      <xsl:attribute name="rend" select="if (@role) then @role else 'bridgehead'"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </p>
+  </xsl:template>
+
   <xsl:template match="dbk:anchor" mode="hub2tei:dbk2tei">
     <anchor>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
