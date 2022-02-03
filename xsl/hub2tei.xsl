@@ -909,6 +909,10 @@
     </p>
   </xsl:template>
 
+  <xsl:template match="dbk:bridgehead/dbk:phrase[@role = 'hub:identifier']" mode="hub2tei:dbk2tei">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="dbk:anchor" mode="hub2tei:dbk2tei">
     <anchor>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
