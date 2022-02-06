@@ -577,7 +577,7 @@
   <!-- Equations -->
   
   <xsl:template match="dbk:inlineequation" mode="hub2tei:dbk2tei">
-      <formula><xsl:apply-templates select="node()" mode="#current"/></formula>
+      <formula rend="inline"><xsl:apply-templates select="node()" mode="#current"/></formula>
   </xsl:template>
   
   <xsl:template match="dbk:informalequation" mode="hub2tei:dbk2tei">
