@@ -335,11 +335,18 @@
     </bibl>
   </xsl:template>
 
-	<xsl:template match="dbk:bibliomixed" mode="hub2tei:dbk2tei">
-		<bibl>
-			<xsl:apply-templates select="@*, node()" mode="#current"/>
-		</bibl>
-	</xsl:template>
+  <xsl:template match="dbk:citation" mode="hub2tei:dbk2tei">
+    <!-- Created from bilio refs by citation managers-->
+    <bibl rend="citation">
+      <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
+    </bibl>
+  </xsl:template>
+
+  <xsl:template match="dbk:bibliomixed" mode="hub2tei:dbk2tei">
+    <bibl>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </bibl>
+  </xsl:template>
 	
 	<xsl:template match="dbk:bibliomisc" mode="hub2tei:dbk2tei">
 		<unclear>
