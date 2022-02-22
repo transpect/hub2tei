@@ -337,8 +337,8 @@
 
   <xsl:template match="dbk:citation" mode="hub2tei:dbk2tei">
     <!-- Created from bilio refs by citation managers-->
-    <bibl rend="citation">
-      <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
+    <bibl type="citation">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
     </bibl>
   </xsl:template>
 
