@@ -245,8 +245,8 @@
     </keywords>
   </xsl:template>
 
-   <xsl:template match="dbk:keywordset/@linkend" mode="hub2tei:dbk2tei">
-    <xsl:attribute name="corresp" select="concat('#', .)"></xsl:attribute>
+   <xsl:template match="dbk:keywordset/@linkend | dbk:citation/@linkend | dbk:citation/@linkends" mode="hub2tei:dbk2tei">
+    <xsl:attribute name="corresp" select="string-join(for $a in tokenize(., '\s+') return concat('#', $a), ' ')"></xsl:attribute>
    </xsl:template>
 
   <xsl:template match="/dbk:book/@xml:lang" mode="hub2tei:dbk2tei">
