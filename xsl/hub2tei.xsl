@@ -593,6 +593,21 @@
       <xsl:apply-templates select="node()" mode="#current"/>
     </figure>
   </xsl:template>
+ 
+  <xsl:template match="dbk:equation" mode="hub2tei:dbk2tei">
+    <!--  because formulas are not allowed between paras -->
+    <figure>
+      <formula notation="{@role}">
+        <xsl:apply-templates select="node()" mode="#current"/>
+      </formula>
+    </figure>
+  </xsl:template>
+  
+  <xsl:template match="dbk:para[every $c in node() satisfies $c[self::dbk:equation]]/dbk:equation" mode="hub2tei:dbk2tei" priority="2">
+    <formula notation="{@role}">
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </formula>
+  </xsl:template>
   
   <xsl:variable name="hub:equation-counter-style-regex" select="'letex_equation_counter'" as="xs:string"/>
   
