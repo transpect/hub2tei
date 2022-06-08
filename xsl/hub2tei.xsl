@@ -584,7 +584,9 @@
   <!-- Equations -->
   
   <xsl:template match="dbk:inlineequation" mode="hub2tei:dbk2tei">
-      <formula rend="inline"><xsl:apply-templates select="node()" mode="#current"/></formula>
+    <formula rend="inline">
+      <xsl:if test="@role"><xsl:attribute name="notation" select="@role"/></xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/></formula>
   </xsl:template>
   
   <xsl:template match="dbk:informalequation" mode="hub2tei:dbk2tei">
@@ -597,14 +599,16 @@
   <xsl:template match="dbk:equation" mode="hub2tei:dbk2tei">
     <!--  because formulas are not allowed between paras -->
     <figure>
-      <formula notation="{@role}">
+      <formula>
+        <xsl:if test="@role"><xsl:attribute name="notation" select="@role"/></xsl:if>
         <xsl:apply-templates select="node()" mode="#current"/>
       </formula>
     </figure>
   </xsl:template>
   
   <xsl:template match="dbk:para[every $c in node() satisfies $c[self::dbk:equation]]/dbk:equation" mode="hub2tei:dbk2tei" priority="2">
-    <formula notation="{@role}">
+    <formula>
+      <xsl:if test="@role"><xsl:attribute name="notation" select="@role"/></xsl:if>
       <xsl:apply-templates select="node()" mode="#current"/>
     </formula>
   </xsl:template>
@@ -631,9 +635,9 @@
   <xsl:template match="@remap[. = 'HiddenText']" mode="hub2tei:dbk2tei"/>
 
   <xsl:template match="dbk:info/dbk:keywordset[@role = 'hub']" mode="hub2tei:dbk2tei">
-      <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
-        <xsl:apply-templates mode="#current"/>
-      </keywords>
+    <keywords scheme="http://www.le-tex.de/resource/schema/hub/1.1/hub.rng">
+      <xsl:apply-templates mode="#current"/>
+    </keywords>
   </xsl:template>
 
   <xsl:template match="dbk:keyword" mode="hub2tei:dbk2tei">
