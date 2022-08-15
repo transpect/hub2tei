@@ -10,8 +10,9 @@
                 xmlns:cx="http://xmlcalabash.com/ns/extensions" 
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:b64="net.sf.saxon.value.Base64BinaryValue"
+                xmlns:mml="http://www.w3.org/1998/Math/MathML"
                 xmlns="http://www.tei-c.org/ns/1.0" 
-                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx html tei b64" 
+                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx html tei b64 mml" 
                 version="2.0">
 
   <!-- see also docbook to tei:
@@ -1465,6 +1466,10 @@
   <xsl:template match="dbk:tabs | dbk:seg" mode="hub2tei:dbk2tei">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
+
+ <xsl:template match="mml:*/@xml:space" mode="hub2tei:dbk2tei">
+ 	<!-- not allowed in schema -->
+ </xsl:template>
 
   <xsl:template match="figure | informalfigure | table[every $child in node() satisfies $child[self::mediaobject | self::title]]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
