@@ -458,33 +458,50 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:author/dbk:affiliation" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:author/dbk:affiliation | 
+                       dbk:info/dbk:authorgroup/dbk:author/dbk:affiliation" mode="hub2tei:dbk2tei">
     <xsl:element name="affiliation">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:element>
   </xsl:template>
   
-  <xsl:template match="dbk:info/dbk:author/dbk:affiliation/dbk:orgname" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:author/dbk:affiliation/dbk:orgname | 
+                       dbk:info/dbk:authorgroup/dbk:author/dbk:affiliation/dbk:orgname" mode="hub2tei:dbk2tei">
     <xsl:element name="orgName">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:author/dbk:email" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:author/dbk:email |  
+                      dbk:info/dbk:authorgroup/dbk:author/dbk:email" mode="hub2tei:dbk2tei">
     <xsl:element name="email">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:author/dbk:uri" mode="hub2tei:dbk2tei" priority="3">
-    <ref><xsl:apply-templates select="@*, dbk:link/@*, node()" mode="#current"/></ref>
+  <xsl:template match="dbk:info/dbk:author/dbk:uri | 
+                      dbk:info/dbk:authorgroup/dbk:author/dbk:uri" mode="hub2tei:dbk2tei" priority="3">
+    <xsl:choose>
+      <xsl:when test="some $att in (@class | @otherclass) satisfies $att = ('orcid', 'doi', 'DOI', 'ISSN', 'ISBN')">
+        <idno><xsl:apply-templates select="@*, node()" mode="#current"/></idno>
+      </xsl:when>
+      <xsl:otherwise>
+        <ref><xsl:apply-templates select="@*, dbk:link/@*, node()" mode="#current"/></ref>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:author/dbk:uri/dbk:link" mode="hub2tei:dbk2tei" priority="3">
+  <xsl:template match="dbk:author/dbk:uri/@class | dbk:author/dbk:uri/@otherclass" mode="hub2tei:dbk2tei" priority="3">
+    <xsl:attribute name="type" select="."/>
+  </xsl:template>
+
+  <xsl:template match="dbk:info/dbk:author/dbk:uri/dbk:link | 
+                       dbk:info/dbk:authorgroup/dbk:author/dbk:uri/dbk:link " mode="hub2tei:dbk2tei" priority="3">
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:author/dbk:address" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:author/dbk:address | 
+                       dbk:info/dbk:authorgroup/dbk:author/dbk:address" mode="hub2tei:dbk2tei">
     <xsl:element name="location">
       <xsl:element name="address">
         <xsl:apply-templates select="@*, node()" mode="#current"/>
