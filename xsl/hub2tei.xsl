@@ -690,13 +690,15 @@
     </div>
   </xsl:template>
   
-   <xsl:template match="dbk:info/dbk:abstract[every $elt in node() satisfies $elt[self::dbk:epigraph]]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:abstract[every $elt in node() satisfies $elt[self::dbk:epigraph]]" mode="hub2tei:dbk2tei">
       <xsl:apply-templates mode="#current"/>
   </xsl:template>
 	
   <xsl:template match="dbk:epigraph" mode="hub2tei:dbk2tei">
     <xsl:choose>
-      <xsl:when test="parent::*[self::dbk:preface | self::dbk:abstract[parent::*[self::dbk:info]]] or preceding-sibling::*[1][self::dbk:title or self::dbk:info]">
+      <xsl:when test="parent::*[self::dbk:preface | self::dbk:abstract[parent::*[self::dbk:info]]] 
+                      or 
+                      (every $pre in preceding-sibling::* satisfies $pre[self::dbk:title or self::dbk:info or self::dbk:epigraph])">
         <epigraph>
           <xsl:apply-templates select="@*, node()" mode="#current"/>
         </epigraph>
