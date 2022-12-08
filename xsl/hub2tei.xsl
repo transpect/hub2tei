@@ -698,7 +698,7 @@
     <xsl:choose>
       <xsl:when test="parent::*[self::dbk:preface | self::dbk:abstract[parent::*[self::dbk:info]]] 
                       or 
-                      (every $pre in preceding-sibling::* satisfies $pre[self::dbk:title or self::dbk:info or self::dbk:epigraph])">
+                      (exists(preceding-sibling::*) and (every $pre in preceding-sibling::* satisfies $pre[self::dbk:title or self::dbk:info or self::dbk:epigraph]))">
         <epigraph>
           <xsl:apply-templates select="@*, node()" mode="#current"/>
         </epigraph>
