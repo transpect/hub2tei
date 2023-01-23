@@ -999,10 +999,12 @@
 
   <xsl:template match="@linkend" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="concat('#', .)"/>
+    <xsl:attribute name="type" select="'xref'"/>
   </xsl:template>
   
   <xsl:template match="@linkends" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="for $i in tokenize(., '\s+') return concat('#', $i)" separator=" "/>
+    <xsl:attribute name="type" select="'xref'"/>
   </xsl:template>
 
 
@@ -1492,11 +1494,17 @@
 
   <xsl:template match="figure | informalfigure | table[every $child in node() satisfies $child[self::mediaobject | self::title]]" mode="hub2tei:dbk2tei" xpath-default-namespace="http://docbook.org/ns/docbook">
     <figure>
-      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="@* except @xlink:href" mode="#current"/>
       <xsl:if test="self::informalfigure[caption] and not(@xml:id)">
         <xsl:attribute name="xml:id" select="concat('IFig_', generate-id())"/>
       </xsl:if>
       <xsl:apply-templates select="title, titleabbrev" mode="#current"/>
+<!--      <xsl:if test="empty((mediaobject/alt, inlinemediaobject/alt, alt)) and @xlink:href">
+        <desc>
+          <!-\- create a link in description for linked images-\->
+          <ref target="{@xlink:href}"/>
+        </desc>
+      </xsl:if>-->
       <xsl:apply-templates select="node() except (title, info)" mode="#current"/>
       <xsl:apply-templates select="info" mode="#current"/>
     </figure>
@@ -1694,6 +1702,12 @@
         <xsl:attribute name="url" select="'inline-svg'"/>
       </xsl:if>      
       <xsl:apply-templates select="imagedata/@css:*, imagedata/*, ../alt" mode="#current"/>
+      <xsl:if test="(..[@xlink:href] or ../..[self::figure|self::table|self::informalfigure|self::informatable][@xlink:href]) and empty(../alt)">
+        <!-- if alt: ref is created there. if there is no alt: create desc and ref-->
+        <desc>
+          <ref target="{(../@xlink:href, ../..[self::figure|self::table|self::informalfigure|self::informatable]/@xlink:href)[1]}"/>
+        </desc>
+      </xsl:if>
     </graphic>
   </xsl:template>
   
@@ -1718,7 +1732,11 @@
   <xsl:template match="alt[parent::mediaobject | parent::inlinemediaobject]" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook">
     <desc>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:if test="..[@xlink:href] or ../..[@xlink:href]">
+        <ref target="{(../@xlink:href, ../../@xlink:href)[1]}"/>
+      </xsl:if>
+      <xsl:apply-templates select="node()" mode="#current"/>
     </desc>
   </xsl:template>
 
