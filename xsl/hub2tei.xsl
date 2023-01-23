@@ -999,12 +999,10 @@
 
   <xsl:template match="@linkend" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="concat('#', .)"/>
-    <xsl:attribute name="type" select="'xref'"/>
   </xsl:template>
   
   <xsl:template match="@linkends" mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="for $i in tokenize(., '\s+') return concat('#', $i)" separator=" "/>
-    <xsl:attribute name="type" select="'xref'"/>
   </xsl:template>
 
 
