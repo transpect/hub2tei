@@ -338,9 +338,15 @@
 
   <xsl:template match="dbk:citation" mode="hub2tei:dbk2tei">
     <!-- Created from bilio refs by citation managers-->
-    <bibl type="citation">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </bibl>
+    <xsl:choose><xsl:when test="..[self::dbk:bibliomisc|self::dbk:bibliomixed]">
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </xsl:when>
+      <xsl:otherwise>
+        <bibl type="citation">
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
+        </bibl>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="dbk:bibliomixed" mode="hub2tei:dbk2tei">
