@@ -213,7 +213,7 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="dbk:info/dbk:biblioid/@class | dbk:info/dbk:author/dbk:uri[not(@class)]/@otherclass | dbk:info/dbk:author/uri/@class" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:info/dbk:biblioid/@class | dbk:orgname/@otherclass | dbk:info/dbk:author/dbk:uri[not(@class)]/@otherclass | dbk:info/dbk:author/uri/@class" mode="hub2tei:dbk2tei">
     <xsl:attribute name="type" select="."/>
   </xsl:template>
 
