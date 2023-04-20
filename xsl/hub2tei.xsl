@@ -1072,6 +1072,10 @@
   <xsl:variable name="hub:default-textbox-type" as="xs:string" select="'Textbox'"/>
 
 	<xsl:template match="dbk:informaltable[hub2tei:conditions-to-dissolve-box-table(.)][parent::*[matches(@role, $hub:default-textbox-type)]]" priority="3" mode="hub2tei:dbk2tei">
+	  <xsl:variable name="sorted-tgroup-parts" as="element()+"
+             	   select="dbk:tgroup/dbk:thead,
+                    	    dbk:tgroup/dbk:tbody,
+                    	    dbk:tgroup/dbk:tfoot"/>
 		<xsl:apply-templates select=".//dbk:entry/*" mode="#current"/>
 	</xsl:template>
 	
@@ -1089,7 +1093,11 @@
       <body>
         <xsl:choose>
           <xsl:when test="dbk:tgroup/*/dbk:row[dbk:entry/dbk:para[matches(@role, $tei:box-head1-role-regex)]]">
-            <xsl:variable name="contents" select="dbk:tgroup/*/dbk:row/dbk:entry/node()" as="node()*"/>
+            <xsl:variable name="sorted-tgroup-parts" as="element()+"
+                          select="dbk:tgroup/dbk:thead,
+                                  dbk:tgroup/dbk:tbody,
+                                  dbk:tgroup/dbk:tfoot"/>
+            <xsl:variable name="contents" select="$sorted-tgroup-parts/dbk:row/dbk:entry/node()" as="node()*"/>
             <xsl:for-each-group select="$contents" group-starting-with="dbk:para[matches(@role, $tei:box-head1-role-regex)]">
             <xsl:variable name="head" select="current-group()[dbk:para[matches(@role, $tei:box-head1-role-regex)]]" as="element(dbk:para)?"/>  
               <div1>
