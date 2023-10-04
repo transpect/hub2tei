@@ -1816,8 +1816,8 @@
             	</xsl:if>
               <xsl:for-each select="entry">
                 <xsl:variable name="cols" as="xs:integer" 
-                              select="  xs:integer(replace(@nameend, '[a-z]+', '')) 
-                                      - xs:integer(replace(@namest,  '[a-z]+', '')) 
+                              select="  xs:integer((replace(@nameend, '[a-z]+', '')[normalize-space()], 0)[1]) 
+                                      - xs:integer((replace(@namest,  '[a-z]+', '')[normalize-space()], 0)[1]) 
                                       + 1"/>
                 <cell>
                   <xsl:if test="@namest">
