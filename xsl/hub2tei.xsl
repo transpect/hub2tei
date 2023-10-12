@@ -912,11 +912,9 @@
   </xsl:template>
 
   <xsl:template match="@sortas" mode="hub2tei:dbk2tei">
-    <xsl:attribute name="sortKey" select="."/>
+    <xsl:attribute name="sortKey" select="replace(., '[\p{Z}\p{C}]', '_')"/>
+    <!--https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-teidata.word.html-->
   </xsl:template>
-
-
-
 
   <xsl:template match="@renderas" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rend" select="."/>
