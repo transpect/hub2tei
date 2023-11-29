@@ -637,6 +637,16 @@
     </formula>
   </xsl:template>
   
+  <!-- HUB 1.1 programlisting-->
+<!--  <xsl:template match="dbk:programlisting" mode="hub2tei:dbk2tei" priority="2">
+    <floatingText type="{local-name()}">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <body>
+        <xsl:apply-templates select="node()" mode="#current"/>
+      </body>
+    </floatingText>
+  </xsl:template>-->
+  
   <xsl:variable name="hub:equation-counter-style-regex" select="'letex_equation_counter'" as="xs:string"/>
   
   <xsl:template match="dbk:mathphrase" mode="hub2tei:dbk2tei">
@@ -945,7 +955,7 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="dbk:para | dbk:simpara" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para | dbk:simpara | dbk:programlisting/dbk:line" mode="hub2tei:dbk2tei">
     <p>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </p>
@@ -1226,6 +1236,7 @@
   <xsl:template match="dbk:sidebar[   matches(@role, $tei:floatingTexts-role)
                                    or tokenize(@remap, '\s') = ('hub:para-background', 'hub:para-border')] 
                       |dbk:div[matches(@role, $tei:floatingTexts-role)]
+                      |dbk:programlisting (:HUB 1.1 programlisting :)
                       |dbk:div[@role = 'drama']
                               [exists(preceding-sibling::*[not(name() = ('dbk:div', 
                                                                          'dbk:section', 
@@ -1301,7 +1312,7 @@
                                  then 'source'
                           else if(matches($role, $tei:letter-style-role))
                                  then 'letter'
-                          else if(matches($role, $tei:code-style-role))
+                          else if(matches($role, $tei:code-style-role) or $box/local-name() = 'programlisting')
                                  then 'code'
                           else        replace($role, '(_-_|\s).*$', '')"/>
   </xsl:function>
