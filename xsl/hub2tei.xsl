@@ -1275,7 +1275,8 @@
     </floatingText>
   </xsl:template>
 
-  <xsl:template match="dbk:para[matches(@role, $tei:box-head1-role-regex) or matches(@role, $tei:box-head2-role-regex)]" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:para[matches(@role, $tei:box-head1-role-regex) or matches(@role, $tei:box-head2-role-regex)]
+                               [not(ancestor::*:table or ancestor::*:table[1][hub2tei:conditions-to-dissolve-box-table(.)])]" mode="hub2tei:dbk2tei">
     <head>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:apply-templates select="node()" mode="#current"/>
