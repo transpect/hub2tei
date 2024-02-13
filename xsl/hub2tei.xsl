@@ -773,7 +773,7 @@
     </xsl:if>
   </xsl:template>
   
-  <xsl:template match="dbk:bibliography[dbk:biblioentry | dbk:bibliomixed]" mode="hub2tei:dbk2tei" priority="5">
+  <xsl:template match="dbk:bibliography[dbk:biblioentry | dbk:bibliomixed | dbk:para]" mode="hub2tei:dbk2tei" priority="5">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
       <div>
