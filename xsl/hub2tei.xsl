@@ -1708,8 +1708,11 @@
                                              then string-join((imagedata/@depth,'pt'),'') 
                                              else imagedata/@depth"/>
       </xsl:if>
-      <xsl:if test="parent::*/@role  or @condition">
-        <xsl:attribute name="rend" select="string-join((parent::*/@role, @condition), ' ')"/>
+      <xsl:if test="parent::*/@role  or @condition[. ne 'artifact']">
+        <xsl:attribute name="rend" select="string-join((parent::*/@role, tokenize(@condition, '\p{Zs}+')[. ne 'artifact']), ' ')"/>
+      </xsl:if>
+      <xsl:if test="@condition[hub2tei:contains-token(., 'artifact')]">
+        <xsl:attribute name="type" select="'artifact'"/>
       </xsl:if>
       <xsl:variable name="srcpaths" select="if(position() eq 1 or count(parent::*/imageobject) eq 1) then parent::*/@srcpath else (),
                                             @srcpath, 
