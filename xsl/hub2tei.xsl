@@ -876,8 +876,8 @@
   </xsl:template>
 
   <xsl:template match="dbk:indexterm/@class[. = 'startofrange']" mode="hub2tei:dbk2tei">
-    <xsl:variable name="end" as="element(dbk:indexterm)" select="key('hub2tei:linking-item-by-id', ../@xml:id)"/>
-    <xsl:attribute name="spanTo" select="concat('ite_', $end/generate-id())"/>
+    <xsl:variable name="end" as="element(dbk:indexterm)?" select="key('hub2tei:linking-item-by-id', ../@xml:id)"/>
+    <xsl:attribute name="spanTo" select="concat('ite_', if ($end) then $end/generate-id() else 'missing-endrange')"/>
   </xsl:template>
 
   <xsl:template match="dbk:indexterm/@type" mode="hub2tei:dbk2tei">
