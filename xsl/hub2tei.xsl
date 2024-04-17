@@ -1324,6 +1324,12 @@
     </quote>
   </xsl:template>
 
+  <xsl:template match="dbk:attribution" mode="hub2tei:dbk2tei">
+    <bibl type="source">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </bibl>
+  </xsl:template>
+  
   <xsl:template match="dbk:itemizedlist | dbk:orderedlist | dbk:variablelist | dbk:glosslist" mode="hub2tei:dbk2tei">
     <list>
       <xsl:attribute name="type">
