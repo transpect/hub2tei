@@ -11,13 +11,15 @@
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:b64="net.sf.saxon.value.Base64BinaryValue"
                 xmlns:mml="http://www.w3.org/1998/Math/MathML"
+                xmlns:tr="http://transpect.io"
                 xmlns="http://www.tei-c.org/ns/1.0" 
-                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx html tei b64 mml" 
+                exclude-result-prefixes="dbk hub2tei hub xlink css xs cx html tei b64 mml tr" 
                 version="2.0">
 
   <!-- see also docbook to tei:
        http://svn.le-tex.de/svn/ltxbase/DBK2TEI -->
   <xsl:import href="http://transpect.io/xslt-util/cals2htmltable/xsl/cals2htmltables.xsl"/>
+  <xsl:import href="http://transpect.io/xslt-util/flat-list-to-tree/xsl/flat-list-to-tree.xsl"/>
   
   <xsl:param name="debug" select="'no'" as="xs:string?"/>
   <xsl:param name="debug-dir-uri" select="'debug'" as="xs:string"/>
@@ -760,6 +762,7 @@
                       |dbk:glossary
                       |dbk:bibliography[dbk:bibliodiv][not(dbk:biblioentry | dbk:biblomixed)] 
                       |dbk:bibliodiv[dbk:para | dbk:simpara]
+                      |dbk:indexdiv
                       " mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
@@ -822,8 +825,6 @@
     <xsl:copy/>
     <xsl:attribute name="subtype" select="'glossary'"/>
   </xsl:template>
-  
-
 
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
@@ -833,7 +834,7 @@
        <xsl:call-template name="determine-index-type"/>
         <!-- If dbk:info carries a role such as p_h1_appendix_group, it may be used for later class calculation: -->
        <xsl:apply-templates select="dbk:info/@role[1]" mode="#current"/>
-       <xsl:apply-templates select="@*, node()" mode="#current"/>
+       <xsl:apply-templates select="@* except @type, node()" mode="#current"/>
      </xsl:element>
     </xsl:if>
   </xsl:template>
@@ -925,7 +926,101 @@
     <xsl:attribute name="sortKey" select="replace(., '[\p{Z}\p{C}]', '_')"/>
     <!--https://tei-c.org/release/doc/tei-p5-doc/en/html/ref-teidata.word.html-->
   </xsl:template>
+  
+  <!-- static index list example: -->
+  <!-- <indexdiv>
+         <title>A</title>
+         <indexentry>
+            <primaryie>Asthenosphäre, <xref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="page-23"/>
+            </primaryie>
+         </indexentry>
+         <indexentry>
+            <primaryie>Atmosphäre, <xref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="page-12"/>
+            </primaryie>
+            <secondaryie>Ionosphäre, <xref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="page-14"/>
+            </secondaryie>
+            <tertiaryie>D‑Schicht, <xref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="page-10"/>
+            </tertiaryie>
+            <tertiaryie>E‑Schicht, <xref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="page-8"/>
+            </tertiaryie>
+            <quaternaryie>Kennelly‐Heaviside‐Schicht, <xref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="page-6"/>
+            </quaternaryie>-->
+  <xsl:variable name="hub2tei:static-index-entry-names" select="('primaryie', 'secondaryie', 'tertiaryie', 'quaternaryie')" as="xs:string+"/>
+  
+  <xsl:template match="dbk:indexdiv/dbk:indexentry" mode="hub2tei:dbk2tei" priority="3">
+    <!-- it might be useful to group these into lists (https://tei-c.org/release/doc/tei-p5-doc/en/html/CO.html#CONOIX). no financing yet.-->
 
+    
+    <xsl:for-each-group select="node()" group-adjacent="local-name() = $hub2tei:static-index-entry-names">
+      <xsl:choose>
+        <xsl:when test="current-grouping-key()">
+          
+          <xsl:variable name="prepared-entries" as="node()*">
+            <xsl:apply-templates select="current-group()" mode="prepare-static-index-entry"/>
+          </xsl:variable>
+          <xsl:variable name="index-list" select="tr:flat-list-to-tree($prepared-entries, 
+                                                                      1, 
+                                                                      max(for $a in distinct-values($prepared-entries//@rend) return xs:integer(replace($a, '^ie', ''))), 
+                                                                      QName('http://www.tei-c.org/ns/1.0', 'list'), 
+                                                                      'rend', 
+                                                                      'ie')"/>
+          <xsl:apply-templates select="$index-list" mode="patch-index-list"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="current-group()" mode="#current"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each-group>
+    
+  </xsl:template>
+  
+  <xsl:template match="tei:item[following-sibling::*[1][self::tei:list][tei:item]]" mode="patch-index-list">
+    <xsl:variable name="next-ol" select="following-sibling::*[1][self::tei:list][tei:item]" as="element(tei:list)"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:if test="$next-ol">
+        <list type="index-list">
+          <xsl:apply-templates select="$next-ol/@*, $next-ol/tei:*" mode="#current"/>
+        </list>  
+      </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="tei:list" mode="patch-index-list">
+    <xsl:choose>
+      <xsl:when test="count(*) eq 1 and tei:list">
+        <xsl:apply-templates mode="#current"/>
+      </xsl:when>
+      <xsl:when test="not(preceding-sibling::*[1][self::tei:item])">
+        <xsl:copy>
+          <xsl:apply-templates select="@*" mode="#current"/>
+          <xsl:attribute name="type" select="'indexlist'"/>
+          <xsl:apply-templates select="node()" mode="#current"/>
+        </xsl:copy>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="@*|*" mode="patch-index-list">
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
+<!--  
+  <xsl:template match="html:ol/html:ol" mode="clean-up">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>-->
+  
+  <xsl:template match="dbk:indexdiv/dbk:indexentry/*[local-name() = $hub2tei:static-index-entry-names]" mode="prepare-static-index-entry">
+    <!-- it might be useful to group these into lists (https://tei-c.org/release/doc/tei-p5-doc/en/html/CO.html#CONOIX). no financing yet.-->
+    <item rend="{concat('ie', index-of($hub2tei:static-index-entry-names, local-name()))}"> 
+      <p rend="{concat('ie', index-of($hub2tei:static-index-entry-names, local-name()))}">
+        <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
+      </p>
+    </item>
+  </xsl:template>
+  
   <xsl:template match="@renderas" mode="hub2tei:dbk2tei">
     <xsl:attribute name="rend" select="."/>
   </xsl:template>
