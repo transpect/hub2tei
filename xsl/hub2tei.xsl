@@ -847,6 +847,9 @@
       <xsl:when test="@role[normalize-space()]">
         <xsl:attribute name="subtype" select="@role"/>
       </xsl:when>
+      <xsl:when test="@type[normalize-space()]">
+        <xsl:attribute name="subtype" select="@type"/>
+      </xsl:when>
       <xsl:when test="normalize-space($hub:fallback-index-type)">
         <xsl:attribute name="subtype" select="$hub:fallback-index-type"/>
       </xsl:when>
