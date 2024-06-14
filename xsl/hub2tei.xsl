@@ -1004,16 +1004,17 @@
     </xsl:choose>
   </xsl:template>
   
-  <xsl:template match="@*|*" mode="patch-index-list">
+  <xsl:template match="@*|*" mode="patch-index-list prepare-static-index-entry">
     <xsl:copy>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
   
-<!--  
-  <xsl:template match="html:ol/html:ol" mode="clean-up">
-    <xsl:apply-templates mode="#current"/>
-  </xsl:template>-->
+  <xsl:template match="dbk:xref" mode="prepare-static-index-entry">
+    <ref target="#{@xlink:href}" type="page">
+      <xsl:value-of select="replace(@xlink:href, '^page-', '')"/>
+    </ref>
+  </xsl:template>
   
   <xsl:template match="dbk:indexdiv/dbk:indexentry/*[local-name() = $hub2tei:static-index-entry-names]" mode="prepare-static-index-entry">
     <!-- it might be useful to group these into lists (https://tei-c.org/release/doc/tei-p5-doc/en/html/CO.html#CONOIX). no financing yet.-->
