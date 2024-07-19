@@ -1106,7 +1106,7 @@
 
   <xsl:template match="dbk:link/@remap" mode="hub2tei:dbk2tei"/>
 
-  <xsl:template match="@xlink:title " mode="hub2tei:dbk2tei">
+  <xsl:template match="@xlink:title " mode="hub2tei:dbk2tei"/>
    
   <xsl:template match="@xlink:href " mode="hub2tei:dbk2tei">
     <xsl:attribute name="target" select="."/>
