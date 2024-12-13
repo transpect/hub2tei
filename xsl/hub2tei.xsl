@@ -291,16 +291,17 @@
     </table>
   </xsl:template>
   
-  <xsl:template match="*:tbody" mode="hub2tei:dbk2tei">
+  <xsl:template match="html:tbody" mode="hub2tei:tidy">
     <!-- resort tfoot for valid TEI data -->
-    <xsl:apply-templates select="../*:tfoot" mode="#current">
-      <xsl:with-param name="resort-tfoot" select="true()" tunnel="yes"  as="xs:boolean"/>
+    <xsl:apply-templates select="../html:tfoot" mode="#current">
+      <xsl:with-param name="resort-tfoot" select="true()" tunnel="yes" as="xs:boolean"/>
     </xsl:apply-templates>
     <xsl:next-match/>
   </xsl:template>
   
-  <xsl:template match="*:foot" mode="hub2tei:dbk2tei">
+  <xsl:template match="html:tfoot" mode="hub2tei:tidy">
     <xsl:param name="resort-tfoot" tunnel="yes" as="xs:boolean?"/>
+    <xsl:message select="'--',$resort-tfoot"/>
     <xsl:if test="$resort-tfoot">
       <xsl:next-match/>
     </xsl:if>
