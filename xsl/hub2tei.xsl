@@ -291,6 +291,20 @@
     </table>
   </xsl:template>
   
+  <xsl:template match="*:tbody" mode="hub2tei:dbk2tei">
+    <!-- resort tfoot for valid TEI data -->
+    <xsl:apply-templates select="../*:tfoot" mode="#current">
+      <xsl:with-param name="resort-tfoot" select="true()" tunnel="yes"  as="xs:boolean"/>
+    </xsl:apply-templates>
+    <xsl:next-match/>
+  </xsl:template>
+  
+  <xsl:template match="*:foot" mode="hub2tei:dbk2tei">
+    <xsl:param name="resort-tfoot" tunnel="yes" as="xs:boolean?"/>
+    <xsl:if test="$resort-tfoot">
+      <xsl:next-match/>
+    </xsl:if>
+  </xsl:template>
   
   <xsl:template match="*:table/@rendition[matches(., '^.+?\.(jpe?g|tiff?|png|eps|ai)', 'i')]" mode="hub2tei:dbk2tei" priority="2">
     <xsl:attribute name="{name()}" select="string-join(for $image in tokenize(., ' ') return hub2tei:image-path($image, root(.)), ' ')"/>
