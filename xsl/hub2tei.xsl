@@ -844,7 +844,7 @@
   <xsl:template match="dbk:index" mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
     <xsl:if test="not(some $e in $exclude satisfies (. is $e))">
-      <xsl:element name="{if (descendant::dbk:para[not(ancestor::dbk:sidebar[@remap eq 'HiddenText'])]) then 'div' else 'divGen'}">
+      <xsl:element name="{if (descendant::*[self::dbk:para|self::dbk:indexentry|dbk:indexdiv][not(ancestor::dbk:sidebar[@remap eq 'HiddenText'])]) then 'div' else 'divGen'}">
        <xsl:attribute name="type" select="name()"/>
        <xsl:call-template name="determine-index-type"/>
         <!-- If dbk:info carries a role such as p_h1_appendix_group, it may be used for later class calculation: -->
@@ -1025,7 +1025,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="dbk:xref" mode="prepare-static-index-entry">
+  <xsl:template match="dbk:xref" mode="hub2tei:dbk2tei">
     <ref target="#{@xlink:href}" type="page">
       <xsl:value-of select="replace(@xlink:href, '^page-', '')"/>
     </ref>
@@ -1035,7 +1035,7 @@
     <!-- it might be useful to group these into lists (https://tei-c.org/release/doc/tei-p5-doc/en/html/CO.html#CONOIX). no financing yet.-->
     <item rend="{concat('ie', index-of($hub2tei:static-index-entry-names, local-name()))}"> 
       <p rend="{concat('ie', index-of($hub2tei:static-index-entry-names, local-name()))}">
-        <xsl:apply-templates select="@* except @role, node()" mode="#current"/>
+        <xsl:apply-templates select="@* except @role, node()" mode="hub2tei:dbk2tei"/>
       </p>
     </item>
   </xsl:template>
