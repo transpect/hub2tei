@@ -1881,13 +1881,40 @@
     xpath-default-namespace="http://docbook.org/ns/docbook">
     <desc>
       <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:if test="not(@annotations)">
+        <!-- if annotations: XMP metadata alt text is additionally given. if remap="fromXMP": alt is from XMP, no other alt text given-->
+        <xsl:apply-templates select="@remap" mode="hub2tei:dbk2tei_alt"/>
+      </xsl:if>
       <xsl:if test="..[@xlink:href] or ../..[@xlink:href]">
         <ref target="{(../@xlink:href, ../../@xlink:href)[1]}"/>
       </xsl:if>
       <xsl:apply-templates select="node()" mode="#current"/>
     </desc>
+    <!--handle XMP meta as own desc tag-->
+    <xsl:apply-templates select="." mode="hub2tei:dbk2tei_alt"/>
   </xsl:template>
 
+  <xsl:template match="*" priority="-0.5" mode="hub2tei:dbk2tei_alt"/>
+  
+  <xsl:template match="@*" priority="-0.5" mode="hub2tei:dbk2tei_alt">
+    <xsl:apply-templates select="." mode="hub2tei:dbk2tei"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:alt[parent::dbk:mediaobject | parent::dbk:inlinemediaobject][@annotations]" priority="3"
+    mode="hub2tei:dbk2tei_alt">
+    <!-- XMP source -->
+    <desc>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:value-of select="@annotations"/>
+    </desc>
+  </xsl:template>
+  
+    <xsl:template match="dbk:alt[parent::dbk:mediaobject | parent::dbk:inlinemediaobject]/@remap" priority="3"
+    mode="hub2tei:dbk2tei_alt">
+    <!-- XMP source -->
+    <xsl:attribute name="type" select="."/>
+  </xsl:template>
+  
   <xsl:template match="textobject[parent::mediaobject | parent::inlinemediaobject]" mode="hub2tei:dbk2tei" 
     xpath-default-namespace="http://docbook.org/ns/docbook">
     <!-- Assumption: only inline content in the textobject. If there is block-level content, we’d probably have to 
