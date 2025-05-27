@@ -776,7 +776,7 @@
                       |dbk:acknowledgements
                       |dbk:glossary
                       |dbk:bibliography[dbk:bibliodiv][not(dbk:biblioentry | dbk:biblomixed)] 
-                      |dbk:bibliodiv[dbk:para | dbk:simpara]
+                      |dbk:bibliodiv[dbk:para | dbk:simpara | dbk:bibliodiv]
                       |dbk:indexdiv
                       " mode="hub2tei:dbk2tei">
     <xsl:param name="exclude" tunnel="yes" as="element(*)*"/>
